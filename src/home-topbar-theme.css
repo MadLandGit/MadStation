@@ -1,0 +1,228 @@
+/* Theme-faithful homepage chrome and icon-only secondary actions.
+   Loaded after each theme's own stylesheet so shared header treatments
+   remain consistent with each theme's surfaces without replacing its identity. */
+
+/* Simple: clean, softly elevated top bar and an accent-aware input. */
+body[data-home-style="simple"] header.bar {
+  width: auto;
+  margin: 32px clamp(12px, 2vw, 28px) 0;
+  padding: 12px clamp(14px, 2vw, 24px);
+  border: 1px solid var(--v5-border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--v5-surface) 84%, transparent);
+  box-shadow: 0 12px 32px rgb(0 0 0 / .10);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+body[data-home-style="simple"] .search input {
+  background: color-mix(in srgb, var(--v5-surface) 94%, var(--v5-base-bg));
+  border-color: var(--v5-border);
+  border-radius: var(--ms-home-search-radius, 12px);
+}
+body[data-home-style="simple"] .search:focus-within input {
+  border-color: var(--v5-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--v5-accent) 18%, transparent);
+}
+body[data-home-style="simple"] #homeCustomizeBtn,
+body[data-home-style="simple"] #launcherSettingsBtn {
+  color: var(--ms-home-control-fg, var(--v5-text));
+  background: var(--ms-home-control-bg, var(--v5-surface));
+  border-color: var(--ms-home-control-border, var(--v5-border));
+  box-shadow: var(--ms-home-control-shadow, none);
+  -webkit-backdrop-filter: var(--ms-home-control-blur, none);
+  backdrop-filter: var(--ms-home-control-blur, none);
+}
+body[data-home-style="simple"] #homeCustomizeBtn:hover,
+body[data-home-style="simple"] #launcherSettingsBtn:hover {
+  color: var(--ms-home-control-fg, var(--v5-text));
+  background: var(--ms-home-control-hover-bg, var(--v5-surface));
+  border-color: var(--v5-accent);
+}
+body[data-home-style="simple"] .actions #homeCustomizeBtn {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 12px;
+}
+
+/* 3D Parallax and Big App: retain the frosted HUD surface without a theme-local search capsule. */
+body[data-home-style="parallax"] .top,
+body[data-home-style="parallax-big"] .top {
+  border: 1px solid color-mix(in srgb, var(--v3-line, var(--edge)) 72%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--glass) 96%, transparent);
+  box-shadow: 0 16px 38px -28px var(--a);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
+}
+body[data-home-style="parallax"] .top::before,
+body[data-home-style="parallax-big"] .top::before {
+  inset: 0;
+  border-radius: inherit;
+  background: transparent;
+}
+body[data-home-style="parallax-jungle"] #changeMainBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0;
+  gap: 0;
+  border-radius: var(--ms-home-control-radius, 12px);
+  border: 1px solid var(--ms-home-control-border, var(--edge, var(--line)));
+  background: var(--ms-home-control-bg, var(--glass));
+  color: var(--ms-home-control-fg, var(--muted));
+  box-shadow: var(--ms-home-control-shadow, none);
+}
+body[data-home-style="parallax-jungle"] #changeMainBtn svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+  stroke: none;
+}
+body[data-home-style="parallax-jungle"] #changeMainBtn:hover {
+  border-color: var(--a, var(--accent));
+  color: var(--text, #fff);
+  transform: translateY(-1px);
+}
+
+/* Retro: sharp phosphor controls, square pixel-edged search and Change Main. */
+body[data-home-style="retro"] .top {
+  border-bottom: 2px solid var(--line);
+  background: linear-gradient(var(--bg) 52%, color-mix(in srgb, var(--panel) 90%, transparent));
+}
+body[data-home-style="retro"] .cmd {
+  border-color: var(--line);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ph) 10%, transparent);
+}
+body[data-home-style="retro"] .cmd:hover,
+body[data-home-style="retro"] .cmd:focus-visible {
+  border-color: var(--ph);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ph) 22%, transparent);
+}
+/* Theme-owned button surfaces: use the same materials as each page's primary cards. */
+body[data-home-style="simple"] .actions #homeCustomizeBtn,
+body[data-home-style="simple"] .actions #launcherSettingsBtn {
+  border: 1px solid var(--v5-border);
+  border-radius: 24px;
+  background: linear-gradient(165deg, var(--v5-surface), color-mix(in srgb, var(--v5-surface) 82%, var(--v5-base-bg)));
+  color: var(--v5-text);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: border-color .2s, box-shadow .2s, transform .2s, color .2s;
+}
+body[data-home-style="simple"] .actions #homeCustomizeBtn:hover,
+body[data-home-style="simple"] .actions #launcherSettingsBtn:hover {
+  border-color: color-mix(in srgb, var(--v5-accent) 55%, var(--v5-border));
+  background: linear-gradient(165deg, var(--v5-surface), color-mix(in srgb, var(--v5-surface) 82%, var(--v5-base-bg)));
+  color: var(--v5-text);
+  box-shadow: 0 12px 24px -20px var(--v5-accent);
+  transform: translateY(-1px);
+}
+
+/* 3D Parallax Big App toolbar actions use the same layered card material as
+   Image Hub / Prompt Studio tiles, instead of inheriting the primary CTA's blue fill. */
+body[data-home-style="parallax-big"] #homeCustomizeBtn,
+body[data-home-style="parallax-big"] #launcherSettingsBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  border: 1px solid var(--ms-home-panel-border, var(--edge, var(--line)));
+  border-radius: var(--ms-home-control-radius, 12px);
+  background: linear-gradient(165deg, var(--s1), color-mix(in srgb, var(--s1) 78%, var(--bg)));
+  color: var(--v3-text, var(--text));
+  box-shadow: inset 0 1px rgb(255 255 255 / .045), 0 8px 20px -16px rgba(0,0,0,.5);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+}
+body[data-home-style="parallax-big"] #homeCustomizeBtn:hover,
+body[data-home-style="parallax-big"] #launcherSettingsBtn:hover {
+  border-color: color-mix(in srgb, var(--a) 48%, var(--ms-home-panel-border, var(--edge, var(--line))));
+  background: linear-gradient(165deg, color-mix(in srgb, var(--s1) 94%, var(--a) 6%), color-mix(in srgb, var(--s1) 72%, var(--bg)));
+  color: var(--v3-text, var(--text));
+  box-shadow: var(--ms-home-panel-shadow, 0 10px 24px -20px var(--a));
+  transform: translateY(-1px);
+}
+body[data-home-style="parallax-big"] #homeCustomizeBtn svg,
+body[data-home-style="parallax-big"] #launcherSettingsBtn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Jungle's selector is an organic leaf badge rather than a star on a square. */
+body[data-home-style="parallax-jungle"] #changeMainBtn.icon-only-main {
+  width: 44px;
+  min-width: 44px;
+  height: 40px;
+  padding: 0;
+  border-radius: 48% 38% 48% 38% / 56% 42% 58% 44%;
+  border-color: color-mix(in srgb, var(--a) 48%, var(--line));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--a) 14%, var(--glass)), var(--glass));
+  color: var(--a);
+  box-shadow: inset 0 1px rgb(255 255 255 / .06), 0 8px 22px rgb(0 0 0 / .12);
+}
+body[data-home-style="parallax-jungle"] #changeMainBtn.icon-only-main svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body[data-home-style="parallax-jungle"] #changeMainBtn.icon-only-main:hover {
+  border-color: var(--a);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--a) 22%, var(--glass)), var(--glass));
+  color: var(--text);
+}
+
+
+/* Use native focus-visible affordances on all icon-only actions, even in retro themes. */
+#homeCustomizeBtn:focus-visible,
+.icon-only-main:focus-visible {
+  outline-offset: 3px;
+}
+
+/* The Simple homepage uses the compact header layout rather than a search slot. */
+body[data-home-style="simple"] header.bar > .search {
+  display: none !important;
+}
+
+/* Keep the Simple header aligned without a reserved search column. */
+body[data-home-style="simple"] header.bar {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+body[data-home-style="claymorphism"] .dock {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+body[data-home-style="parallax"] .top,
+body[data-home-style="parallax-big"] .top,
+body[data-home-style="parallax-jungle"] .top {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+@media (max-width: 899px) {
+  body[data-home-style="parallax"] .top,
+  body[data-home-style="parallax-big"] .top,
+  body[data-home-style="parallax-jungle"] .top {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+@media (max-width: 820px) {
+  body[data-home-style="claymorphism"] .dock {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}

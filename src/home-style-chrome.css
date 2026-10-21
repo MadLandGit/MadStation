@@ -1,0 +1,76 @@
+/* Native window dragging is consistent across every isolated homepage theme.
+   Buttons, links and form controls remain click targets rather than draggable surfaces. */
+body[data-home-style] :is(header.top, header.bar, header.topbar, .top, .topbar) {
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+body[data-home-style] :is(header.top, header.bar, header.topbar, .top, .topbar) :is(button, a, input, select, textarea, summary, [role="button"], [role="link"], [tabindex], [contenteditable="true"]) {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+/* Galaxy has an independent top-level brand rather than a shared header wrapper. */
+body[data-home-style="galaxy"] .brand {
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+/* Retro Complex has a physical monitor chin instead of a conventional page header. */
+body[data-home-style="retro-complex"] .chin {
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+body[data-home-style="retro-complex"] .chin :is(button, a, input, select, textarea, summary, [role="button"], [role="link"], [tabindex], [contenteditable="true"], [role="dialog"], [role="menu"], [role="menuitem"]) {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+body[data-home-style="galaxy"] #launcherSettingsBtn,
+body[data-home-style="galaxy"] #themeBtn {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+/* Shared homepage chrome: keep the app window controls clear without restyling each theme. */
+:root { --home-window-chrome-height: 42px; }
+body[data-home-style="retro"] .top,
+body[data-home-style="retro-complex"] .top,
+body[data-home-style="parallax-jungle"] .top,
+body[data-home-style="claymorphism"] .top,
+body[data-home-style="glass"] .top {
+  padding-top: var(--home-window-chrome-height) !important;
+}
+/* Simple keeps its own title-bar reserve; Parallax gets the shared native chrome offset below. */
+body[data-home-style="simple"] .bar,
+body[data-home-style="parallax"] .top { padding-top: 14px; }
+/* Keep the Parallax HUD card itself clear of the native title-bar buttons. */
+body[data-home-style="parallax"] .top {
+  top: var(--home-window-chrome-height) !important;
+  margin-top: var(--home-window-chrome-height) !important;
+}
+/* Big App's header is a floating card, not a full-bleed top edge. */
+body[data-home-style="parallax-big"] .top {
+  top: var(--home-window-chrome-height) !important;
+  margin-top: var(--home-window-chrome-height) !important;
+  padding-top: 14px !important;
+  width: min(1280px, calc(100% - 32px));
+}
+/* Galaxy has an absolute brand, so keep it below native window chrome. */
+body[data-home-style="galaxy"] .brand { top: var(--home-window-chrome-height) !important; }
+/* Day/Night is managed from the main-screen quick controls. Keep the legacy target hidden
+   for compatibility, and never show a second theme toggle beside Settings. */
+#themeBtn:not([data-theme-quick-trigger]) { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+/* Header controls remain above theme decoration without changing their native positioning. */
+#launcherSettingsBtn { z-index: 40; }
+@media (max-width: 600px) {
+  body[data-home-style="retro"] .top,
+  body[data-home-style="retro-complex"] .top,
+  body[data-home-style="parallax-jungle"] .top,
+  body[data-home-style="claymorphism"] .top,
+  body[data-home-style="glass"] .top { padding-top: 38px !important; }
+  body[data-home-style="parallax-big"] .top { width: calc(100% - 24px); }
+}
+
+/* Duplicate system/time chips stay hidden in the header while their IDs remain available to legacy telemetry handlers. */
+header.top .chip[hidden],
+header.bar .chip[hidden],
+.topbar .status-chip[hidden] {
+  display: none !important;
+}

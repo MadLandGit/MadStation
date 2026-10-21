@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https: file:; font-src 'self'; connect-src 'none'; frame-src 'self' file:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" http-equiv="Content-Security-Policy"/>
+<title>Mad Station</title>
+<link href="styles.css" rel="stylesheet"/>
+<link href="design-tokens.css" rel="stylesheet"/>
+<link href="design-kit.css" rel="stylesheet"/>
+<link href="home.css" rel="stylesheet"/>
+<link href="pages.css" rel="stylesheet"/>
+<link href="developer-visual-debug.css" rel="stylesheet"/>
+</head>
+<body data-theme="dark">
+<div class="home-startup-loading" id="homeStartupLoadingScreen" role="status" aria-live="polite" aria-label="Loading your saved homepage">
+  <div class="home-startup-loading-card">
+    <span class="home-startup-loading-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none"><path d="M16 3.5 27.5 10v12L16 28.5 4.5 22V10L16 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10.5 21V12l5.5 5.2 5.5-5.2v9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <strong class="home-startup-loading-title">MAD STATION</strong>
+    <span class="home-startup-loading-message">Preparing your workspace</span>
+    <span class="home-startup-loading-spinner" aria-hidden="true"></span>
+  </div>
+</div>
+<div class="app-shell" id="appShell">
+<main class="home-screen" id="launcherScreen" aria-label="Mad Station home">
+  <div class="home-bg" aria-hidden="true">
+    <span class="home-bg-glow home-bg-glow--core"></span>
+    <span class="home-bg-glow home-bg-glow--cool"></span>
+    <span class="home-bg-glow home-bg-glow--violet"></span>
+    <span class="home-bg-grid"></span>
+    <span class="home-bg-stars"></span>
+    <span class="home-bg-stars home-bg-stars--b"></span>
+    <span class="home-bg-word">MAD STATION</span>
+  </div>
+
+  <header class="home-topbar" aria-label="Mad Station main page">
+    <div class="home-brand" aria-label="Mad Station">
+      <span class="home-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><defs><linearGradient id="homeMarkGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse"><stop class="home-stop-a"/><stop offset="1" class="home-stop-b"/></linearGradient></defs><path d="M16 3.5 27.5 10v12L16 28.5 4.5 22V10L16 3.5Z" stroke="url(#homeMarkGrad)" stroke-width="1.6" stroke-linejoin="round" opacity=".85"/><path d="M10.5 21V12l5.5 5.2L21.5 12v9" stroke="url(#homeMarkGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="3.5" r="1.7" fill="var(--accent)"/></svg>
+      </span>
+      <span class="home-brand-text">
+        <span class="home-brand-name"><b>Mad</b> Station</span>
+        <span class="home-brand-tag">Personal AI workspace</span>
+      </span>
+    </div>
+    <div class="home-topbar-actions" aria-label="Home controls">
+<div id="homeStyleQuickAccess" class="home-style-quick-access" data-host-legacy="true" aria-label="Homepage quick access" hidden>
+  <button id="homeQuickControlsButton" class="home-style-quick-button home-quick-controls-button" type="button" aria-label="Quick Access" aria-haspopup="dialog" aria-expanded="false" aria-controls="homeQuickControlsMenu" title="Quick Access — theme and day/night mode">
+    <svg class="home-quick-controls-glyph" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M4 12h3M11 12h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/><circle cx="9" cy="12" r="2"/></svg>
+    <span class="home-quick-sr-label" id="homeQuickAccessLabel">Simple</span>
+  </button>
+  <div id="homeQuickControlsMenu" class="home-style-quick-menu home-quick-controls-menu" role="dialog" aria-label="Homepage theme and appearance controls" hidden>
+    <div class="home-style-quick-menu-head"><strong>Theme &amp; appearance</strong><span id="homeQuickControlsDescription">Choose a theme and day or night mode</span></div>
+    <button id="homeDayNightToggle" class="home-quick-mode-button" type="button" aria-label="Switch between day and night"><span class="home-quick-mode-icon" aria-hidden="true">☼</span><span><small>APPEARANCE MODE</small><strong id="homeDayNightLabel">Switch to Day</strong></span><span class="home-quick-mode-chevron" aria-hidden="true">↔</span></button>
+    <section class="home-quick-group" aria-labelledby="homeThemeTitle"><div class="home-quick-group-title" id="homeThemeTitle">Homepage theme</div><div id="homeStyleQuickOptions" class="home-style-quick-options" role="radiogroup" aria-label="Choose homepage theme"></div></section>
+    <button id="homeQuickSettingsButton" class="home-quick-settings-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Open Settings</span><kbd>↗</kbd></button>
+  </div>
+</div>
+      <button class="home-customize-btn home-settings home-settings-topbar" id="launcherSettingsBtn" type="button" aria-label="Settings" title="Settings">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+      <button class="home-customize-btn home-arrange-btn" id="homeArrangeBtn" type="button" aria-label="Arrange" aria-pressed="false" aria-controls="launcherScreen" title="Arrange companion order and widget positions">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 5h12M8 12h12M8 19h12"></path><circle cx="3.5" cy="5" r="1"></circle><circle cx="3.5" cy="12" r="1"></circle><circle cx="3.5" cy="19" r="1"></circle></svg>
+      </button>
+      <button class="home-customize-btn" id="homeCustomizeBtn" type="button" aria-label="Customization" aria-haspopup="dialog" aria-controls="homeCustomizeOverlay" title="Customize home menu">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="home-layout-editor-bar" id="homeLayoutEditorBar" aria-label="Arrange Home layout" aria-live="polite" hidden>
+    <div class="home-layout-editor-copy">
+      <strong>Arrange Home</strong>
+      <span>Drag companion apps within the Hub Companions panel, then choose Done to save or Cancel to discard. The single top mini app and AI Hub stay fixed. Move fixed-size widgets inside the green widget canvas.</span>
+    </div>
+    <div class="home-layout-editor-actions">
+      <span id="homeLayoutEditorStatus" class="home-layout-editor-status">Changes save on this device.</span>
+      <button class="home-layout-action home-layout-action--quiet" id="homeLayoutCancelBtn" type="button">Cancel</button>
+      <button class="home-layout-action home-layout-action--primary" id="homeLayoutDoneBtn" type="button">Done</button>
+    </div>
+  </section>
+
+  <div class="home-stage">
+    <!-- Full companion cards are registered separately from icon-only mini apps. -->
+    <aside class="home-tools" id="homeApps" aria-label="Hub companion apps">
+      <div class="home-apps-react-root" id="homeAppsReactMount"></div>
+    </aside>
+
+    <!-- Icon-only shortcuts have their own registry and retain their own signal lines. -->
+    <div class="home-mini-apps is-empty" id="homeMiniApps" aria-label="Mini apps"></div>
+
+    <!-- The core: AI Hub is the main app. -->
+    <section class="home-core" aria-labelledby="launcherAiHubTitle">
+      <div class="home-ring home-ring--outer"><i></i><i></i></div>
+      <div class="home-ring home-ring--scan"></div>
+      <div class="home-ring home-ring--inner"></div>
+      <button class="home-core-btn" type="button" data-app-launch="ai-hub" aria-describedby="launcherAiHubDescription">
+        <span class="home-core-sheen" aria-hidden="true"></span>
+        <span class="home-core-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><defs><linearGradient id="homeHubGrad" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse"><stop class="home-stop-a"/><stop offset="1" class="home-stop-b"/></linearGradient></defs><g stroke="url(#homeHubGrad)"><circle cx="12" cy="12" r="2.6"></circle><circle cx="6" cy="7" r="1.4"></circle><circle cx="18" cy="6" r="1.4"></circle><circle cx="18" cy="18" r="1.4"></circle><path d="M9.8 10.3 7.2 8.1M14.4 9.9l2.4-2.4M14.2 14.3l2.7 2.2"></path></g></svg>
+        </span>
+        <span class="home-core-kicker">Main app</span>
+        <strong class="home-core-title" id="launcherAiHubTitle">AI Hub</strong>
+        <span class="home-core-desc" id="launcherAiHubDescription">Every AI account, provider and session — one calm place.</span>
+        <span class="home-core-stats"><span><b id="launcherAccountCount">0</b> accounts</span><i></i><span><b id="launcherProviderCount">0</b> providers</span></span>
+        <span class="home-core-cta">Open AI Hub <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+      </button>
+    </section>
+
+
+    <!-- Live panels are independent widgets; RAM is the first registered widget. -->
+    <aside class="home-side" aria-label="System widgets">
+      <div class="home-widget-list" id="homeWidgets" aria-label="System widgets"></div>
+    </aside>
+  </div>
+</main>
+<iframe id="launcherV2Screen" class="launcher-screen hidden home-v2-frame" data-home-src="home-v2.html" data-home-unload-inactive="true" title="Simple Mad Station homepage" aria-label="Simple homepage"></iframe>
+<iframe id="launcherParallaxScreen" class="launcher-screen hidden home-parallax-frame" data-home-src="home-v3.html" data-home-unload-inactive="true" title="3D Parallax Mad Station homepage" aria-label="3D Parallax homepage"></iframe>
+<iframe id="launcherRetroScreen" class="launcher-screen hidden home-retro-frame" data-home-src="home-retro.html" data-home-unload-inactive="true" title="Simple Retro Mad Station homepage" aria-label="Simple Retro homepage"></iframe>
+<iframe id="launcherRetroComplexScreen" class="launcher-screen hidden home-retro-complex-frame" data-home-src="home-retro-complex.html" data-home-unload-inactive="true" title="Retro Complex Mad Station homepage" aria-label="Retro Complex homepage"></iframe>
+<iframe id="launcherParallaxBigScreen" class="launcher-screen hidden home-parallax-big-frame" data-home-src="home-v4.html" data-home-unload-inactive="true" title="3D Parallax Big App Mad Station homepage" aria-label="3D Parallax Big App homepage"></iframe>
+<iframe id="launcherGalaxyScreen" class="launcher-screen hidden home-galaxy-frame" data-home-src="home-galaxy.html" data-home-unload-inactive="true" title="Galaxy Mad Station homepage" aria-label="Galaxy homepage"></iframe>
+<iframe id="launcherParallaxJungleScreen" class="launcher-screen hidden home-parallax-jungle-frame" data-home-src="home-parallax-jungle.html" data-home-unload-inactive="true" title="Parallax Jungle Mad Station homepage" aria-label="Parallax Jungle homepage"></iframe>
+<iframe id="launcherClaymorphismScreen" class="launcher-screen hidden home-claymorphism-frame" data-home-src="home-claymorphism.html" data-home-unload-inactive="true" title="Claymorphism Mad Station homepage" aria-label="Claymorphism homepage"></iframe>
+<iframe id="launcherGlassScreen" class="launcher-screen hidden home-glass-frame" data-home-src="home-glass.html" data-home-unload-inactive="true" title="Glass Mad Station homepage" aria-label="Glass homepage"></iframe>
+<iframe id="launcherIsometricWorldScreen" class="launcher-screen hidden home-isometric-world-frame" data-home-src="home-isometric-world.html" data-home-unload-inactive="true" title="Isometric World Mad Station homepage" aria-label="Isometric World homepage"></iframe>
+<div id="homeStyleTransitionCurtain" class="home-style-transition-curtain" aria-hidden="true" hidden><span class="home-transition-core"></span><span class="home-transition-orbit home-transition-orbit--a"></span><span class="home-transition-orbit home-transition-orbit--b"></span><span class="home-transition-caption">MAD STATION</span></div>
+<main class="ms-screen hidden" id="imageHubScreen" aria-label="Image Hub workspace">
+  <div class="ms-inner image-hub-inner">
+    <div class="image-hub-workspace" id="imageHubWorkspace">
+      <aside class="ms-card ms-card--flat image-hub-aside" id="imageHubSidebar" aria-label="Image tools and accounts">
+        <div class="brand image-hub-brand">
+          <div id="imageHubSidebarBrandReactMount" style="display: contents"></div>
+          <div class="brand-copy brand-copy-aihub-monitor">
+            <div class="resource-monitor-mount resource-monitor-mount--sidebar" id="imageHubRamMonitorMount"></div>
+          </div>
+          
+          
+          
+        <div id="imageHubSidebarActionsReactMount" style="display: contents"></div>
+        </div>
+        <div id="imageHubSearchReactMount"></div>
+        <div aria-label="Image tools" class="provider-tiles" id="imageHubProviderTiles" role="list"></div>
+        <div class="org-bar" role="group" aria-label="Image tool category">
+          <div id="imageHubCategoryFiltersReactMount" style="display: contents"></div>
+        </div>
+        <div id="imageHubSidebarListHeadingReactMount" style="display: contents"></div>
+        <div class="image-hub-account-list is-list-view" id="imageHubAccountList" role="list" aria-label="Image Hub accounts"><div class="ms-empty">Add an account to start browsing.</div></div>
+      </aside>
+      <div class="image-hub-main">
+        <div class="image-hub-workspace-chrome-mount" id="imageHubWorkspaceChromeReactMount"></div>
+        <section class="image-hub-tab-panel" data-image-hub-panel="studio">
+          <section class="ms-card image-hub-browser-panel" aria-label="Selected image tool browser">
+            <div class="ms-browser-toolbar image-hub-browser-toolbar" id="imageHubBrowserToolbar" role="toolbar" aria-label="Image studio browser controls"></div>
+            <div class="ms-browser-frame image-hub-browser-slot" id="imageHubBrowserSlot">
+              <div class="image-hub-webview-wrap" id="imageHubWebviewWrap"><div id="imageHubBrowserStateReactMount" class="image-hub-browser-state-mount"></div></div>
+            </div>
+          </section>
+        </section>
+        <section class="image-hub-tab-panel hidden" data-image-hub-panel="accounts">
+          <div class="image-hub-discover" id="imageHubDiscoveryReactMount" aria-label="Discover image tools and manage accounts"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="modal hidden feature-settings-modal image-hub-settings-modal" id="imageHubSettingsOverlay" role="dialog" aria-modal="true" aria-labelledby="imageHubSettingsTitle" aria-describedby="imageHubSettingsSubtitle">
+  <div id="imageHubSettingsReactMount"></div>
+</div>
+<main class="ms-screen hidden" id="videoHubScreen" aria-label="Video Hub workspace">
+  <div class="ms-inner video-hub-inner">
+    <div class="video-hub-workspace" id="videoHubWorkspace">
+      <aside class="ms-card ms-card--flat video-hub-aside" id="videoHubSidebar" aria-label="Video accounts">
+        <div class="brand video-hub-brand">
+          <button aria-label="Back" class="back-settings" id="videoHubBackBtn" title="Back" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <div class="brand-mark brand-mark-ai" aria-label="Video Hub logo">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path><path d="M7 3.5v2M17 3.5v2"></path></svg>
+          </div>
+          <div class="brand-copy brand-copy-aihub-monitor">
+            <div class="resource-monitor-mount resource-monitor-mount--sidebar" id="videoHubRamMonitorMount"></div>
+          </div>
+          <button aria-label="Settings" class="icon-only" id="videoHubSettingsBtn" title="Settings" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+          <button aria-label="Notifications" class="icon-only" id="videoHubNotificationsBtn" title="Notifications" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="notification-badge hidden" id="videoHubNotificationBadge">0</span></button>
+          <button aria-label="Hide sidebar" class="icon-only aihub-hide-sidebar-btn" id="videoHubHideSidebarBtn" title="Hide sidebar" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"></path><path d="M18 9l-3 3 3 3"></path></svg></button>
+        </div>
+        <div id="videoHubSidebarControlsReactMount" aria-label="Video Hub account search and filters"></div>
+        <div class="provider-tiles" id="videoHubProviderTiles" role="tablist" aria-label="Filter by video site"></div>
+        <div class="list-head">
+          <div class="list-title" id="videoHubListTitle">All accounts</div>
+          <span class="ms-chip" id="videoHubAccountCount">0 accounts</span>
+        </div>
+        <div class="video-hub-recent hidden" id="videoHubRecent" aria-label="Recent accounts"></div>
+        <div class="video-hub-account-list" id="videoHubAccountList" role="list" aria-label="Video Hub accounts"><div class="ms-empty">Loading your video accounts…</div></div>
+        <div class="ms-empty hidden" id="videoHubNoMatch">No accounts match this filter.</div>
+      </aside>
+      <div class="video-hub-main">
+        <header class="ms-header video-hub-header" id="videoHubHeaderReactMount" aria-label="Video Hub workspace header"></header>
+        <section class="video-hub-tab-panel" data-video-hub-panel="studio">
+          <section class="ms-card video-hub-browser-panel" aria-label="Selected video generator browser">
+            <div class="ms-browser-toolbar video-hub-browser-toolbar" id="videoHubBrowserToolbarReactMount" role="toolbar" aria-label="Video studio browser controls"></div>
+            <div class="ms-browser-frame video-hub-browser-slot" id="videoHubBrowserSlot">
+              <div class="video-hub-browser-placeholder" id="videoHubBrowserPlaceholder"><span class="video-hub-play-mark" aria-hidden="true">▶</span><strong>Your video studio opens here</strong><span>Select an account, sign in, and use the site normally. Its login stays separate from every other Video Hub account and from AI Hub.</span></div>
+              <div id="videoHubBrowserStateReactMount" style="display: contents"></div>
+            </div>
+          </section>
+        </section>
+        <section class="video-hub-tab-panel hidden" data-video-hub-panel="accounts">
+          <div class="video-hub-accounts-page">
+            <div class="video-hub-stats" id="videoHubStatsReactMount" aria-label="Video Hub summary"></div>
+            <section class="ms-card video-hub-quickstart" aria-label="Quick start">
+              <div class="video-hub-section-head"><div><span class="ms-eyebrow">Quick start</span><h2 class="ms-title">Pick a site, get a free studio</h2><span class="ms-muted video-hub-section-caption">One click creates an isolated login. Free allowances may change at each provider.</span></div></div>
+              <div class="ms-grid video-hub-site-grid" id="videoHubSiteGrid"></div>
+            </section>
+            <div class="video-hub-account-setup">
+              <section class="ms-card video-hub-manage-card">
+                <div class="video-hub-section-head"><div><span class="ms-eyebrow">Accounts</span><h2 class="ms-title">Add an account</h2><span class="ms-muted video-hub-section-caption">Choose a site and create an isolated login.</span></div></div>
+                <div id="videoHubAddAccountReactMount" aria-label="Add an isolated Video Hub account">
+                  <label class="video-hub-field-label" for="videoHubNewProvider">Video site</label>
+                  <select class="ms-input" id="videoHubNewProvider"></select>
+                  <label class="video-hub-field-label" for="videoHubNewName">Account label <span class="ms-muted">(optional)</span></label>
+                  <input class="ms-input" id="videoHubNewName" maxlength="60" placeholder="e.g. Personal account" autocomplete="off" />
+                  <button class="ms-btn ms-btn--primary video-hub-add-btn" id="videoHubAddAccountBtn" type="button">+ Add account</button>
+                </div>
+              </section>
+              <section class="ms-card video-hub-custom-site">
+                <div class="video-hub-section-head"><div><span class="ms-eyebrow">Video sites</span><h2 class="ms-title">Add another video site</h2><span class="ms-muted video-hub-section-caption">Add any HTTPS video generator.</span></div></div>
+                <div id="videoHubAddSiteReactMount" aria-label="Add a custom video site">
+                  <form id="videoHubAddProviderForm" class="video-hub-provider-form">
+                    <label class="video-hub-field-label" for="videoHubNewProviderName">Site name</label>
+                    <input class="ms-input" id="videoHubNewProviderName" maxlength="60" placeholder="Video service name" required />
+                    <label class="video-hub-field-label" for="videoHubNewProviderUrl">Website URL</label>
+                    <input class="ms-input" id="videoHubNewProviderUrl" type="url" maxlength="2048" placeholder="https://example.com" required />
+                    <label class="video-hub-field-label" for="videoHubNewProviderIcon">Company icon URL <span class="ms-muted">(optional)</span></label>
+                    <input class="ms-input" id="videoHubNewProviderIcon" type="url" maxlength="2048" placeholder="https://example.com/logo.png" />
+                    <span class="ms-muted">Leave blank to fetch the site favicon automatically. You can supply a direct HTTPS logo or image URL.</span>
+                    <button class="ms-btn" type="submit">Add video site</button>
+                  </form>
+                </div>
+                <div class="video-hub-provider-list" id="videoHubProviderList"></div>
+              </section>
+            </div>
+            <p class="ms-muted video-hub-privacy-note">Each account has its own persistent browser session. Logins are saved locally on this device.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="videoHubSettingsReactMount" aria-label="Video Hub settings dialog"></div>
+<main class="clipboard-screen hidden" id="clipboardScreen">
+<div class="clipboard-inner">
+<header class="clipboard-header">
+<div class="app-header-cluster">
+<button aria-label="Back" class="back-settings" id="clipboardBackBtn" title="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button>
+<div class="clipboard-title" aria-label="Notes &amp; Tasks"><span class="app-icon app-icon-notes" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="13" height="15" rx="2"></rect><path d="M8 9h6M8 12h5M8 15h4"></path><circle cx="18" cy="16" r="4"></circle><path d="m16.4 16 1.1 1.1 2.2-2.3"></path></svg></span><span class="page-brand-text"><span class="page-brand-name">Notes &amp; Tasks</span><span class="page-brand-tag">Hub companion</span></span></div>
+<div class="clipboard-header-actions"><div class="clipboard-header-ram" id="clipboardRamMonitorMount"></div><div id="utilitySettingsButtonsReactMount"></div><button class="icon-only standalone-notification-btn" id="clipboardNotificationsBtn" type="button" aria-label="Notifications" title="Notifications"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="notification-badge hidden" id="clipboardNotificationBadge">0</span></button></div>
+</div>
+</header>
+
+<nav class="clipboard-tabs" id="utilityTabsReactMount" role="tablist" aria-label="Personal utility apps"></nav>
+
+<section class="utility-panel active" id="clipboardTabPanel" data-utility-panel="clipboard" role="tabpanel">
+<section class="clipboard-workspace">
+<aside class="clipboard-stats" aria-label="Notes & Tasks summary" id="clipboardStatsReactMount"></aside>
+<div class="clipboard-compose card" id="clipboardComposer"></div>
+<div class="clipboard-list-panel card">
+<div class="clipboard-list-head" id="clipboardListHeaderReactMount"></div>
+<div class="clipboard-toolbar" id="clipboardToolbarReactMount"></div>
+<div class="clipboard-items" id="clipboardItems"></div>
+</div>
+</section>
+</section>
+
+<section class="utility-panel" id="notesTabPanel" data-utility-panel="notes" role="tabpanel">
+<div id="notesHeaderReactMount"></div>
+<div class="notes-layout">
+<div id="notesComposerReactMount"></div>
+<section class="card notes-list-panel"><div class="utility-list-head" id="notesListHeaderReactMount"></div><div id="notesList" class="notes-list"></div></section>
+</div>
+</section>
+
+<section class="utility-panel" id="todoTabPanel" data-utility-panel="todo" role="tabpanel">
+<div id="todoHeroReactMount"></div>
+<section class="card todo-panel"><div id="todoComposerReactMount"></div><div id="todoToolbarReactMount"></div><div id="todoList" class="todo-list"></div></section>
+</section>
+
+</div>
+</main>
+<div class="modal hidden feature-settings-modal" id="clipboardSettingsModal"></div>
+<aside class="sidebar">
+<div class="brand">
+<button aria-label="Back" class="back-settings" id="openLauncherBtn" title="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button>
+<div class="brand-mark brand-mark-ai brand-mark-hub" aria-label="AI Hub logo">
+<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.6"></circle><circle cx="6" cy="7" r="1.4"></circle><circle cx="18" cy="6" r="1.4"></circle><circle cx="18" cy="18" r="1.4"></circle><path d="M9.8 10.3 7.2 8.1M14.4 9.9l2.4-2.4M14.2 14.3l2.7 2.2"></path></svg>
+</div>
+<div class="brand-copy brand-copy-aihub-monitor">
+<div class="resource-monitor-mount resource-monitor-mount--sidebar" id="aiHubRamMonitorMount"></div>
+</div>
+<button aria-label="Lock Mad Station" class="icon-only hidden" id="lockBtn" title="Lock Mad Station (Ctrl+Shift+L)">
+<svg aria-hidden="true" viewbox="0 0 24 24"><rect height="9" rx="2" width="14" x="5" y="11"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+</button>
+<button aria-label="Settings" class="icon-only" id="settingsBtn" title="Settings">
+<svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+</button>
+<button aria-label="Notifications" class="icon-only" id="notificationsBtn" title="Notifications"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="notification-badge hidden" id="notificationBadge">0</span></button>
+<button aria-label="Hide sidebar" class="icon-only aihub-hide-sidebar-btn" id="hideSidebarBtn" title="Hide sidebar"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h16"></path><path d="M18 9l-3 3 3 3"></path></svg></button>
+</div>
+<div class="search-wrap">
+<svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<input autocomplete="off" class="search" id="search" placeholder="Search accounts…"/>
+<kbd id="searchKbd">Ctrl K</kbd>
+<button aria-label="Clear search" class="search-clear hidden" id="searchClear" title="Clear search"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div aria-label="Providers" class="provider-tiles" id="providerTiles" role="tablist" data-reorder-axis="x"></div><div class="org-bar" id="orgBar"><button class="tiny-btn active" id="orgAllBtn" type="button">All</button><button class="tiny-btn" id="orgFavoritesBtn" type="button">Pinned</button><select class="ms-input org-group-filter" aria-label="Filter by group" id="orgGroupFilter"><option value="">Groups</option></select></div><div class="recent-accounts" id="recentAccounts"></div>
+<div class="list-head">
+<div class="list-title" id="listTitle">All accounts</div>
+<button class="list-add hidden" id="listAdd" type="button"></button>
+</div>
+<div class="accounts" id="accounts"></div>
+<button aria-label="Downloads" class="sidebar-dl hidden" id="downloadsBtn" title="Downloads" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5"></path><path d="M5 20h14"></path></svg><span class="sidebar-dl-label" id="downloadsBtnLabel">Downloads</span><span class="dl-badge hidden" id="downloadsBadge">0</span></button>
+</aside>
+<div class="ctx-menu hidden" id="ctxMenu" role="menu"></div>
+<div class="toast hidden" id="toast"></div>
+
+<main class="standalone-app-screen hidden instruction-screen" id="instructionScreen">
+  <div class="standalone-app-inner forge-app-inner">
+    <header class="standalone-app-header forge-app-header">
+      <div class="app-header-cluster">
+      <button class="back-settings forge-back-btn" id="instructionBackBtn" title="Back" aria-label="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      <div class="forge-header-brand">
+        <span class="forge-brand-mark app-icon-prompt" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H10l-4 3v-5.2a2 2 0 0 1-1-1.8v-5z"></path><path d="M8 8.5h7M8 11.5h5"></path><path d="m17 4 .55 1.65L19.2 6.2l-1.65.55L17 8.4l-.55-1.65L14.8 6.2l1.65-.55L17 4z"></path></svg></span><span class="page-brand-text"><span class="page-brand-name">Prompt Studio</span><span class="page-brand-tag">Hub companion</span></span>
+      </div>
+      <div class="forge-header-actions" aria-label="Prompt Studio header tools">
+        <div class="resource-monitor-mount resource-monitor-mount--forge" id="forgeRamMonitorMount"></div>
+        <button class="icon-only standalone-settings-btn" id="instructionSettingsBtn" type="button" aria-label="Prompt Studio settings" title="Prompt Studio settings"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3h0a1.7 1.7 0 0 0-1 1.5v.1a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5h0a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9v0a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1v0a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+        <button class="icon-only standalone-notification-btn" id="instructionNotificationsBtn" type="button" aria-label="Notifications" title="Notifications"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="notification-badge hidden" id="instructionNotificationBadge">0</span></button>
+      </div>
+      </div>
+    </header>
+
+    <div id="instructionForgeComposerReactMount" class="forge-composer-react-mount" hidden></div>
+    <section class="forge-workspace" id="instructionForgeComposerLegacy" aria-label="Prompt Studio workspace">
+      <article class="lab-card forge-brief-card">
+        <div class="forge-card-head">
+          <div>
+            <h2>Explain what you actually mean</h2>
+          </div>
+          
+        </div>
+        <textarea id="forgeInput" rows="12" placeholder="Example: I think this is Electron 44 or maybe 43, and I want the app to keep each AI login separate but close the browser when I leave the section…"></textarea>
+        <div class="forge-brief-footer">
+          <div class="forge-fix-chips" aria-label="Forge correction capabilities">
+            <span>Terminology correction</span><span>Version normalization</span><span>Intent preservation</span><span>Missing-detail detection</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="lab-card forge-result-card">
+        <div class="forge-card-head">
+          <div>
+            <h2>Make the instruction precise</h2>
+          </div>
+          <div class="forge-result-actions">
+            <button class="tiny-btn" id="forgeCopyBtn" type="button">Copy</button>
+          </div>
+        </div>
+        <textarea id="forgeOutput" rows="12" placeholder="Your refined, self-contained prompt will appear here." readonly></textarea>
+        <div class="forge-result-footer">
+          <label class="forge-model-picker"><span>Forge with</span><select class="ms-input" id="forgeModel" aria-label="AI used by Instruction Forge"></select></label>
+          <button class="primary forge-run-btn" id="forgeBtn" type="button">Generate prompt <span>↗</span></button>
+        </div>
+      </article>
+    </section>
+
+    <section class="forge-browser-card lab-card" aria-label="AI account browser">
+      <div class="forge-browser-head">
+        <div>
+          <h2>Each AI account keeps its own browser session</h2>
+        </div>
+        <div class="forge-browser-status" id="forgeBrowserStatus"><i></i><span>Choose an account</span></div>
+      </div>
+
+      <div class="forge-browser-layout">
+        <aside class="forge-account-panel" aria-label="Account picture and account picker">
+          <div class="forge-account-panel-head">
+            <span class="eyebrow">ACCOUNT</span>
+            <span class="forge-account-panel-hint">Select an account</span>
+          </div>
+          <div class="forge-account-rail" id="forgeAccountList" role="tablist" aria-label="AI Hub accounts available to Prompt Studio"></div>
+        </aside>
+
+        <div class="forge-browser-pane">
+          <div class="ms-browser-toolbar forge-browser-toolbar" role="toolbar" aria-label="Prompt Studio browser controls">
+            <div class="forge-browser-nav ms-browser-nav" role="group" aria-label="Page navigation">
+              <button class="tiny-btn ms-browser-tool-btn forge-browser-nav-btn" type="button" data-forge-nav="back" aria-label="Back" title="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <button class="tiny-btn ms-browser-tool-btn forge-browser-nav-btn" type="button" data-forge-nav="forward" aria-label="Forward" title="Forward"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+              <button class="tiny-btn ms-browser-tool-btn forge-browser-nav-btn" id="forgeReloadBtn" type="button" data-forge-nav="refresh" aria-label="Refresh page" title="Refresh page"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 0 0-12-4L4 11"/><path d="M4 17v-5h5"/><path d="M5 12a7 7 0 0 0 12 4l3-3"/></svg></button>
+            </div>
+            <div class="ms-browser-address forge-address-bar" id="forgeBrowserAddress" role="group" aria-label="Current site and account" aria-live="polite">
+              <svg class="ms-browser-address-lock" id="forgeBrowserSecurity" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              <span class="forge-browser-url ms-browser-address-location" id="forgeBrowserUrl">No browser selected</span>
+              <span class="ms-browser-address-account" id="forgeBrowserAccountLabel">No account</span>
+            </div>
+            <div class="forge-browser-page-title" id="forgeBrowserTitle" title="Waiting for an AI account">Waiting for an AI account</div>
+            <button class="ms-btn ms-btn--sm ms-browser-open-external forge-open-external-btn" id="forgeOpenExternalBtn" type="button" aria-label="Open page in browser" title="Open page in browser" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg><span>Open in browser</span></button>
+          </div>
+
+          <div class="forge-browser-slot" id="forgeBrowserSlot">
+            <div class="forge-browser-placeholder" id="forgeBrowserPlaceholder">
+              <span class="forge-placeholder-orb" aria-hidden="true">✦</span>
+              <strong>Select an AI Hub account</strong>
+              <span>The browser opens with that account's saved session. Leave Forge and the live browser is closed to reclaim RAM; the login itself stays saved.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<main class="ailab-screen hidden" id="aiLabScreen">
+  <div class="ailab-inner">
+    <header class="ailab-header">
+      <div class="app-header-cluster">
+      <button class="back-settings" id="aiLabBackBtn" title="Back" aria-label="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      <span class="ailab-header-icon app-icon app-icon-playground" aria-label="AI Playground" title="AI Playground"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 3h6M10 3v5l-4.6 9.1A2 2 0 0 0 7.2 20h9.6a2 2 0 0 0 1.8-2.9L14 8V3"></path><path d="M8 14h8"></path><circle cx="18.5" cy="6" r="1.1"></circle><circle cx="20.5" cy="9" r=".8"></circle></svg></span><span class="page-brand-text"><span class="page-brand-name">AI Playground</span><span class="page-brand-tag">Hub companion</span></span>
+      <div class="ailab-header-actions"><div class="resource-monitor-mount resource-monitor-mount--ailab" id="aiLabRamMonitorMount"></div><button class="icon-only standalone-settings-btn" id="aiLabSettingsBtn" type="button" aria-label="AI Playground settings" title="AI Playground settings"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3h0a1.7 1.7 0 0 0-1 1.5v.1a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5h0a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9v0a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1v0a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 .3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+        <button class="icon-only standalone-notification-btn" id="aiLabNotificationsBtn" type="button" aria-label="Notifications" title="Notifications"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="notification-badge hidden" id="aiLabNotificationBadge">0</span></button></div>
+      </div>
+    </header>
+    <section class="ailab-panel active" data-lab-panel="model-arena">
+      <div class="arena-three-card-row" aria-label="Model Arena controls">
+        <nav class="arena-nav-card lab-card" aria-label="Arena navigation">
+          <button class="arena-nav-card-btn active" type="button" data-lab-tab="model-arena">Model Arena</button>
+          <button class="arena-nav-card-btn" type="button" data-lab-tab="arena-accounts">Arena Accounts</button>
+          <button class="arena-nav-card-btn" type="button" data-lab-tab="scoreboard">Leaderboard</button>
+        </nav>
+
+        <div class="arena-mode-card lab-card" id="arenaGlobalTop" aria-label="Model Arena modes">
+        <div class="arena-global-modes">
+          <nav class="arena-subtabs" aria-label="Model Arena modes">
+            <button class="arena-subtab active" type="button" data-arena-tab="free-account">Free Account Arena</button>
+            <button class="arena-subtab" type="button" data-arena-tab="api">API Arena</button>
+            <button class="arena-subtab" type="button" data-arena-tab="local">Local AI Arena</button>
+          </nav>
+        </div>
+        </div>
+
+      </div>
+
+      <section class="arena-subpanel active" data-arena-panel="free-account">
+        <div id="freeAccountArenaReactMount" class="browser-arena-react-mount"></div>
+      </section>
+
+<section class="arena-subpanel" data-arena-panel="api">
+<section class="api-model-manager lab-card" id="apiModelSettingsCard">
+  <button class="tiny-btn api-model-collapse" id="apiModelSettingsCollapseBtn" type="button" aria-expanded="true" aria-controls="apiModelSettingsContent" title="Collapse API model settings" aria-label="Collapse API model settings"><span aria-hidden="true">⌃</span></button>
+  <div class="api-model-settings-content" id="apiModelSettingsContent">
+    <div class="arena-setup-head">
+      <div><strong>API model settings</strong><span>Credentials are stored securely on this device and are never written to AI Playground history.</span></div>
+    </div>
+    <div class="api-model-settings-body" id="apiModelSettingsBody">
+      <div class="form-grid api-model-grid">
+        <label>API model<select class="ms-input" id="apiModelEditor" aria-label="API model settings model"></select></label>
+        <label>Provider<input id="apiModelProvider" aria-label="API provider" readonly /></label>
+        <label>Display name<input id="apiModelName" aria-label="API model display name" /></label>
+        <label>Model ID<input id="apiModelModel" aria-label="API model ID" /></label>
+        <label class="span-2">Endpoint<input id="apiModelEndpoint" aria-label="API endpoint" placeholder="https://api.example.com/v1" type="url" /></label>
+        <label class="span-2">API key<input id="apiModelKey" aria-label="API key" autocomplete="new-password" placeholder="Enter a new key to store securely" type="password" /><span id="apiModelKeyStatus" class="field-hint">API key status</span></label>
+      </div>
+      <div class="form-actions"><button class="ms-btn" id="apiModelClearKeyBtn" type="button">Clear stored key</button><span class="actions-spacer"></span><button class="ms-btn ms-btn--primary" id="apiModelSaveBtn" type="button">Save API model</button></div>
+    </div>
+  </div>
+</section>
+      <div id="apiArenaReactMount" class="api-arena-react-mount"></div>
+    </section>
+
+<section class="arena-subpanel" data-arena-panel="local">
+      <div id="localArenaReactMount" class="browser-arena-react-mount"></div>
+    </section>
+    </section>
+
+<section class="ailab-panel" data-lab-panel="arena-accounts">
+      <nav class="arena-nav-card lab-card arena-secondary-nav" aria-label="Arena navigation">
+        <button class="arena-nav-card-btn" type="button" data-lab-tab="model-arena">Model Arena</button>
+        <button class="arena-nav-card-btn active" type="button" data-lab-tab="arena-accounts">Arena Accounts</button>
+        <button class="arena-nav-card-btn" type="button" data-lab-tab="scoreboard">Leaderboard</button>
+      </nav>
+      <div class="ailab-panel-head"><div><span class="eyebrow">02 · ARENA ACCOUNTS</span><h2>Accounts that belong to the Arena.</h2><p>These are separate from AI Hub. Add as many accounts as you like for every provider — each one keeps its own login. Sign in once inside the Arena browser and it is remembered.</p></div><span class="scan-meta" id="arenaAccountCount">0 accounts</span></div>
+      <section class="lab-card arena-acc-add" id="arenaSetupLegacy">
+        <div class="arena-acc-form">
+          <label><span class="field-label">Provider</span><select class="ms-input" id="arenaNewProvider"></select></label>
+          <label><span class="field-label">Account name (optional)</span><input id="arenaNewName" type="text" maxlength="60" placeholder="e.g. Personal, Work, Free #2"/></label>
+          <button class="ms-btn ms-btn--primary" id="arenaAddAccountBtn">Add account</button>
+        </div>
+        <details class="arena-prov-add"><summary>Add a provider that isn't listed</summary>
+          <div class="arena-acc-form">
+            <label><span class="field-label">Provider name</span><input id="arenaNewProviderName" type="text" maxlength="60" placeholder="e.g. HuggingChat"/></label>
+            <label><span class="field-label">Website (https)</span><input id="arenaNewProviderUrl" type="text" maxlength="300" placeholder="https://huggingface.co/chat/"/></label>
+            <button class="ms-btn" id="arenaAddProviderBtn">Add provider</button>
+          </div>
+        </details>
+      </section>
+      <div id="arenaSetupReactMount" hidden></div>
+      <div class="arena-prov-tiles" id="arenaProviderTiles"></div>
+      <div class="arena-acc-list" id="arenaAccountList"></div>
+    </section>
+
+<section class="ailab-panel" data-lab-panel="scoreboard">
+      <nav class="arena-nav-card lab-card arena-secondary-nav" aria-label="Arena navigation">
+        <button class="arena-nav-card-btn" type="button" data-lab-tab="model-arena">Model Arena</button>
+        <button class="arena-nav-card-btn" type="button" data-lab-tab="arena-accounts">Arena Accounts</button>
+        <button class="arena-nav-card-btn active" type="button" data-lab-tab="scoreboard">Leaderboard</button>
+      </nav>
+      <div class="ailab-panel-head"><div><span class="eyebrow">03 · LEADERBOARD</span><h2>Which models and accounts do you prefer?</h2><p>Every vote in the Model Arena counts here. A win is 1 point, a tie is half a point. Stored only on this PC.</p></div><button class="tiny-btn" id="scoreClearBtn">Clear leaderboard</button></div>
+      <div class="lb-summary" id="leaderboardSummary"></div>
+      <div class="lb-columns">
+        <section class="lab-card lb-card"><div class="field-head"><strong>Model rankings</strong><span class="scan-meta">Combined across all accounts</span></div><div id="leaderboardModels" class="scoreboard-list"></div></section>
+        <section class="lab-card lb-card"><div class="field-head"><strong>Account rankings</strong><span class="scan-meta">Each account on its own</span></div><div id="leaderboardAccounts" class="scoreboard-list"></div></section>
+      </div>
+    </section>
+  </div>
+</main>
+<main class="settings-screen ms-screen hidden" id="settingsScreen">
+<aside class="st-nav">
+<div class="st-nav-head">
+<button aria-label="Close settings" class="back-settings ms-icon-btn" id="closeSettings" title="Back (Esc)"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button>
+<div><h1 id="settingsTitle">Settings</h1><p id="settingsScopeText">Saved automatically</p></div>
+</div>
+<div class="st-search ms-input" id="stSearchBox"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input autocomplete="off" id="settingsSearch" placeholder="Search settings…"/><button aria-label="Clear search" class="st-search-clear hidden" id="settingsSearchClear"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<nav class="st-nav-list">
+<div class="st-nav-label" data-settings-scope="aihub" data-label="aihub-main">AI HUB</div>
+<div class="st-nav-label" data-settings-scope="global" data-label="general">GENERAL</div>
+<button class="settings-tab ms-tab" data-tab="providers" title="Providers" data-settings-scope="aihub"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="4" y="4"></rect><rect height="7" rx="1.5" width="7" x="13" y="4"></rect><rect height="7" rx="1.5" width="7" x="4" y="13"></rect><path d="M16.5 13v7M13 16.5h7"></path></svg><span>Providers</span></button>
+<button class="settings-tab ms-tab" data-tab="accounts" title="Accounts" data-settings-scope="aihub"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg><span>Accounts</span></button>
+<button class="settings-tab ms-tab" data-tab="shortcuts" title="Keybinds" data-settings-scope="aihub"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="12" rx="2" width="18" x="3" y="6"></rect><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"></path></svg><span>Keybinds</span></button>
+ <button class="settings-tab ms-tab" data-tab="appearance" title="Appearance" data-settings-scope="aihub"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.5-2.2-.5-1.2.3-2.3.3-2.3H17a4 4 0 0 0 4-4C21 6.9 17 3 12 3z"></path><circle cx="7.5" cy="11" r="1"></circle><circle cx="10" cy="7.5" r="1"></circle><circle cx="14.5" cy="7.5" r="1"></circle></svg><span>Appearance</span></button>
+<button class="settings-tab ms-tab" data-tab="appearance" title="Appearance" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.5-2.2-.5-1.2.3-2.3.3-2.3H17a4 4 0 0 0 4-4C21 6.9 17 3 12 3z"></path><circle cx="7.5" cy="11" r="1"></circle><circle cx="10" cy="7.5" r="1"></circle><circle cx="14.5" cy="7.5" r="1"></circle></svg><span>Appearance</span></button>
+<button class="settings-tab ms-tab" data-tab="accessibility" title="Accessibility" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="5" r="2"></circle><path d="M5 8h14M12 8v12M8 12l-3 5M16 12l3 5"></path></svg><span>Accessibility</span></button>
+<button class="settings-tab ms-tab" data-tab="audio" title="Audio" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"></path><path d="M16 9.5a4 4 0 0 1 0 5M18.5 7a7.5 7.5 0 0 1 0 10"></path></svg><span>Audio</span></button>
+<button class="settings-tab ms-tab" data-tab="startup" title="Startup" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"></path></svg><span>Startup</span></button>
+<button class="settings-tab ms-tab" data-tab="lock" title="Security" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="9" rx="2" width="14" x="5" y="11"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span>Security</span></button>
+<button class="settings-tab ms-tab" data-tab="downloads" title="Downloads &amp; models" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5"></path><path d="M5 20h14"></path></svg><span>Downloads</span></button>
+<div class="st-nav-label" data-settings-scope="aihub" data-label="aihub-sessions">AI HUB · SESSIONS</div>
+<button class="settings-tab ms-tab" data-tab="privacy" title="Privacy" data-settings-scope="aihub"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg><span>Session privacy</span></button>
+<button class="settings-tab ms-tab" data-tab="websites" title="Websites" data-settings-scope="aihub"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"></path></svg><span>Website rules</span></button>
+
+<div class="st-nav-label" data-settings-scope="global" data-label="information">INFORMATION</div>
+<button class="settings-tab ms-tab" data-tab="about" title="About" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg><span>About</span></button>
+<button class="settings-tab ms-tab" data-tab="data" title="Data" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 4h14v16H5z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg><span>Data</span></button>
+<div class="st-nav-label" data-settings-scope="global" data-label="developer">DEVELOPER</div>
+<button class="settings-tab ms-tab" data-tab="developer" title="Developer" data-settings-scope="global"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"></path></svg><span>Developer</span></button>
+</nav>
+</aside>
+<section class="st-main" id="settingsContent">
+<div class="st-banner hidden" id="restartNotice"><strong>Restart required</strong><span>One of your changes only takes effect after Mad Station restarts.</span><button class="ms-btn ms-btn--sm ms-btn--primary hidden" id="restartBtn">Restart now</button></div>
+<div class="settings-panel active" data-panel="providers" data-settings-scope="aihub"><div class="panel-head"><div><h2 class="ms-title">Providers</h2><p>Manage the AI websites available in Mad Station. Each provider can have its own metadata, icon and authentication settings.</p></div></div><div class="bento"><section class="card ms-card ms-card--flat span-2"><header class="card-head ms-card-head"><span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="4" y="4"></rect><rect height="7" rx="1.5" width="7" x="13" y="4"></rect><rect height="7" rx="1.5" width="7" x="4" y="13"></rect><path d="M16.5 13v7M13 16.5h7"></path></svg></span><div><h3>Providers</h3><p>Any HTTPS AI website. You can also drag the provider tiles in the sidebar.</p></div><div class="card-action"><span class="count-pill ms-chip" id="providerCountPill">0 providers</span><button class="ms-btn ms-btn--primary with-ico" id="addProviderBtn"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Add provider</button></div></header><div class="provider-list" id="providerList"></div></section></div></div>
+<div class="settings-panel" data-panel="accounts" data-settings-scope="aihub"><div class="panel-head"><div><h2 class="ms-title">Accounts</h2><p>Manage your isolated logins, shortcuts, groups, favorites and account-specific behavior.</p></div></div><div class="bento"><section class="card ms-card ms-card--flat span-2"><header class="card-head ms-card-head"><span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg></span><div><h3>Accounts</h3><p>Every account has its own persistent, separate login. You can also drag accounts in the sidebar.</p></div><div class="card-action"><span class="count-pill ms-chip" id="accountCountInfo">0 accounts</span><button class="ms-btn ms-btn--primary with-ico" id="settingsAddAccountBtn"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Add account</button></div></header><div class="settings-account-list" id="settingsAccountList"></div></section><div id="accountSafetyReactMount" class="remaining-settings-react-root"></div></div></div>
+<div class="settings-panel" data-panel="shortcuts" data-settings-scope="aihub"><div class="panel-head"><div><h2 class="ms-title">Keybinds</h2><p>Give every account its own shortcut. They work even while an AI page has focus.</p></div></div><div class="bento"><section class="card ms-card ms-card--flat span-2"><div class="tip"><strong>Tip</strong> Click a shortcut, then press the keys you want (use Ctrl, Alt or Shift). Press Esc to cancel. Each shortcut must be unique.</div><div class="shortcut-list" id="shortcutList"></div></section><div id="builtInShortcutsReactMount" class="remaining-settings-react-root"></div></div></div>
+<div class="settings-panel" data-panel="appearance" data-settings-scope="aihub"><div class="panel-head"><div><h2 class="ms-title">Appearance</h2><p>Customize how the AI Hub sidebar presents your accounts.</p></div></div><div class="bento"><div id="aiHubSidebarAppearanceReactMount" class="remaining-settings-react-root"></div></div></div><div class="settings-panel" data-panel="appearance" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Appearance</h2><p>Customize the look and layout of Mad Station. Each visual option includes its own live preview.</p></div></div><div class="bento"><section class="card ms-card ms-card--flat span-2 homepage-styles-card" data-q="Themes homepage style Simple Simple Retro Retro Complex 3D Parallax 3D Parallax Big App Galaxy Parallax Jungle Claymorphism Glass">
+<header class="card-head ms-card-head">
+<span class="card-ico"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5v-11Z"></path><path d="m4 6.5 8 3.5 8-3.5M12 10v11"></path></svg></span>
+<div><h3>Themes</h3><p>Choose the homepage style that opens when Mad Station starts. Each style has its own preview, applies immediately, and is saved on this device.</p></div>
+</header>
+<div class="card-body"><div class="homepage-style-grid" id="homepageStyles" role="group" aria-label="Homepage styles"></div></div>
+</section><section class="card ms-card ms-card--flat appearance-choice-card accent-choice-card">
+<header class="card-head ms-card-head">
+<span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.5-2.2-.5-1.2.3-2.3 1.6-2.3H17a4 4 0 0 0 4-4C21 6.9 17 3 12 3z"></path><circle cx="7.5" cy="11" r="1"></circle><circle cx="10" cy="7.5" r="1"></circle><circle cx="14.5" cy="7.5" r="1"></circle></svg></span>
+<div><h3>Accent colour</h3><p>Choose the highlight colour used across buttons, focus states, switches, and active controls.</p></div>
+</header>
+<div class="card-body appearance-choice-body">
+<div class="appearance-live-preview accent-live-preview" data-preview="accent" aria-label="Accent colour preview">
+<div class="accent-preview-top"><span class="accent-preview-dot"></span><div><strong>Accent preview</strong><span>Updates the interface highlights</span></div></div>
+<div class="accent-preview-actions"><button type="button" tabindex="-1" aria-hidden="true">Primary action</button><span class="accent-preview-line"></span></div>
+</div>
+<div class="appearance-choice-content">
+<div class="appearance-choice-label"><strong>Preset colours</strong><span>Pick a built-in colour or choose your own.</span></div>
+<div class="accent-choice-grid" data-q="Accent colour color custom picker" id="accentOptions" role="group" aria-label="Accent colours">
+<button class="accent-choice" data-accent-choice="blue" type="button" aria-label="Blue" title="Blue" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<button class="accent-choice" data-accent-choice="violet" type="button" aria-label="Violet" title="Violet" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<button class="accent-choice" data-accent-choice="pink" type="button" aria-label="Pink" title="Pink" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<button class="accent-choice" data-accent-choice="red" type="button" aria-label="Red" title="Red" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<button class="accent-choice" data-accent-choice="orange" type="button" aria-label="Orange" title="Orange" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<button class="accent-choice" data-accent-choice="green" type="button" aria-label="Green" title="Green" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<button class="accent-choice" data-accent-choice="teal" type="button" aria-label="Teal" title="Teal" aria-pressed="false"><span class="accent-choice-swatch"></span></button>
+<label class="accent-choice accent-custom-choice" id="customAccentChoice" aria-label="Custom colour" title="Custom colour">
+<span class="accent-choice-swatch custom-accent-swatch"><span class="custom-accent-icon" aria-hidden="true"><svg viewBox="0 0 24 24" role="img" aria-label="Pick more colours"><path d="M12 3a9 9 0 1 0 0 18h1.1a2.1 2.1 0 0 0 1.5-3.5 1.7 1.7 0 0 1 1.3-2.8h1A4.1 4.1 0 0 0 21 10.6C21 6.4 17 3 12 3Z"/><circle cx="7.5" cy="10" r="1" fill="currentColor"/><circle cx="11.5" cy="7.2" r="1" fill="currentColor"/><circle cx="16" cy="9" r="1" fill="currentColor"/><path d="M17.5 15.5v5m-2.5-2.5h5"/></svg></span></span>
+<input aria-label="Custom accent colour" id="customAccentPicker" type="color" value="#8ab4ff">
+</label>
+</div>
+</div>
+</div>
+</section>
+<section class="card ms-card ms-card--flat appearance-choice-card mode-choice-card">
+<header class="card-head ms-card-head">
+<span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3h0a1.7 1.7 0 0 0-1 1.5v.1a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5h0a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9v0a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1v0a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+<div><h3>Modes</h3><p>Choose how Mad Station follows light and dark appearance preferences.</p></div>
+<span class="card-note" id="themeChoiceSummary">Dark</span>
+</header>
+<div class="card-body appearance-choice-body">
+<div class="appearance-live-preview mode-live-preview" data-preview="theme" aria-label="Theme mode preview">
+<div class="mode-preview-window"><span class="mode-preview-sidebar"></span><div class="mode-preview-content"><strong>Mad Station</strong><span></span><span></span><b></b></div></div>
+<span class="mode-preview-label">Dark mode</span>
+</div>
+<div class="appearance-choice-content">
+<div class="appearance-choice-label"><strong>Appearance mode</strong><span>System follows your device preference automatically.</span></div>
+<div class="mode-choice-grid" id="themeOptions" role="group" aria-label="Appearance modes">
+<button class="mode-choice" data-theme-choice="dark" type="button" aria-pressed="false"><span class="mode-choice-icon mode-icon-dark"></span><span><strong>Dark</strong><small>Dark surfaces</small></span></button>
+<button class="mode-choice" data-theme-choice="light" type="button" aria-pressed="false"><span class="mode-choice-icon mode-icon-light"></span><span><strong>Light</strong><small>Bright surfaces</small></span></button>
+<button class="mode-choice" data-theme-choice="system" type="button" aria-pressed="false"><span class="mode-choice-icon mode-icon-system"></span><span><strong>System</strong><small>Follow device</small></span></button>
+</div>
+</div>
+</div>
+</section><section class="card ms-card ms-card--flat span-2 background-library-card"><header class="card-head ms-card-head"><span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="8" cy="9" r="1.5"></circle><path d="m4 17 5-5 4 4 3-3 4 4"></path></svg></span><div><h3>Background</h3><p>Choose a built-in style such as Parallax—the animated 3D depth background—or add your own image background.</p></div><span class="card-note">15 defaults</span></header><div class="card-body"><div class="background-library-toolbar"><div><strong>Background library</strong><span>Default backgrounds are always available. Custom backgrounds are saved to this workspace.</span></div><div class="background-library-actions"><button class="ms-btn ms-btn--sm" id="addBackgroundUrlBtn" type="button">Add from URL</button><button class="ms-btn ms-btn--sm" id="addBackgroundFileBtn" type="button">Add from computer</button></div></div><div class="background-url-form hidden" id="backgroundUrlForm"><div class="background-url-input-wrap"><input class="ms-input" id="backgroundUrlInput" type="url" inputmode="url" autocomplete="off" placeholder="https://example.com/background.jpg" aria-label="Background image URL"><span id="backgroundUrlError" role="alert"></span></div><button class="ms-btn ms-btn--sm" id="saveBackgroundUrlBtn" type="button">Add background</button><button class="ms-btn ms-btn--sm" id="cancelBackgroundUrlBtn" type="button">Cancel</button></div><div class="background-library" id="backgroundLibrary" aria-live="polite"></div></div></section><div id="globalAppearanceAdvancedReactMount" class="remaining-settings-react-root"></div></div></div>
+<div class="settings-panel" data-panel="accessibility" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Accessibility</h2><p>Make Mad Station easier to read and navigate.</p></div></div><div class="bento" id="globalSettingsAccessibilityReactMount"></div></div><div class="settings-panel" data-panel="audio" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Audio output</h2><p>Choose the speaker or headphones Mad Station uses for its audio test and playback.</p></div></div><div class="bento" id="globalSettingsAudioReactMount"></div></div><div class="settings-panel" data-panel="startup" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Startup</h2><p>Choose what Mad Station does when it opens and how sessions behave between launches.</p></div></div><div class="bento" id="globalSettingsStartupReactMount"></div></div>
+<div class="settings-panel" data-panel="lock" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Lock</h2><p>Protect Mad Station when you step away or when Windows locks.</p></div></div><div class="bento"><div class="group-label">App lock</div><section class="card ms-card ms-card--flat span-2"><header class="card-head ms-card-head"><span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="9" rx="2" width="14" x="5" y="11"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span><div><h3>Password</h3><p>Stops someone using your unlocked PC. It does not encrypt files, so also turn on BitLocker in Windows.</p></div></header><div class="card-body"><div class="row" data-q="Password set change remove lock now"><span class="row-copy"><strong>Password</strong><span id="passwordStatus">No password set.</span></span><span class="row-actions"><button class="ms-btn" id="setPasswordBtn">Set password</button><button class="ms-btn hidden" id="lockNowBtn">Lock now</button><button class="ms-btn ms-btn--sm danger hidden" id="removePasswordBtn">Remove</button></span></div></div></section><section class="card ms-card ms-card--flat span-2"><header class="card-head ms-card-head"><span class="card-ico"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="9" rx="2" width="14" x="5" y="11"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span><div><h3>When to lock</h3><p>Only active once a password is set.</p></div></header><div class="card-body"><div class="lock-options" id="lockOptions"></div></div></section></div></div>
+<div class="settings-panel" data-panel="downloads" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Downloads</h2><p>Manage files downloaded from websites and workspace tools.</p></div></div><div class="bento" id="downloadsSettingsReactMount"></div></div>
+<div class="settings-panel privacy-panel" data-panel="privacy" data-settings-scope="aihub"><div id="aiHubPrivacyReactMount"></div></div>
+<div class="settings-panel" data-panel="websites" data-settings-scope="aihub"><div id="aiHubWebsitesReactMount"></div></div>
+<div class="settings-panel" data-panel="about" data-settings-scope="global"><div id="aboutReactMount"></div></div>
+<div class="settings-panel" data-panel="data" data-settings-scope="global"><div class="panel-head"><div><h2 class="ms-title">Data</h2><p>Back up, restore, import, export and troubleshoot your Mad Station workspace.</p></div></div><div class="bento" id="dataDiagnosticsReactMount"></div></div>
+<div class="settings-panel" data-panel="developer" data-settings-scope="global"><div id="developerReactMount"></div></div>
+
+<div class="st-empty hidden" id="settingsNoResults"><strong>No settings found</strong><span>Try a different word, like “lock”, “zoom” or “camera”.</span></div>
+</section>
+</main>
+</div>
+<div aria-label="Notifications" class="floating-panel hidden" id="notificationPanel" role="dialog"><div class="floating-head"><strong>Notifications</strong><button aria-label="Close" class="close ms-icon-btn" id="closeNotifications" type="button">×</button></div><div class="notification-list" id="notificationList"></div><div class="floating-foot"><button class="ms-btn" id="clearNotificationsBtn" type="button">Clear notifications</button></div></div>
+<div class="modal hidden feature-settings-modal" id="notesSettingsModal" role="dialog" aria-modal="true" aria-labelledby="notesSettingsTitle" aria-describedby="notesSettingsSubtitle"><div id="notesSettingsReactMount"></div></div>
+<div class="modal hidden feature-settings-modal" id="todoSettingsModal"></div>
+<div class="modal hidden feature-settings-modal" id="instructionSettingsModal">
+<div class="ms-card ms-card--flat clipboard-settings-card" id="instructionSettingsLegacy">
+<div class="clipboard-settings-heading"><div class="clipboard-settings-icon ms-brand-tile"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3h0a1.7 1.7 0 0 0-1 1.5v.1a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5h0a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9v0a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1v0a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></div><div><div class="modal-title">Prompt Studio settings</div><div class="modal-subtitle">Choose the default AI and output behavior for Prompt Studio.</div></div><button aria-label="Back" class="close ms-icon-btn" id="closeInstructionSettings" type="button" title="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button></div>
+<div class="clipboard-settings-section"><div class="clipboard-settings-section-title ms-eyebrow">Prompt defaults</div><div class="clipboard-settings-section-subtitle ms-muted">These preferences only affect Prompt Studio.</div><label class="clipboard-setting-label">Default AI<select class="ms-input" id="forgeDefaultModel"></select></label><label class="toggle-row"><input id="forgeClearOutput" type="checkbox"><span><strong>Clear previous result when generating</strong><small>Remove the old instruction as soon as a new Forge run starts.</small></span></label><label class="toggle-row"><input id="forgeAutoCopyOutput" type="checkbox"><span><strong>Copy generated prompt automatically</strong><small>Put a successful generated prompt on the system clipboard.</small></span></label><label class="toggle-row"><input id="forgeKeepInput" type="checkbox"><span><strong>Keep input after generating</strong><small>Leave your original explanation in the input box after a successful generation.</small></span></label></div>
+<div class="clipboard-settings-actions"><button class="ms-btn" id="cancelInstructionSettings" type="button">Cancel</button><button class="ms-btn ms-btn--primary" id="saveInstructionSettings" type="button">Save settings</button></div>
+</div>
+<div id="instructionSettingsReactMount" hidden></div>
+</div>
+<div class="modal hidden feature-settings-modal" id="aiLabSettingsModal">
+<div class="ms-card ms-card--flat clipboard-settings-card" id="aiLabSettingsLegacy">
+<div class="clipboard-settings-heading"><div class="clipboard-settings-icon ms-brand-tile"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3h0a1.7 1.7 0 0 0-1 1.5v.1a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5h0a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9v0a1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1v0a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></div><div><div class="modal-title">AI Playground settings</div><div class="modal-subtitle">Set the starting Arena view and local-model behavior for AI Playground.</div></div><button aria-label="Back" class="close ms-icon-btn" id="closeAiLabSettings" type="button" title="Back"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></button></div>
+<div class="clipboard-settings-section"><div class="clipboard-settings-section-title ms-eyebrow">Playground defaults</div><div class="clipboard-settings-section-subtitle ms-muted">These preferences are stored with AI Playground and do not change AI Hub.</div><label class="clipboard-setting-label">Default Playground tab<select class="ms-input" id="aiLabDefaultTab"><option value="model-arena">Model Arena</option><option value="arena-accounts">Arena Accounts</option><option value="scoreboard">Leaderboard</option></select></label><label class="clipboard-setting-label">Default Arena mode<select class="ms-input" id="aiLabDefaultArena"><option value="free-account">Free Account Arena</option><option value="api">API Arena</option><option value="local">Local AI Arena</option></select></label><label class="toggle-row"><input id="aiLabAutoScanLocal" type="checkbox"><span><strong>Scan local models when opened</strong><small>Refresh local-model discovery whenever Local AI Arena is selected.</small></span></label><label class="toggle-row"><input id="aiLabRememberArenaAccounts" type="checkbox"><span><strong>Remember Arena account pair</strong><small>Restore the last left/right Free Account Arena accounts next time AI Lab opens.</small></span></label></div>
+<div class="clipboard-settings-actions"><button class="ms-btn" id="cancelAiLabSettings" type="button">Cancel</button><button class="ms-btn ms-btn--primary" id="saveAiLabSettings" type="button">Save settings</button></div>
+</div>
+<div id="aiLabSettingsReactMount" hidden></div>
+</div>
+<div class="modal hidden" id="accountModal">
+<div class="modal-card wide setup-modal account-setup-modal">
+<div class="modal-header setup-header">
+<div class="setup-heading">
+<span class="setup-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg></span>
+<div><div class="modal-title" id="accountModalTitle">Add an AI account</div><div class="modal-subtitle" id="accountModalSubtitle">Create a separate persistent session for this account.</div></div>
+</div>
+<button aria-label="Close" class="close" id="closeAccountModal" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div id="accountFormReactMount"></div>
+</div>
+</div>
+<div class="modal hidden" id="renameModal">
+<div class="modal-card">
+<div class="modal-header"><div><div class="modal-title">Rename account</div><div class="modal-subtitle">Only changes the name shown in Mad Station. The login stays the same.</div></div><button aria-label="Close" class="close" id="closeRenameModal" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div id="renameFormReactMount" hidden></div>
+<form id="renameFormLegacy">
+<label>Account name<input autocomplete="off" id="renameInput" maxlength="60" required=""/></label>
+<div class="form-error" id="renameError"></div>
+<div class="form-actions"><button class="secondary" id="cancelRenameBtn" type="button">Cancel</button><button class="primary" type="submit">Save name</button></div>
+</form>
+</div>
+</div>
+<div class="modal hidden" id="downloadsModal">
+<div class="modal-card wide dl-card">
+<div class="modal-header">
+<div><div class="modal-title">Downloads</div><div class="modal-subtitle" id="downloadsSubtitle">Website files and local Mad Station components. This list is cleared when Mad Station closes.</div></div>
+<button aria-label="Close" class="close" id="closeDownloadsModal" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div class="dl-list" id="downloadsList"></div>
+<div class="form-actions"><button class="secondary" id="dlOpenFolderBtn" type="button">Open folder</button><button class="secondary" id="dlClearBtn" type="button">Clear finished</button></div>
+</div>
+</div>
+<div class="modal hidden" id="memoryProcessesModal" role="dialog" aria-modal="true" aria-labelledby="memoryProcessesTitle">
+<div class="modal-card wide memory-processes-card">
+<div class="modal-header">
+<div><div class="modal-title" id="memoryProcessesTitle">Mad Station processes</div><div class="modal-subtitle" id="memoryProcessesSubtitle">Live working-set memory by Electron process.</div></div>
+<button aria-label="Close process details" class="close" id="closeMemoryProcessesModal" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div class="memory-process-summary" id="memoryProcessSummary"></div>
+<div class="memory-process-toolbar"><span id="memoryProcessesUpdated">Measuring…</span><button class="secondary" id="refreshMemoryProcessesBtn" type="button">Refresh</button></div>
+<div class="memory-process-table-wrap">
+<table class="memory-process-table">
+<thead><tr><th scope="col">Process</th><th scope="col">Type</th><th scope="col">PID</th><th scope="col">RAM</th></tr></thead>
+<tbody id="memoryProcessesBody"><tr><td colspan="4" class="memory-process-empty">Process metrics unavailable.</td></tr></tbody>
+</table>
+</div>
+<div class="memory-process-footer"><span>Working set is the physical memory currently assigned to each process.</span><button class="tiny-btn" id="closeMemoryProcessesBtn" type="button">Close</button></div>
+</div>
+</div>
+<div class="modal hidden" id="providerModal">
+<div class="modal-card wide setup-modal provider-setup-modal">
+<div class="modal-header setup-header">
+<div class="setup-heading">
+<span class="setup-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 5h16v14H4z"></path><path d="M8 9h8M8 13h5"></path></svg></span>
+<div><div class="modal-title" id="providerModalTitle">Add provider</div><div class="modal-subtitle">Create a reusable provider definition for an HTTPS AI website.</div></div>
+</div>
+<button aria-label="Close" class="close" id="closeProviderModal" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+<div id="providerFormReactMount"></div>
+</div>
+</div>
+<div class="modal hidden" id="passwordModal">
+<div class="modal-card">
+<div class="modal-header"><div><div class="modal-title" id="passwordModalTitle">Set password</div><div class="modal-subtitle" id="passwordModalSubtitle">Choose at least 8 characters. There is no way to recover it; if you forget it you can reset the lock, which signs out all accounts.</div></div><button aria-label="Close" class="close" id="closePasswordModal" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+<div id="passwordFormReactMount" hidden></div>
+<form id="passwordFormLegacy">
+<label id="pwCurrentRow">Current password<input autocomplete="off" id="pwCurrent" type="password" maxlength="256"/></label>
+<label id="pwNewRow">New password<input autocomplete="off" id="pwNew" type="password" maxlength="256"/></label>
+<label id="pwConfirmRow">Confirm new password<input autocomplete="off" id="pwConfirm" type="password" maxlength="256"/></label>
+<div class="form-error" id="pwError"></div>
+<div class="form-actions"><button class="secondary" id="cancelPasswordBtn" type="button">Cancel</button><button class="primary" id="savePasswordBtn" type="submit">Save password</button></div>
+</form>
+</div>
+</div>
+<div class="lock-screen ms-screen hidden" id="lockScreen">
+<form class="lock-card ms-card ms-card--flat" id="lockForm">
+<div class="about-logo"><img alt="Mad Station" src="../assets/icon.png"/></div>
+<h2>Mad Station is locked</h2>
+<p>Enter your password to continue.</p>
+<input aria-label="Unlock password" autocomplete="off" class="ms-input" id="lockPassword" placeholder="Password" type="password" maxlength="256"/>
+<div class="form-error" id="lockError"></div>
+<button class="ms-btn ms-btn--primary" id="lockSubmit" type="submit">Unlock</button>
+<button class="ms-btn ms-btn--sm" id="forgotPasswordBtn" type="button">Forgot password?</button>
+</form>
+<div id="lockScreenReactMount" hidden></div>
+</div>
+<div id="aiHubManagementFormsControllerMount" hidden></div>
+<div id="imageHubSidebarChromeControllerMount" hidden></div>
+<div id="notesWorkspaceControllerMount" hidden></div>
+<div id="utilityWorkspacesReactRoot" hidden></div>
+<div id="homeCustomizerReactMount" class="home-customizer-react-root"></div>
+<!-- Keep native window chrome after all UI mounts. Electron resolves overlapping app-region rectangles
+     using document order, so this shared drag target and its controls must follow every page/root mount. -->
+<div class="window-drag-strip" aria-hidden="true"></div>
+<div class="window-controls" aria-label="Window controls">
+  <button class="window-control window-minimize" id="windowMinimizeBtn" type="button" aria-label="Minimize" title="Minimize">−</button>
+  <button class="window-control window-maximize" id="windowMaximizeBtn" type="button" aria-label="Maximize" title="Maximize">□</button>
+  <button class="window-control window-close" id="windowCloseBtn" type="button" aria-label="Close" title="Close">×</button>
+</div>
+<script src="developer-visual-debug.js"></script>
+<script src="appearance.js"></script>
+<script src="home-core-system.js"></script>
+<script src="home-apps.js"></script>
+<script src="home-app-list.js"></script>
+<script src="home-mini-apps.js"></script>
+<script src="home-mini-list.js"></script>
+<script src="home-widgets.js"></script>
+<script src="home-widget-list.js"></script>
+<script src="home-customizer.js"></script>
+<script src="home-layout-editor.js"></script>
+<script src="renderer.js"></script>
+<script src="home-page-switcher.js"></script>
+<!-- React owns the Notifications and Downloads list presentation; the renderer host retains notification/download state and mutations, badge counts, progress-width DOM updates and native overlay behavior. React also owns Home companion cards, mini-app tiles, live-widget shells, AI Hub account cards, account-navigation provider filters/group/favorite controls/recent chips/list heading, provider/account/shortcut management lists and create/edit forms, utility lists and complete Clipboard/To-do workspaces, the Home customizer dialog, the Image Hub account sidebar, sidebar search/actions, settings, browser states, browser toolbar and active-account status, Image Hub workspace tabs, Notes header/search/composer/settings and utility lists, Video Hub quick-start site cards, provider-filter tiles, account-list tiles, recent-account chips, provider-management rows, and Appearance theme/accent/background and advanced layout/visual controls, AI Hub account/provider context menus, sidebar appearance/account safety/built-in shortcut info, plus Accessibility, Audio output, Startup, Lock, Downloads, Data/Diagnostics, About, Developer, AI Hub Privacy and Websites settings panels, the API Arena, Free Account Arena browser shell, Local AI Arena comparison workflow, Model Arena account-management and account/provider creation forms, scoreboard, API model settings, AI Playground settings, Prompt Studio settings, account tabs and browser status. -->
+<script type="module" src="../build/home-companions-react.js"></script>
+<script type="module" src="../build/home-mini-apps-react.js"></script>
+<script type="module" src="../build/accounts-react.js"></script>
+<script type="module" src="../build/ai-hub-management-forms-react.js"></script>
+<script type="module" src="../build/ai-hub-management-lists-react.js"></script>
+<script type="module" src="../build/ai-hub-account-navigation-react.js"></script>
+<script type="module" src="../build/context-menu-react.js"></script>
+<script type="module" src="../build/rename-account-modal-react.js"></script>
+<script type="module" src="../build/password-modal-react.js"></script>
+<script type="module" src="../build/lock-screen-react.js"></script>
+<script type="module" src="../build/utility-lists-react.js"></script>
+<script type="module" src="../build/utility-workspaces-react.js"></script>
+<script type="module" src="../build/home-customizer-react.js"></script>
+<script type="module" src="../build/home-widgets-react.js"></script>
+<script type="module" src="../build/image-hub-sidebar-react.js"></script>
+<script type="module" src="../build/image-hub-discovery-react.js"></script>
+<script type="module" src="../build/image-hub-workspace-toolbar-react.js"></script>
+<script type="module" src="../build/image-hub-workspace-chrome-react.js"></script>
+<script type="module" src="../build/image-hub-sidebar-chrome-react.js"></script>
+<script type="module" src="../build/image-hub-settings-react.js"></script>
+<script type="module" src="../build/image-hub-browser-state-react.js"></script>
+<script type="module" src="../build/notes-workspace-react.js"></script>
+<script type="module" src="../build/video-hub-sites-react.js"></script>
+<script type="module" src="../build/video-hub-provider-tiles-react.js"></script>
+<script type="module" src="../build/video-hub-sidebar-controls-react.js"></script>
+<script type="module" src="../build/video-hub-account-list-react.js"></script>
+<script type="module" src="../build/video-hub-recent-react.js"></script>
+<script type="module" src="../build/notifications-react.js"></script>
+<script type="module" src="../build/downloads-list-react.js"></script>
+<script type="module" src="../build/memory-process-table-react.js"></script>
+<script type="module" src="../build/memory-monitor-react.js"></script>
+<script type="module" src="../build/video-hub-providers-react.js"></script>
+<script type="module" src="../build/video-hub-workspace-chrome-react.js"></script>
+<script type="module" src="../build/video-hub-browser-state-react.js"></script>
+<script type="module" src="../build/video-hub-settings-react.js"></script>
+<script type="module" src="../build/video-hub-setup-forms-react.js"></script>
+<script type="module" src="../build/appearance-controls-react.js"></script>
+<script type="module" src="../build/remaining-settings-panels-react.js"></script>
+<script type="module" src="../build/global-settings-panels-react.js"></script>
+<script type="module" src="../build/system-settings-panels-react.js"></script>
+<script type="module" src="../build/information-security-panels-react.js"></script>
+<script type="module" src="../build/ai-playground-api-arena-react.js"></script>
+<script type="module" src="../build/ai-playground-api-model-settings-react.js"></script>
+<script type="module" src="../build/ai-playground-browser-arenas-react.js"></script>
+<script type="module" src="../build/ai-playground-arena-management-react.js"></script>
+<script type="module" src="../build/instruction-forge-accounts-react.js"></script>
+<script type="module" src="../build/instruction-forge-settings-react.js"></script>
+<script type="module" src="../build/instruction-forge-composer-react.js"></script>
+<script type="module" src="../build/ai-playground-settings-react.js"></script>
+<script type="module" src="../build/ai-playground-arena-setup-react.js"></script>
+</body>
+</html>

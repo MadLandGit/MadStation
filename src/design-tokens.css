@@ -1,0 +1,370 @@
+/* =====================================================================
+   Mad Station — Design tokens  (THE single source of truth)
+
+   The "night station" design system, layer 2 of 3:
+
+     1. Core palette   --bg --sidebar --surface --surface-2 --surface-3
+                       --line --line-strong --text --muted --muted-2
+                       --accent --accent-strong --danger
+                       Defined in styles.css (:root, light/dark/system) and
+                       set live by appearance.js (accent). These are already
+                       role-named; use them directly. Never use raw colors.
+     2. Design tokens  --ms-*   <- THIS FILE
+                       Shape, spacing, surface material, borders, shadows and
+                       button looks. This is the ONLY place where the
+                       Appearance settings (body[data-*], set by appearance.js)
+                       are mapped to values. Nothing else may re-declare them.
+     3. Components     design-kit.css (.ms-*) for new work, plus the shared
+                       legacy classes restyled in pages.css / home.css.
+
+   Rules
+     • Name tokens by ROLE (--ms-r-card), never by value (--ms-20px).
+     • Everything derives from layer-1 variables, so Light / Dark / System,
+       every accent and every Appearance option reach every screen at once.
+     • A new Appearance option = one new rule block here + the matching value
+       list in appearance.js. tests/design-system.test.js fails if they drift.
+     • No url(), no @import (strict app CSP).
+
+   Load order (renderer.html): styles.css → design-tokens.css →
+   design-kit.css → home.css → pages.css
+   ===================================================================== */
+
+body {
+  /* --- motion + type --- */
+  --ms-ease: cubic-bezier(.2, .8, .2, 1);
+  --ms-font-ui: "Segoe UI Variable Text", "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+
+  /* --- signature gradient (accent → accent-strong) --- */
+  --ms-fire: linear-gradient(120deg, var(--accent) 0%, var(--accent-strong) 100%);
+
+  /* --- semantic hues: recognisable, but adapt to light / dark --- */
+  --ms-sky:   color-mix(in srgb, #4fb8f5 78%, var(--text) 22%);
+  --ms-mint:  color-mix(in srgb, #2fd9a8 78%, var(--text) 22%);
+  --ms-lilac: color-mix(in srgb, #a58bff 78%, var(--text) 22%);
+  --ms-amber: color-mix(in srgb, #f5b73b 78%, var(--text) 22%);
+  --ms-rose:  color-mix(in srgb, #ff4d86 80%, var(--text) 20%);
+
+  /* --- surface material (data-surface-style) --- */
+  --ms-card-bg: var(--surface);
+  --ms-card-blur: none;
+
+  /* --- shape (data-corner-style / data-button-corner) --- */
+  --ms-r-card: 20px;
+  --ms-r-card-lg: 22px;
+  --ms-r-sm: 13px;
+  --ms-r-xs: 10px;
+  --ms-r-icon: 10px;
+  --ms-r-btn: 999px;
+
+  /* --- borders & shadows (data-border-style / data-shadow-style) --- */
+  --ms-card-border: var(--line);
+  --ms-card-shadow: 0 14px 40px -18px color-mix(in srgb, black 35%, transparent);
+
+  /* --- spacing (data-card-spacing / data-density) --- */
+  --ms-gap: 6px;
+  --ms-pad-y: 15px;
+  --ms-pad-x: 18px;
+
+  /* --- buttons (data-button-background) --- */
+  --ms-btn-bg: color-mix(in srgb, var(--text) 5%, transparent);
+  --ms-btn-fg: var(--text);
+  --ms-btn-bd: var(--line-strong);
+  --ms-btn-sh: 0 0 0 0 transparent;
+  --ms-btn-bg-hover: color-mix(in srgb, var(--text) 11%, transparent);
+}
+
+/* ---- Surface style ---- */
+body[data-surface-style="solid"]    { --ms-card-bg: var(--surface); --ms-card-blur: none; }
+body[data-surface-style="glass"]    { --ms-card-bg: color-mix(in srgb, var(--surface) 70%, transparent); --ms-card-blur: blur(18px) saturate(125%); }
+body[data-surface-style="elevated"] { --ms-card-bg: var(--surface-2); --ms-card-blur: none; }
+body[data-surface-style="frosted"]  { --ms-card-bg: color-mix(in srgb, var(--surface) 58%, transparent); --ms-card-blur: blur(26px) saturate(150%); }
+
+/* ---- Corner style ---- */
+body[data-corner-style="soft"]   { --ms-r-card: 20px; --ms-r-card-lg: 22px; --ms-r-sm: 13px; --ms-r-icon: 10px; }
+body[data-corner-style="sharp"]  { --ms-r-card: 6px;  --ms-r-card-lg: 6px;  --ms-r-sm: 4px;  --ms-r-icon: 4px; }
+body[data-corner-style="square"] { --ms-r-card: 0;    --ms-r-card-lg: 0;    --ms-r-sm: 0;    --ms-r-icon: 0; }
+body[data-corner-style="ultra"]  { --ms-r-card: 32px; --ms-r-card-lg: 34px; --ms-r-sm: 20px; --ms-r-icon: 14px; }
+
+/* ---- Button corner ---- */
+body[data-button-corner="soft"]   { --ms-r-btn: 10px; }
+body[data-button-corner="pill"]   { --ms-r-btn: 999px; }
+body[data-button-corner="square"] { --ms-r-btn: 5px; }
+body[data-button-corner="sharp"]  { --ms-r-btn: 0; }
+body[data-button-corner="glass"]  { --ms-r-btn: 12px; }
+body[data-button-corner="neon"]   { --ms-r-btn: 6px; }
+
+/* ---- Button background ---- */
+body[data-button-background="solid"]    { --ms-btn-bg: var(--accent); --ms-btn-fg: var(--bg); --ms-btn-bd: var(--accent); --ms-btn-bg-hover: var(--accent-strong); }
+body[data-button-background="outline"]  { --ms-btn-bg: transparent; --ms-btn-fg: var(--accent); --ms-btn-bd: var(--accent); --ms-btn-bg-hover: color-mix(in srgb, var(--accent) 12%, transparent); }
+body[data-button-background="ghost"]    { --ms-btn-bg: color-mix(in srgb, var(--accent) 10%, transparent); --ms-btn-fg: var(--accent); --ms-btn-bd: transparent; --ms-btn-bg-hover: color-mix(in srgb, var(--accent) 20%, transparent); }
+body[data-button-background="contrast"] { --ms-btn-bg: var(--text); --ms-btn-fg: var(--bg); --ms-btn-bd: var(--text); --ms-btn-bg-hover: color-mix(in srgb, var(--text) 86%, var(--bg)); }
+body[data-button-background="glass"]    { --ms-btn-bg: color-mix(in srgb, var(--surface) 62%, transparent); --ms-btn-fg: var(--accent); --ms-btn-bd: color-mix(in srgb, var(--accent) 38%, var(--line-strong)); --ms-btn-sh: inset 0 1px 0 color-mix(in srgb, var(--text) 14%, transparent); --ms-btn-bg-hover: color-mix(in srgb, var(--surface) 80%, transparent); }
+body[data-button-background="neon"]     { --ms-btn-bg: color-mix(in srgb, var(--accent) 18%, transparent); --ms-btn-fg: var(--accent); --ms-btn-bd: var(--accent); --ms-btn-sh: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 18px color-mix(in srgb, var(--accent) 28%, transparent); --ms-btn-bg-hover: color-mix(in srgb, var(--accent) 28%, transparent); }
+body[data-button-background="text"]     { --ms-btn-bg: transparent; --ms-btn-fg: var(--accent); --ms-btn-bd: transparent; --ms-btn-bg-hover: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* ---- Border style ---- */
+body[data-border-style="subtle"]   { --ms-card-border: var(--line); }
+body[data-border-style="balanced"] { --ms-card-border: var(--line-strong); }
+body[data-border-style="strong"]   { --ms-card-border: color-mix(in srgb, var(--text) 24%, transparent); }
+body[data-border-style="neon2"]    { --ms-card-border: color-mix(in srgb, var(--accent) 52%, var(--line-strong)); }
+body[data-border-style="neon"]     { --ms-card-border: var(--accent); }
+body[data-border-style="glass"]    { --ms-card-border: color-mix(in srgb, var(--text) 22%, var(--line)); }
+body[data-border-style="none"]     { --ms-card-border: transparent; }
+
+/* ---- Shadow style ---- */
+body[data-shadow-style="none"]   { --ms-card-shadow: 0 0 0 0 transparent; }
+body[data-shadow-style="soft"]   { --ms-card-shadow: 0 14px 40px -18px color-mix(in srgb, black 35%, transparent); }
+body[data-shadow-style="strong"] { --ms-card-shadow: 0 22px 50px -12px color-mix(in srgb, black 50%, transparent); }
+body[data-shadow-style="neon"]   { --ms-card-shadow: 0 0 22px color-mix(in srgb, var(--accent) 26%, transparent), 0 18px 48px -14px color-mix(in srgb, var(--accent) 22%, transparent); }
+body[data-shadow-style="glass"]  { --ms-card-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 14%, transparent), 0 12px 32px -10px color-mix(in srgb, black 25%, transparent); }
+
+/* ---- Card spacing (gap between cards) ---- */
+body[data-card-spacing="compact"]     { --ms-gap: 3px; }
+body[data-card-spacing="comfortable"] { --ms-gap: 6px; }
+body[data-card-spacing="spacious"]    { --ms-gap: 13px; }
+
+/* ---- Density (padding inside cards) ---- */
+body[data-density="compact"] { --ms-pad-y: 10px; --ms-pad-x: 14px; }
+
+/* ---- Isolated modular Home palette bridge and Appearance adapter ----
+   The iframe normally receives the exact computed core palette from the host.
+   These scoped values are only its standalone-preview fallback. Keeping this
+   mapping here means the Home skin consumes the same roles as the rest of the app. */
+:root:has(body[data-home-isolated="true"]) {
+  color-scheme: dark;
+  --bg: #0b0b0c;
+  --sidebar: #111112;
+  --surface: #171718;
+  --surface-2: #1d1d1f;
+  --surface-3: #232326;
+  --line: rgba(255,255,255,.09);
+  --line-strong: rgba(255,255,255,.14);
+  --text: #f5f5f7;
+  --muted: #96969d;
+  --muted-2: #6f7078;
+  --accent: #8ab4ff;
+  --accent-strong: #5f9bff;
+  --danger: #ff6b75;
+  --shadow: 0 18px 55px rgba(0,0,0,.38);
+}
+:root:has(body[data-home-isolated="true"][data-theme="light"]) {
+  color-scheme: light;
+  --bg: #f5f5f7;
+  --sidebar: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f0f0f2;
+  --surface-3: #e7e7ea;
+  --line: rgba(0,0,0,.09);
+  --line-strong: rgba(0,0,0,.15);
+  --text: #1c1c1e;
+  --muted: #6e6e73;
+  --muted-2: #8a8a90;
+  --accent: #2767d9;
+  --accent-strong: #1558ca;
+  --danger: #c93e4a;
+  --shadow: 0 18px 55px rgba(0,0,0,.12);
+}
+@media (prefers-color-scheme: light) {
+  :root:has(body[data-home-isolated="true"][data-theme="system"]) {
+    color-scheme: light;
+    --bg: #f5f5f7;
+    --sidebar: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f0f0f2;
+    --surface-3: #e7e7ea;
+    --line: rgba(0,0,0,.09);
+    --line-strong: rgba(0,0,0,.15);
+    --text: #1c1c1e;
+    --muted: #6e6e73;
+    --muted-2: #8a8a90;
+    --accent: #2767d9;
+    --accent-strong: #1558ca;
+    --danger: #c93e4a;
+    --shadow: 0 18px 55px rgba(0,0,0,.12);
+  }
+}
+
+body[data-home-isolated="true"] {
+  --line-2: var(--line-strong, var(--line));
+  --faint: var(--muted-2, var(--muted));
+  --h1: var(--accent);
+  --h2: var(--ms-lilac);
+  --h3: var(--ms-rose);
+  --h4: var(--ms-amber);
+  --h5: var(--ms-mint);
+  --h6: var(--ms-sky);
+  --ok: var(--ms-mint);
+  --warn: var(--ms-amber);
+  --bad: var(--danger);
+  --r: var(--ms-r-card);
+  --r-sm: var(--ms-r-sm);
+  --gap: var(--ms-home-module-gap);
+  --pad: var(--ms-home-panel-padding-y);
+  --on-accent: var(--bg);
+  --ms-home-background: var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-position: center;
+  --ms-home-background-repeat: no-repeat;
+  --ms-home-panel-bg: var(--surface);
+  --ms-home-overlay-bg: var(--bg);
+  --ms-home-panel-blur: none;
+  --ms-home-panel-border: var(--ms-card-border);
+  --ms-home-panel-shadow: none;
+  --ms-home-elevated-shadow: var(--ms-card-shadow);
+  --ms-home-panel-radius: var(--ms-r-card);
+  --ms-home-small-radius: var(--ms-r-sm);
+  --ms-home-quick-radius: var(--ms-r-btn);
+  --ms-home-search-radius: var(--ms-r-sm);
+  --ms-home-control-radius: var(--ms-r-btn);
+  --ms-home-module-gap: calc(var(--ms-gap) + 6px);
+  --ms-home-panel-padding: var(--ms-pad-y);
+  --ms-home-panel-padding-x: var(--ms-pad-x);
+  --ms-home-panel-padding-y: var(--ms-pad-y);
+  --ms-home-row-gap: 6px;
+  --ms-home-toast-bg: var(--text);
+  --ms-home-toast-fg: var(--bg);
+  --ms-home-control-bg: var(--ms-btn-bg);
+  --ms-home-control-fg: var(--ms-btn-fg);
+  --ms-home-control-border: var(--ms-btn-bd);
+  --ms-home-control-shadow: var(--ms-btn-sh);
+  --ms-home-control-blur: none;
+  --ms-home-control-hover-bg: var(--ms-btn-bg-hover);
+  --ms-home-primary-bg: var(--ms-btn-bg);
+  --ms-home-primary-fg: var(--ms-btn-fg);
+  --ms-home-primary-border: var(--ms-btn-bd);
+  --ms-home-primary-shadow: var(--ms-btn-sh);
+  --ms-home-primary-hover-bg: var(--ms-btn-bg-hover);
+  --ms-home-status-indicator-display: inline-block;
+  color-scheme: dark;
+}
+body[data-home-isolated="true"][data-theme="light"] {
+  --on-accent: #ffffff;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light) {
+  body[data-home-isolated="true"][data-theme="system"] {
+    --on-accent: #ffffff;
+    color-scheme: light;
+  }
+}
+
+/* The Home supports every background available in Settings -> Appearance.
+   These are adapters to the same global background styles, always tinted by the active accent. */
+body[data-background-style="plain"] {
+  --ms-home-background: var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="aurora"] {
+  --ms-home-background: radial-gradient(ellipse at 14% 8%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 39%), radial-gradient(ellipse at 88% 86%, color-mix(in srgb, var(--accent-strong) 13%, transparent), transparent 37%), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="grid"] {
+  --ms-home-background: linear-gradient(color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--text) 4%, transparent) 1px, transparent 1px), var(--bg);
+  --ms-home-background-size: 28px 28px, 28px 28px, auto;
+  --ms-home-background-repeat: repeat, repeat, no-repeat;
+}
+body[data-background-style="spotlight"] {
+  --ms-home-background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 48%), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="mesh"] {
+  --ms-home-background: radial-gradient(ellipse at 18% 18%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 30%), radial-gradient(ellipse at 79% 22%, color-mix(in srgb, var(--accent-strong) 12%, transparent), transparent 29%), radial-gradient(ellipse at 44% 84%, color-mix(in srgb, var(--text) 7%, transparent), transparent 32%), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="neon"] {
+  --ms-home-background: radial-gradient(ellipse at 12% 12%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 34%), radial-gradient(ellipse at 88% 82%, color-mix(in srgb, var(--accent-strong) 18%, transparent), transparent 38%), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="dots"] {
+  --ms-home-background: radial-gradient(circle, color-mix(in srgb, var(--accent) 20%, transparent) 1.2px, transparent 1.5px), var(--bg);
+  --ms-home-background-size: 18px 18px, auto;
+  --ms-home-background-repeat: repeat, no-repeat;
+}
+body[data-background-style="rings"] {
+  --ms-home-background: repeating-radial-gradient(circle at 20% 20%, transparent 0 18px, color-mix(in srgb, var(--accent) 10%, transparent) 19px 20px), repeating-radial-gradient(circle at 80% 75%, transparent 0 28px, color-mix(in srgb, var(--text) 7%, transparent) 29px 30px), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="hex"] {
+  --ms-home-background: linear-gradient(30deg, transparent 48%, color-mix(in srgb, var(--text) 5%, transparent) 49% 51%, transparent 52%), linear-gradient(150deg, transparent 48%, color-mix(in srgb, var(--text) 5%, transparent) 49% 51%, transparent 52%), var(--bg);
+  --ms-home-background-size: 36px 62px, 36px 62px, auto;
+  --ms-home-background-repeat: repeat, repeat, no-repeat;
+}
+body[data-background-style="waves"] {
+  --ms-home-background: repeating-radial-gradient(ellipse at 0 100%, transparent 0 28px, color-mix(in srgb, var(--accent) 9%, transparent) 29px 31px, transparent 32px 62px), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="diagonal"] {
+  --ms-home-background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, transparent) 0 1px, transparent 1px 22px), var(--bg);
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="circuit"] {
+  --ms-home-background: linear-gradient(90deg, transparent 48%, color-mix(in srgb, var(--accent) 12%, transparent) 49% 51%, transparent 52%), linear-gradient(0deg, transparent 48%, color-mix(in srgb, var(--accent) 10%, transparent) 49% 51%, transparent 52%), radial-gradient(circle at 25% 25%, color-mix(in srgb, var(--accent) 16%, transparent) 0 3px, transparent 4px), var(--bg);
+  --ms-home-background-size: 42px 42px, 42px 42px, 42px 42px, auto;
+  --ms-home-background-repeat: repeat, repeat, repeat, no-repeat;
+}
+body[data-background-style="constellation"] {
+  --ms-home-background: radial-gradient(circle at 14% 20%, color-mix(in srgb, var(--accent) 35%, transparent) 0 2px, transparent 3px), radial-gradient(circle at 36% 48%, color-mix(in srgb, var(--accent) 24%, transparent) 0 1.5px, transparent 2.5px), linear-gradient(135deg, var(--bg), var(--bg));
+  --ms-home-background-size: auto;
+  --ms-home-background-repeat: no-repeat;
+}
+body[data-background-style="tiles"] {
+  --ms-home-background: linear-gradient(45deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, transparent 25%, transparent 75%, color-mix(in srgb, var(--text) 7%, transparent) 75%), linear-gradient(45deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, transparent 25%, transparent 75%, color-mix(in srgb, var(--text) 7%, transparent) 75%), var(--bg);
+  --ms-home-background-size: 28px 28px, 28px 28px, auto;
+  --ms-home-background-position: 0 0, 14px 14px, center;
+  --ms-home-background-repeat: repeat, repeat, no-repeat;
+}
+body[data-background-style="parallax"] {
+  --ms-home-background: radial-gradient(ellipse at 14% 8%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 36%), radial-gradient(ellipse at 88% 24%, color-mix(in srgb, var(--accent-strong) 17%, transparent), transparent 34%), radial-gradient(ellipse at 52% 92%, color-mix(in srgb, var(--text) 7%, transparent), transparent 38%), linear-gradient(color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--accent) 7%, transparent) 1px, transparent 1px), var(--bg);
+  --ms-home-background-size: auto, auto, auto, 48px 48px, 48px 48px, auto;
+  --ms-home-background-position: center, center, center, 0 0, 0 0, center;
+  --ms-home-background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+}
+body[data-background-style="custom"] {
+  --ms-home-background: var(--custom-background-image, var(--bg));
+  --ms-home-background-size: cover;
+  --ms-home-background-position: center;
+  --ms-home-background-repeat: no-repeat;
+}
+
+/* Borders/shadows/surfaces/shape and spacing all flow through the common tokens. */
+body[data-surface-style="solid"] { --ms-home-panel-bg: var(--surface); --ms-home-overlay-bg: var(--bg); --ms-home-panel-blur: none; }
+body[data-surface-style="elevated"] { --ms-home-panel-bg: var(--ms-card-bg); --ms-home-overlay-bg: var(--surface-2); --ms-home-panel-blur: none; }
+body[data-surface-style="glass"],
+body[data-surface-style="frosted"] { --ms-home-panel-bg: var(--ms-card-bg); --ms-home-overlay-bg: var(--ms-card-bg); --ms-home-panel-blur: var(--ms-card-blur); --ms-home-toast-bg: var(--ms-card-bg); --ms-home-toast-fg: var(--text); }
+body[data-border-style] { --ms-home-panel-border: var(--ms-card-border); }
+body[data-shadow-style="soft"] { --ms-home-panel-shadow: none; --ms-home-elevated-shadow: var(--ms-card-shadow); }
+body[data-shadow-style="none"] { --ms-home-panel-shadow: var(--ms-card-shadow); --ms-home-elevated-shadow: var(--ms-card-shadow); }
+body[data-shadow-style="strong"],
+body[data-shadow-style="neon"],
+body[data-shadow-style="glass"] { --ms-home-panel-shadow: var(--ms-card-shadow); --ms-home-elevated-shadow: var(--ms-card-shadow); }
+body[data-card-spacing] { --ms-home-module-gap: calc(var(--ms-gap) + 6px); }
+body[data-density] { --ms-home-panel-padding: var(--ms-pad-y); --ms-home-panel-padding-x: var(--ms-pad-x); --ms-home-panel-padding-y: var(--ms-pad-y); }
+body[data-border-spacing="compact"] { --ms-home-row-gap: 2px; }
+body[data-border-spacing="comfortable"] { --ms-home-row-gap: 6px; }
+body[data-border-spacing="spacious"] { --ms-home-row-gap: 11px; }
+body[data-show-status-bar="false"] { --ms-home-status-indicator-display: none; }
+body[data-show-status-bar="true"] { --ms-home-status-indicator-display: inline-block; }
+
+/* Apply each global button mode to all Home controls, including the main CTA. */
+body[data-button-background] {
+  --ms-home-control-bg: var(--ms-btn-bg);
+  --ms-home-control-fg: var(--ms-btn-fg);
+  --ms-home-control-border: var(--ms-btn-bd);
+  --ms-home-control-shadow: var(--ms-btn-sh);
+  --ms-home-control-hover-bg: var(--ms-btn-bg-hover);
+  --ms-home-primary-bg: var(--ms-btn-bg);
+  --ms-home-primary-fg: var(--ms-btn-fg);
+  --ms-home-primary-border: var(--ms-btn-bd);
+  --ms-home-primary-shadow: var(--ms-btn-sh);
+  --ms-home-primary-hover-bg: var(--ms-btn-bg-hover);
+}
+body[data-button-background="glass"] { --ms-home-control-blur: blur(10px) saturate(135%); }
+body:not([data-button-background="glass"]) { --ms-home-control-blur: none; }

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Mad Station — Developer Inspector</title>
+  <link rel="stylesheet" href="developer-debug-window.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-lockup">
+      <div class="brand-mark" aria-hidden="true">MS</div>
+      <div><p class="eyebrow">MAD STATION / DEVELOPER TOOLS</p><h1>Live Inspector</h1><p class="subtitle">A separate, readable view of the page beneath your pointer.</p></div>
+    </div>
+    <div class="header-actions">
+      <span id="liveStatus" class="status-pill status-waiting"><span class="status-dot"></span><span id="liveStatusText">Waiting for page data</span></span>
+      <button id="pinButton" class="button button-secondary" type="button" aria-pressed="true" title="Keep this inspector above Mad Station">📌 Pinned on top</button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <nav class="inspector-tabs" role="tablist" aria-label="Developer Inspector tabs">
+      <button class="inspector-tab is-active" id="tabLiveButton" type="button" role="tab" aria-selected="true" aria-controls="tabLivePanel" data-inspector-tab="live">Live Inspector</button>
+      <button class="inspector-tab" id="tabDebugOptionsButton" type="button" role="tab" aria-selected="false" aria-controls="tabDebugOptionsPanel" data-inspector-tab="options">Debug Options</button>
+      <button class="inspector-tab" id="tabElementExplorerButton" type="button" role="tab" aria-selected="false" aria-controls="tabElementExplorerPanel" data-inspector-tab="elements">Element Explorer</button>
+      <button class="inspector-tab" id="tabVisualLegendButton" type="button" role="tab" aria-selected="false" aria-controls="tabVisualLegendPanel" data-inspector-tab="legend">Visual Legend</button>
+    </nav>
+    <div class="inspector-tab-panel" id="tabLivePanel" role="tabpanel" aria-labelledby="tabLiveButton">
+    <section class="section-card overview-card">
+      <div class="section-heading"><div><span class="section-index">01</span><h2>Page overview</h2></div><button id="copySnapshotButton" class="button button-secondary" type="button">Copy snapshot JSON</button></div>
+      <div class="metric-grid">
+        <div class="metric"><span class="metric-label">Workspace</span><strong id="pageWorkspace">Waiting…</strong></div>
+        <div class="metric"><span class="metric-label">Page / theme</span><strong id="pageName">—</strong></div>
+        <div class="metric"><span class="metric-label">Viewport</span><strong id="pageViewport">—</strong></div>
+        <div class="metric"><span class="metric-label">DOM elements</span><strong id="pageElements">—</strong></div>
+        <div class="metric"><span class="metric-label">Grid / Flex</span><strong id="pageGridFlex">—</strong></div>
+        <div class="metric"><span class="metric-label">Overflow / hidden</span><strong id="pageOverflowHidden">—</strong></div>
+        <div class="metric"><span class="metric-label">Document size</span><strong id="pageDocumentSize">—</strong></div>
+        <div class="metric"><span class="metric-label">Page scroll</span><strong id="pageScroll">—</strong></div>
+        <div class="metric"><span class="metric-label">Pointer position</span><strong id="pagePointer">—</strong></div>
+        <div class="metric"><span class="metric-label">Interactive controls</span><strong id="pageInteractive">—</strong></div>
+        <div class="metric"><span class="metric-label">Duplicate-ID elements</span><strong id="pageDuplicateIds">—</strong></div>
+        <div class="metric"><span class="metric-label">Fixed / sticky nodes</span><strong id="pageFixedSticky">—</strong></div>
+      </div>
+      <div class="section-foot"><span id="pageTitle">Document title: —</span><span id="updatedAt">Last update: —</span></div>
+    </section>
+
+    <section class="section-card hover-card">
+      <div class="section-heading"><div><span class="section-index">02</span><h2>Element under pointer</h2></div><button id="copySelectorButton" class="button button-primary" type="button" disabled>Copy CSS selector</button></div>
+      <div id="hoverEmpty" class="empty-state">Move the pointer over an element in Mad Station to inspect it here.</div>
+      <div id="hoverContent" hidden>
+        <div class="element-identity"><span id="elementTag" class="tag-pill">—</span><span id="elementId" class="element-id">No ID</span></div>
+        <div id="elementSelector" class="selector-code">—</div>
+        <div class="element-field-grid">
+          <div class="field"><span class="field-label">CSS classes</span><div id="elementClasses" class="field-value wrap">—</div></div>
+          <div class="field"><span class="field-label">Accessible name / text label</span><div id="elementLabel" class="field-value wrap">—</div></div>
+          <div class="field"><span class="field-label">Viewport rectangle</span><div id="elementRect" class="field-value mono">—</div></div>
+          <div class="field"><span class="field-label">Document position</span><div id="elementDocumentRect" class="field-value mono">—</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card context-selection-card" id="contextSelectionSection" hidden>
+      <div class="section-heading"><div><span class="section-index">02B</span><h2>Right-click selection</h2><p class="heading-description">The last element you selected with the Debug Mode right-click menu, even after moving the pointer away.</p></div><div class="context-selection-actions"><button id="copyContextAgentReferenceButton" class="button button-primary" type="button">Copy agent reference</button><button id="copyContextJsonButton" class="button button-secondary" type="button">Copy selection JSON</button></div></div>
+      <div class="element-identity"><span id="contextSelectionTag" class="tag-pill">—</span><span id="contextSelectionId" class="element-id">No ID</span></div>
+      <div id="contextSelectionSelector" class="selector-code">—</div>
+      <div class="element-field-grid">
+        <div class="field"><span class="field-label">Page / theme</span><div id="contextSelectionPage" class="field-value wrap">—</div></div>
+        <div class="field"><span class="field-label">Viewport rectangle</span><div id="contextSelectionRect" class="field-value mono">—</div></div>
+        <div class="field"><span class="field-label">Parent selector</span><div id="contextSelectionParent" class="field-value wrap">—</div></div>
+        <div class="field"><span class="field-label">Nearest interactive control</span><div id="contextSelectionInteractive" class="field-value wrap">—</div></div>
+        <div class="field"><span class="field-label">Pointer / document coordinates</span><div id="contextSelectionCoordinates" class="field-value mono">—</div></div>
+      </div>
+    </section>
+
+    <div class="two-column">
+      <section class="section-card">
+        <div class="section-heading"><div><span class="section-index">03</span><h2>Layout &amp; box model</h2></div></div>
+        <div id="layoutEmpty" class="empty-state compact">Hover an element to see its computed layout.</div>
+        <div id="layoutContent" class="data-table" hidden>
+          <div class="data-row"><span>Display</span><code id="styleDisplay">—</code></div>
+          <div class="data-row"><span>Position</span><code id="stylePosition">—</code></div>
+          <div class="data-row"><span>Z-index</span><code id="styleZIndex">—</code></div>
+          <div class="data-row"><span>Pointer events</span><code id="stylePointer">—</code></div>
+          <div class="data-row"><span>Overflow X / Y</span><code id="styleOverflow">—</code></div>
+          <div class="data-row"><span>Opacity / visibility</span><code id="styleOpacity">—</code></div>
+          <div class="data-row"><span>Cursor</span><code id="styleCursor">—</code></div>
+          <div class="data-row"><span>Flex / grid</span><code id="styleFlexGrid">—</code></div>
+          <div class="data-row"><span>Grid template columns / rows</span><code id="styleGridTemplates" class="wrap">—</code></div>
+          <div class="data-row"><span>Gap / row gap / column gap</span><code id="styleGaps">—</code></div>
+          <div class="data-row"><span>Flex basis / grow / shrink</span><code id="styleFlexValues">—</code></div>
+          <div class="data-row"><span>Width / height</span><code id="styleDimensions">—</code></div>
+          <div class="data-row"><span>Min / max dimensions</span><code id="styleMinMax" class="wrap">—</code></div>
+          <div class="data-row"><span>Box sizing / border radius</span><code id="styleBoxSizing" class="wrap">—</code></div>
+          <div class="data-row"><span>Transform / filters</span><code id="styleTransform" class="wrap">—</code></div>
+          <div class="data-row"><span>Background image</span><code id="styleBackgroundImage" class="wrap">—</code></div>
+          <div class="data-row"><span>Animation / transition</span><code id="styleAnimationTransition" class="wrap">—</code></div>
+          <div class="data-row"><span>Font family</span><code id="styleFontFamily" class="wrap">—</code></div>
+          <div class="data-row"><span>Font size / weight</span><code id="styleFontSizeWeight">—</code></div>
+          <div class="data-row"><span>Line height</span><code id="styleLineHeight">—</code></div>
+          <div class="data-row"><span>Text color</span><code id="styleColor">—</code></div>
+          <div class="data-row"><span>Background color</span><code id="styleBackground">—</code></div>
+          <div class="data-row"><span>Flex direction</span><code id="styleFlexDirection">—</code></div>
+          <div class="data-row"><span>Alignment</span><code id="styleAlignment">—</code></div>
+          <div class="data-row"><span>White space / isolation</span><code id="styleWhiteSpaceIsolation">—</code></div>
+          <div class="data-row"><span>Padding</span><code id="boxPadding">—</code></div>
+          <div class="data-row"><span>Margin</span><code id="boxMargin">—</code></div>
+          <div class="data-row"><span>Border width</span><code id="boxBorder">—</code></div>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="section-heading"><div><span class="section-index">04</span><h2>Accessibility &amp; input</h2></div></div>
+        <div id="a11yEmpty" class="empty-state compact">Hover a control to inspect its accessible properties.</div>
+        <div id="a11yContent" class="data-table" hidden>
+          <div class="data-row"><span>Role</span><code id="a11yRole">—</code></div>
+          <div class="data-row"><span>Element type</span><code id="a11yType">—</code></div>
+          <div class="data-row"><span>Tab index</span><code id="a11yTabIndex">—</code></div>
+          <div class="data-row"><span>ARIA label</span><code id="a11yLabel" class="wrap">—</code></div>
+          <div class="data-row"><span>Disabled</span><code id="a11yDisabled">—</code></div>
+          <div class="data-row"><span>Focused now</span><code id="a11yFocused">—</code></div>
+          <div class="data-row"><span>Cursor target</span><code id="a11yCursorTarget">—</code></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section-card">
+      <div class="section-heading"><div><span class="section-index">05</span><h2>Hit-test stack</h2><p class="heading-description">Topmost first: these are the elements the browser reports under the current pointer.</p></div></div>
+      <div id="hitTestEmpty" class="empty-state compact">Move over a button or menu to see what is actually receiving pointer hit-testing.</div>
+      <ol id="hitTestList" class="hit-list" hidden></ol>
+    </section>
+
+    <div class="two-column">
+      <section class="section-card">
+        <div class="section-heading"><div><span class="section-index">06</span><h2>Last click</h2></div><button id="clearClickButton" class="button button-quiet" type="button">Clear</button></div>
+        <div id="clickEmpty" class="empty-state compact">No click captured yet. Enable “Trace the last click” in Developer Options.</div>
+        <div id="clickContent" class="data-table" hidden>
+          <div class="data-row vertical"><span>Clicked element</span><code id="clickTarget" class="wrap">—</code></div>
+          <div class="data-row vertical"><span>Actionable ancestor</span><code id="clickAncestor" class="wrap">—</code></div>
+          <div class="data-row"><span>Trusted event</span><code id="clickTrusted">—</code></div>
+          <div class="data-row"><span>Default prevented</span><code id="clickPrevented">—</code></div>
+          <div class="data-row"><span>Time</span><code id="clickTime">—</code></div>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="section-heading"><div><span class="section-index">07</span><h2>Overflow &amp; hidden nodes</h2></div></div>
+        <div class="audit-summary"><div><span>Overflowing</span><strong id="overflowCount">—</strong></div><div><span>Hidden nodes</span><strong id="hiddenCount">—</strong></div></div>
+        <div class="field"><span class="field-label">Hidden element samples</span><div id="hiddenSamples" class="field-value mono wrap">—</div></div>
+        <div class="field"><span class="field-label">Overflow samples</span><div id="overflowSamples" class="field-value mono wrap">—</div></div>
+      </section>
+    </div>
+
+    <footer class="page-footer"><span>Diagnostics stay local to this app. Form values and arbitrary page text are not collected; the inspector reports control labels, selectors, layout, and element geometry.</span><span id="inspectorStatus">Connected to Mad Station</span></footer>
+    </div>
+
+    <section class="inspector-tab-panel" id="tabDebugOptionsPanel" role="tabpanel" aria-labelledby="tabDebugOptionsButton" hidden>
+      <section class="section-card">
+        <div class="section-heading debug-options-heading"><div><span class="section-index">08</span><h2>Debug Options</h2><p class="heading-description">Every toggle from Developer Settings is available here. Changes are sent to the main app and active built-in homepage.</p></div><div class="debug-mode-actions"><button id="enableDebugModeButton" class="button button-primary" type="button">Enable Debug Mode</button><button id="disableDebugModeButton" class="button button-secondary" type="button">Disable Debug Mode</button><button id="reloadDebugSettingsButton" class="button button-secondary" type="button">Reload saved settings</button><button id="resetDebugSettingsButton" class="button button-secondary" type="button">Reset defaults</button></div></div>
+        <div id="debugSettingsStatus" class="notice-line" role="status">Loading saved debug settings…</div>
+        <div id="debugSettingsGrid" class="debug-settings-grid"></div>
+        <div class="section-foot"><span>Visual overlays are pointer-transparent. Debug Mode will start disabled after a full app restart for recovery safety.</span><span id="debugSettingsCount">—</span></div>
+      </section>
+    </section>
+
+    <section class="inspector-tab-panel" id="tabElementExplorerPanel" role="tabpanel" aria-labelledby="tabElementExplorerButton" hidden>
+      <section class="section-card">
+        <div class="section-heading"><div><span class="section-index">09</span><h2>Element Explorer</h2><p class="heading-description">Search every DOM element in the currently visible app page or built-in homepage theme, including hidden nodes, non-rendering tags, and descendants of open shadow roots. Highlighting a hidden result temporarily reveals it for inspection.</p></div></div>
+        <form id="elementSearchForm" class="element-search-form">
+          <label class="element-search-field" for="elementSearchInput"><span class="field-label">Find by tag, ID, class, selector, role, or accessible label</span><input id="elementSearchInput" class="element-search-input" type="search" placeholder="e.g. #settingsBtn, .sidebar, button, dialog" autocomplete="off" spellcheck="false" maxlength="240"></label>
+          <label class="element-search-hidden"><input id="elementSearchIncludeHidden" type="checkbox" checked><span>Include hidden elements</span></label>
+          <button id="elementSearchButton" class="button button-primary" type="submit">Search page</button>
+          <button id="elementSearchRefreshButton" class="button button-secondary" type="button">Refresh all</button>
+        </form>
+        <div class="element-search-summary"><span id="elementSearchSummary">Search the current page to list matching elements.</span><span id="elementSearchPage">Page —</span></div>
+        <div id="elementSearchResults" class="element-results"><div class="empty-state">Enter a search term or choose Refresh all to enumerate page elements.</div></div>
+        <div class="element-search-pagination"><button id="elementSearchPrevious" class="button button-secondary" type="button" disabled>← Previous</button><button id="elementSearchNext" class="button button-secondary" type="button" disabled>Next →</button></div>
+        <div id="elementSearchStatus" class="section-foot"><span>For performance, each page displays up to 50 results. Searching scans the complete active document, not just the visible viewport. Closed shadow roots and isolated third-party pages are not inspectable by design.</span></div>
+      </section>
+      <section class="section-card debug-hidden-section">
+        <div class="section-heading"><div><span class="section-index">09B</span><h2>Temporarily hidden by Debug Mode</h2><p class="heading-description">Use Debug Mode’s right-click menu → “Hide element temporarily” to uncover controls behind it or simplify a page. These changes never delete nodes or alter inline styles, and they reset when Debug Mode is disabled or the page reloads.</p></div><button id="unhideAllElementsButton" class="button button-secondary" type="button" disabled>Unhide all</button></div>
+        <div id="debugHiddenElementsSummary" class="element-search-summary"><span>No elements hidden by Debug Mode.</span></div>
+        <div id="debugHiddenElementsList" class="element-results"><div class="empty-state">No temporary hides yet. Right-click an element in the app while Debug Mode is enabled.</div></div>
+      </section>
+    </section>
+
+    <section class="inspector-tab-panel" id="tabVisualLegendPanel" role="tabpanel" aria-labelledby="tabVisualLegendButton" hidden>
+      <section class="section-card">
+        <div class="section-heading"><div><span class="section-index">10</span><h2>Visual Debug Legend</h2><p class="heading-description">What the colored lines, boxes, labels, and overlays mean. Multiple diagnostics can target the same element; the most specific highlight may cover the basic outline.</p></div></div>
+        <div class="legend-grid">
+          <article class="legend-item"><span class="legend-swatch legend-red-outline" aria-hidden="true"></span><div><strong>Thin red / pink outline — every element</strong><p>The baseline outline is applied to DOM elements so you can see their boundaries, including elements with no visible background.</p><code>Outline Elements</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-blue-outline" aria-hidden="true"></span><div><strong>Blue / cyan outline — layout containers</strong><p>Marks likely structural elements such as sections, headers, navigation, cards, panels, grids, forms, and layout wrappers.</p><code>Outline Elements</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-green-outline" aria-hidden="true"></span><div><strong>Bright green outline — interactive controls</strong><p>Marks buttons, links, inputs, select boxes, text areas, ARIA buttons, and elements with a tabindex. This rule is drawn over the basic container outline.</p><code>Outline Elements</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-lime-dashed" aria-hidden="true"></span><div><strong>Lime dashed outline — keyboard-focusable</strong><p>Shows controls and elements reachable by keyboard navigation. It can overlap or replace the normal outline.</p><code>Highlight keyboard-focusable controls</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-overflow-red" aria-hidden="true"></span><div><strong>Thick red outline / red inset — overflow</strong><p>Marks elements the overflow audit identified as extending beyond their bounds or the available viewport. Check width, height, overflow, and child positioning.</p><code>Highlight overflow</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-hover-magenta" aria-hidden="true"></span><div><strong>Magenta outline — element under pointer</strong><p>Highlights the exact element currently hovered when hover inspection is enabled.</p><code>Highlight element under pointer</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-selected-yellow" aria-hidden="true"></span><div><strong>Amber / yellow outline and glow — selected element</strong><p>Appears briefly after you choose Highlight in Element Explorer. It identifies the specific search result selected for inspection.</p><code>Element Explorer → Highlight</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-selected-yellow" aria-hidden="true"></span><div><strong>Amber floating card — hidden element revealed</strong><p>When you highlight a hidden search result, the Inspector temporarily reveals the selected node at the top-left of the page and opens hidden ancestors. The original styles are restored after about four seconds.</p><code>Element Explorer → Reveal &amp; highlight</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-container-fill" aria-hidden="true"></span><div><strong>Translucent blue fill / inset edge — container tint</strong><p>Adds a subtle tint to probable layout containers to make wrapper regions, nested panels, and structural blocks easier to distinguish.</p><code>Tint layout containers</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-grid-lines" aria-hidden="true"></span><div><strong>Blue grid lines — spacing grid</strong><p>The brighter major lines repeat every 16 pixels; finer, fainter lines repeat every 4 pixels. Use them to compare padding, gaps, and alignment.</p><code>Show 16 px layout grid</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-label-badge" aria-hidden="true">tag#id</span><div><strong>Gold labels — element identity</strong><p>Small badges identify an element by tag, ID, and classes. They are annotations, not part of the actual page layout.</p><code>Label elements and IDs</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-debug-window" aria-hidden="true"></span><div><strong>Dark panel with cyan edge — inspector window</strong><p>This is the separate Developer Inspector itself, not a page element. Its outline helps distinguish the diagnostics window from overlays drawn over the app.</p><code>Separate desktop window</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-paused" aria-hidden="true">Ⅱ</span><div><strong>Paused animation — animation freeze</strong><p>When enabled, the animation on the element currently under the pointer pauses temporarily. Menu transitions are intentionally not globally disabled.</p><code>Pause animation under pointer</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-box-model" aria-hidden="true"><span>P</span><span>B</span><span>M</span></span><div><strong>Box model — numbers in the Inspector, not a page overlay</strong><p>Padding, border, and margin measurements are shown in the Layout &amp; box model section. This option adds measurement data; it does not paint another colored box over the app.</p><code>Show box model details</code></div></article>
+          <article class="legend-item"><span class="legend-swatch legend-info-only" aria-hidden="true"><span>i</span></span><div><strong>Inspector-only diagnostics — no colored line</strong><p>Hit-test stack, last-click trace, hidden-node audit, duplicate IDs, fixed/sticky counts, accessibility fields, and computed CSS appear in the separate Inspector window rather than being drawn onto the page.</p><code>Interaction diagnostics / Page overview</code></div></article>
+        </div>
+        <div class="legend-note"><strong>Why colors can look mixed:</strong> one element may be both a container and a button, or both overflowing and hovered. CSS rules overlap by design. Hover magenta and selected amber highlights are especially specific; toggle options one at a time to isolate a boundary.</div>
+      </section>
+    </section>
+  </main>
+  <script src="developer-debug-window.js"></script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+/* Mad Station — Home v3 dynamic visual layer.
+   Kept separate from home-v2.css so the app's appearance tokens remain authoritative. */
+body {
+  --glow: color-mix(in srgb, var(--accent) 28%, transparent);
+  --glass: color-mix(in srgb, var(--ms-home-panel-bg, var(--surface)) 78%, transparent);
+}
+
+/* Ambient cursor lighting sits above the active Appearance background, never replacing it. */
+.home { isolation: isolate; background: var(--ms-home-background, var(--bg)); background-size: var(--ms-home-background-size, auto); background-position: var(--ms-home-background-position, center); background-repeat: var(--ms-home-background-repeat, no-repeat); }
+.home::before {
+  content: ""; position: fixed; inset: 32px 0 0; z-index: 0; pointer-events: none; opacity: .45;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 24%), color-mix(in srgb, var(--accent) 12%, transparent), transparent 78%),
+              radial-gradient(ellipse at 92% 82%, color-mix(in srgb, var(--accent-strong, var(--accent)) 8%, transparent), transparent 46%);
+}
+/* The default/Plain choice still gets a quiet, intentional Home backdrop:
+   two very soft accent blooms over the theme base, rather than an empty canvas.
+   Explicit non-plain background choices continue to use their own token patterns. */
+body[data-background-style="plain"] .home::before {
+  opacity: .42;
+  background: radial-gradient(ellipse at 13% 9%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 42%),
+              radial-gradient(ellipse at 91% 84%, color-mix(in srgb, var(--accent-strong, var(--accent)) 9%, transparent), transparent 43%);
+}
+body[data-background-style="parallax"] .home::before {
+  opacity: .55;
+  background: radial-gradient(ellipse at 14% 8%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 38%), radial-gradient(ellipse at 88% 26%, color-mix(in srgb, var(--accent-strong, var(--accent)) 17%, transparent), transparent 36%), radial-gradient(ellipse at 53% 90%, color-mix(in srgb, var(--text) 7%, transparent), transparent 42%);
+}
+body[data-background-style="parallax"] .home::after {
+  content: ""; position: fixed; inset: 8% -10% 18%; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent) 1px, transparent 1px);
+  background-size: 52px 52px; background-position: 0 0, 0 0;
+  transform: perspective(620px) rotateX(58deg) translateY(-12%); transform-origin: 50% 0;
+  mask-image: linear-gradient(var(--text) 0, transparent 83%); -webkit-mask-image: linear-gradient(var(--text) 0, transparent 83%);
+  animation: home-modern-parallax-floor 7s linear infinite;
+}
+@keyframes home-modern-parallax-floor { to { background-position: 0 52px, 0 0; } }
+body.reduce-motion .home::after { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .home::after { animation: none !important; } }
+.home > * { position: relative; z-index: 1; }
+
+/* Floating capsule toolbar. Always reserve the top 32px for native window controls. */
+.hm-top {
+  position: sticky; top: 32px; margin-top: 32px; z-index: 20;
+  width: min(1320px, calc(100% - 32px)); padding: 10px 14px;
+  border: 1px solid var(--ms-home-panel-border, var(--line));
+  border-radius: var(--ms-home-panel-radius, var(--r));
+  background: color-mix(in srgb, var(--ms-home-panel-bg, var(--surface)) 94%, transparent);
+  box-shadow: var(--ms-home-panel-shadow, var(--shadow));
+  backdrop-filter: var(--ms-home-panel-blur, none);
+  -webkit-backdrop-filter: var(--ms-home-panel-blur, none);
+}
+.hm-search input { height: 40px; background: color-mix(in srgb, var(--ms-home-panel-bg, var(--surface-2)) 88%, transparent); border-color: var(--ms-home-panel-border, var(--line)); }
+.hm-search input:focus { background: var(--ms-home-panel-bg, var(--surface)); }
+.hm-btn { border-radius: var(--ms-home-control-radius, 999px); }
+.hm-icon-btn { border-radius: var(--ms-home-control-radius, 50%); }
+
+.hm-main { gap: calc(var(--ms-home-module-gap, var(--gap)) + 2px); }
+/* Keep the first row clear of the floating header instead of letting the hero
+   and performance cards visually touch the toolbar. */
+.hm-body { gap: calc(var(--ms-home-module-gap, var(--gap)) + 14px); margin-top: 24px; }
+
+/* Main AI Hub hero card with a moving network graphic and cursor-directed light. */
+.hm-hub {
+  min-height: 218px; padding: 25px 28px;
+  border: 1px solid var(--ms-home-panel-border, var(--line));
+  border-radius: var(--ms-r-card-lg, var(--ms-home-panel-radius, var(--r)));
+  background: radial-gradient(520px 260px at 92% 40%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 70%), var(--ms-home-panel-bg, var(--surface));
+  box-shadow: var(--ms-home-elevated-shadow, var(--shadow));
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.hm-hub::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(460px circle at var(--hx, 70%) var(--hy, 45%), color-mix(in srgb, var(--accent) 13%, transparent), transparent 68%);
+  transition: opacity .22s;
+}
+.hm-hub:hover { transform: translateY(-3px); box-shadow: var(--ms-home-elevated-shadow, var(--shadow)); }
+.hm-hub:hover::after { opacity: 1; }
+.hm-hub-copy strong { font-size: clamp(25px, 2.8vw, 32px); letter-spacing: -.025em; }
+.hm-hub-icon { border-radius: var(--ms-r-icon, var(--ms-home-small-radius)); box-shadow: var(--ms-home-panel-shadow, none); }
+.hm-hub-stats { gap: 8px; flex-wrap: wrap; }
+.hm-hub-stats > span { padding: 4px 12px; border-radius: var(--ms-home-small-radius, var(--r-sm)); background: color-mix(in srgb, var(--ms-home-panel-bg, var(--surface)) 78%, transparent); border: 1px solid var(--ms-home-panel-border, var(--line)); }
+.hm-hub-cta { margin-top: 6px; padding: 9px 18px; border-radius: var(--ms-home-control-radius, var(--ms-r-btn)); background: var(--ms-home-primary-bg, var(--accent)); color: var(--ms-home-primary-fg, var(--on-accent)); box-shadow: var(--ms-home-primary-shadow, none); transition: gap .2s, background .2s; }
+.hm-hub-cta svg { width: 16px; height: 16px; }
+.hm-hub:hover .hm-hub-cta { gap: 14px; }
+.hm-net { opacity: .92; filter: drop-shadow(0 0 18px var(--glow)); }
+.hm-net .n { animation: hmFloat 5s ease-in-out infinite; }
+.hm-net .n2 { animation-delay: -1.2s; }
+.hm-net .n3 { animation-delay: -2.4s; }
+.hm-net .n4 { animation-delay: -3.6s; }
+
+/* Workspace cards become a responsive bento grid with cursor-aware highlights. */
+.hm-sec-head h2 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); font-weight: 750; }
+.hm-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--ms-home-module-gap, var(--gap)); }
+.hm-card {
+  --mod: var(--accent);
+  grid-template-columns: 1fr auto; grid-template-areas: "i go" "b b"; gap: 15px;
+  padding: calc(var(--ms-home-panel-padding-y, var(--ms-home-panel-padding, var(--pad))) + 2px) var(--ms-home-panel-padding-x, var(--ms-home-panel-padding, var(--pad))); overflow: hidden;
+  background: var(--ms-home-panel-bg, var(--surface)); border-color: var(--ms-home-panel-border, var(--line));
+  border-radius: var(--ms-home-panel-radius, var(--r)); box-shadow: var(--ms-home-panel-shadow, none);
+  animation: hmUp .48s calc(var(--i, 0) * 55ms) both;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s;
+}
+.hm-card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(390px circle at var(--cx, 50%) var(--cy, 50%), color-mix(in srgb, var(--mod) 14%, transparent), transparent 66%);
+  transition: opacity .25s;
+}
+.hm-card:hover::before { opacity: 1; }
+.hm-card:hover { transform: translateY(-4px); box-shadow: var(--ms-home-elevated-shadow, var(--shadow)); }
+.hm-card-icon { grid-area: i; width: 48px; height: 48px; border-radius: var(--ms-r-icon, var(--ms-home-small-radius)); position: relative; z-index: 1; }
+.hm-card-icon svg, .hm-card-icon img { width: 24px; height: 24px; }
+.hm-card-body { grid-area: b; position: relative; z-index: 1; }
+.hm-card-body strong { font-size: 17px; letter-spacing: -.01em; }
+.hm-card-go { grid-area: go; opacity: 1; transform: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: var(--ms-home-control-radius, 50%); border: 1px solid var(--ms-home-panel-border, var(--line)); position: relative; z-index: 1; transition: all .2s; }
+.hm-card-go svg { width: 17px; height: 17px; }
+.hm-card:hover .hm-card-go { background: var(--ms-home-control-bg, var(--mod)); color: var(--ms-home-control-fg, var(--on-accent)); border-color: var(--ms-home-control-border, transparent); transform: rotate(-45deg); }
+.hm-grip { grid-area: go; position: relative; z-index: 2; }
+.hm-quick-item { border-radius: var(--ms-home-quick-radius, var(--ms-r-btn)); transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s; }
+.hm-quick-item:hover { transform: translateY(-3px) scale(1.02); border-color: var(--accent); box-shadow: var(--ms-home-elevated-shadow, var(--shadow)); }
+.hm-widget { animation: hmUp .55s .18s both; }
+.hm-notes-widget-launch {
+  display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: start; gap: 13px;
+  width: 100%; padding: 5px 2px 2px; border: 0; border-radius: var(--ms-home-small-radius, 12px);
+  color: var(--text); background: transparent; text-align: left; cursor: pointer;
+}
+.hm-notes-widget-launch:hover .hm-notes-widget-cta { color: var(--accent); gap: 10px; }
+.hm-notes-widget-launch:focus-visible { outline-offset: 4px; }
+.hm-notes-widget-icon {
+  display: grid; place-items: center; width: 46px; height: 46px; border-radius: var(--ms-r-icon, var(--ms-home-small-radius));
+  color: var(--h5); background: color-mix(in srgb, var(--h5) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--h5) 28%, var(--ms-home-panel-border, var(--line)));
+}
+.hm-notes-widget-icon svg { width: 23px; height: 23px; }
+.hm-notes-widget-copy { display: grid; gap: 6px; min-width: 0; }
+.hm-notes-widget-copy > strong { font-size: 14px; font-weight: 700; letter-spacing: -.01em; }
+.hm-notes-widget-copy > span:not(.hm-notes-widget-cta) { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.hm-notes-widget-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 3px; color: var(--accent); font-size: 12.5px; font-weight: 700; transition: gap .18s, color .18s; }
+.hm-notes-widget-cta svg { width: 15px; height: 15px; }
+.hm-results { animation: hmUp .18s both; }
+.hm-drawer-panel { border-radius: var(--ms-home-panel-radius, var(--r)) 0 0 var(--ms-home-panel-radius, var(--r)); }
+.hm-scrim { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+
+@keyframes hmUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes hmFloat { 50% { transform: translateY(-6px); } }
+
+body.reduce-motion .hm-hub, body.reduce-motion .hm-card, body.reduce-motion .hm-widget,
+body.reduce-motion .hm-net .n, body.reduce-motion .live-dot { animation: none !important; transition: none !important; }
+body.reduce-motion .hm-card:hover, body.reduce-motion .hm-hub:hover, body.reduce-motion .hm-quick-item:hover { transform: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .hm-hub, .hm-card, .hm-widget, .hm-net .n, .live-dot { animation: none !important; transition: none !important; }
+  .hm-card:hover, .hm-hub:hover, .hm-quick-item:hover { transform: none !important; }
+}
+body.no-hover-animation .hm-card, body.no-hover-animation .hm-hub, body.no-hover-animation .hm-quick-item,
+body.no-hover-animation .hm-card-go, body.no-hover-animation .hm-hub-cta,
+body.no-hover-animation .hm-notes-widget-cta { transition: none !important; }
+body.no-hover-animation .hm-card:hover, body.no-hover-animation .hm-hub:hover, body.no-hover-animation .hm-quick-item:hover { transform: none; box-shadow: var(--ms-home-panel-shadow, none); }
+body.no-hover-animation .hm-card:hover::before, body.no-hover-animation .hm-hub:hover::after { opacity: 0; }
+body.no-hover-animation .hm-card:hover .hm-card-go { transform: none; }
+body.no-hover-animation .hm-hub:hover .hm-hub-cta { gap: 8px; }
+body.no-hover-animation .hm-hub:hover .hm-hub-cta svg { transform: none; }
+body.no-hover-animation .hm-notes-widget-launch:hover .hm-notes-widget-cta { gap: 6px; }
+
+/* Keep interactive controls outside the native titlebar click region. */
+@media (max-width: 1120px) {
+  .hm-top { top: 32px; margin-top: 32px; grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; }
+  .hm-search { grid-column: 1 / -1; order: 3; }
+}
+@media (max-width: 1080px) {
+  .hm-body { grid-template-columns: minmax(0, 1fr); }
+  .hm-side { position: static; }
+  .hm-widgets { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .hm-widget, .hm-widget[data-size='small'], .hm-widget[data-size='large'] { grid-column: auto; }
+}
+@media (max-width: 760px) {
+  .hm-top, .hm-body { padding-inline: 16px; }
+  .hm-top { top: 32px; margin-top: 32px; width: calc(100% - 24px); padding: 10px 12px; border-radius: var(--ms-home-panel-radius, var(--r)); }
+  .hm-btn span { display: none; } .hm-btn { width: 36px; padding: 0; }
+  .hm-net { display: none; } .hm-hub { padding: 22px; min-height: 190px; }
+  .hm-widgets { grid-template-columns: minmax(0, 1fr); }
+  .hm-arrange-bar { flex-direction: column; align-items: flex-start; width: calc(100% - 32px); }
+}
+@media (max-width: 520px) {
+  .hm-main { gap: calc(var(--ms-home-module-gap, var(--gap)) + 2px); }
+  .hm-hub { padding: 18px; }
+}
+@media (max-height: 800px) and (min-width: 1081px) {
+  .hm-hub { min-height: 196px; padding-block: 20px; }
+  .hm-main { gap: calc(var(--ms-home-module-gap, var(--gap)) + 2px); }
+}
+
+/* Fit the current launcher modules inside the normal 1450×920 app window.
+   This only compacts spacing and card internals; vertical scrolling stays
+   available whenever users add enough modules to exceed the viewport. */
+@media (min-width: 1081px) and (min-height: 801px) and (max-height: 960px) {
+  .hm-top { padding-block: 8px; }
+  .hm-search input { height: 36px; }
+  .hm-btn, .hm-icon-btn { height: 34px; }
+  .hm-icon-btn { width: 34px; }
+
+  .hm-body { margin-top: 24px; gap: calc(var(--ms-home-module-gap, var(--gap)) + 14px); padding-bottom: 16px; }
+  .hm-main { gap: calc(var(--ms-home-module-gap, var(--gap)) + 2px); }
+  .hm-side { gap: var(--ms-home-module-gap, var(--gap)); }
+  .hm-sec { gap: calc(var(--ms-home-module-gap, var(--gap)) - 4px); }
+  .hm-sec-head { gap: 8px; }
+
+  .hm-hub { min-height: 168px; padding: 16px 22px; }
+  .hm-hub-copy { gap: 4px; }
+  .hm-hub-icon { width: 38px; height: 38px; margin-bottom: 2px; }
+  .hm-hub-copy strong { font-size: clamp(23px, 2.1vw, 28px); }
+  .hm-hub-stats { gap: 6px; margin-top: 2px; }
+  .hm-hub-stats > span { padding: 2px 9px; }
+  .hm-hub-cta { margin-top: 2px; padding: 6px 13px; }
+
+  .hm-grid { gap: var(--ms-home-module-gap, var(--gap)); }
+  .hm-card { gap: 9px; padding: min(var(--ms-home-panel-padding-y, 12px), 12px) min(var(--ms-home-panel-padding-x, 14px), 14px); }
+  .hm-card-icon { width: 40px; height: 40px; border-radius: var(--ms-r-icon, var(--ms-home-small-radius)); }
+  .hm-card-body { gap: 2px; }
+  .hm-card-body strong { font-size: 15px; }
+  .hm-chips { gap: 5px; margin-top: 5px; }
+  .hm-chips span { padding: 1px 7px; }
+
+  .hm-widgets { gap: var(--ms-home-module-gap, var(--gap)); }
+  .hm-widget { padding: min(var(--ms-home-panel-padding-y, 12px), 12px) min(var(--ms-home-panel-padding-x, 14px), 14px); }
+  .hm-widget-head { margin-bottom: 8px; }
+  .ram { gap: 8px; }
+  .ram-top { gap: 10px; }
+  .ram-top .ring { width: 64px; height: 64px; }
+  .ram-top .ring::before { inset: 6px; }
+  .ram-total { font-size: 20px; }
+  .ram-spark { height: 34px; }
+  .ram-legend { gap: 3px 8px; font-size: 11.5px; }
+  .ram-note, .ram-foot { font-size: 11px; }
+  .mini { gap: 7px; }
+  .mini-main { gap: 8px; }
+
+  /* Use the two-column widget space efficiently at this height. */
+  .hm-widgets > .hm-widget[data-id='notes-tasks'][data-size='medium'] { grid-column: span 1; }
+  .hm-notes-widget-launch { grid-template-columns: 32px minmax(0, 1fr); gap: 8px; }
+  .hm-notes-widget-icon { width: 32px; height: 32px; border-radius: var(--ms-r-icon, var(--ms-home-small-radius)); }
+  .hm-notes-widget-icon svg { width: 18px; height: 18px; }
+  .hm-notes-widget-copy { gap: 3px; }
+  .hm-notes-widget-copy > span:not(.hm-notes-widget-cta) { font-size: 11px; line-height: 1.35; }
+  .hm-notes-widget-cta { gap: 4px; margin-top: 1px; font-size: 11.5px; }
+  .hm-notes-widget-cta svg { width: 13px; height: 13px; }
+}
+

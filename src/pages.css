@@ -1,0 +1,506 @@
+/* =====================================================================
+   Mad Station — Pages ("night station" skin)
+   Brings the new home page's visual identity to every other screen:
+   AI Hub, Prompt Studio, AI Playground, Notes & Tasks (Clips / Notes /
+   To-Do list) and Settings.
+
+   Same language as home.css:
+     • glowing backdrop + dot grid
+     • gradient icon tiles with an accent ring
+     • cards with a soft diagonal sheen and an accent edge on hover
+     • pill buttons, uppercase letter-spaced labels, accent-gradient CTAs
+   Tokens come from design-tokens.css (--ms-*), which derive from the app's
+   theme variables (--bg, --text, --accent …), and the same Appearance settings (surface, corners,
+   buttons, borders, shadows, spacing) apply here exactly as on Home.
+   Loaded after styles.css and home.css so it wins on equal specificity.
+   ===================================================================== */
+
+/* Tokens (--ms-*) and the Appearance mapping live in design-tokens.css — do not re-declare them here. */
+
+/* ===================================================================
+   1. Backdrop — same glow + dot grid as the home page (default look only;
+      a chosen background pattern / custom image still wins).
+   =================================================================== */
+:is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen) {
+  isolation: isolate;
+  font-family: var(--ms-font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+body[data-background-style="aurora"] :is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen)::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(closest-side at 50% 38%, color-mix(in srgb, var(--accent) 17%, transparent), color-mix(in srgb, var(--accent-strong) 7%, transparent) 55%, transparent 100%) 50% 0 / 1500px 1100px no-repeat,
+    radial-gradient(closest-side at 0% 100%, color-mix(in srgb, var(--accent-strong) 13%, transparent), transparent 100%) 0 100% / 62vw 62vw no-repeat,
+    radial-gradient(closest-side at 100% 0%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 100%) 100% 0 / 52vw 52vw no-repeat;
+}
+body[data-background-style="aurora"] :is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen)::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .34;
+  background-image: radial-gradient(color-mix(in srgb, var(--text) 22%, transparent) 1px, transparent 1.3px);
+  background-size: 30px 30px; background-position: center;
+  -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 30%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(ellipse 72% 62% at 50% 30%, #000 0%, transparent 78%);
+}
+/* AI Hub: soft glow behind the website area, sidebar becomes a station panel */
+body[data-background-style="aurora"] .app-shell {
+  background:
+    radial-gradient(closest-side at 62% 30%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 100%) 0 0 / 1200px 900px no-repeat,
+    radial-gradient(closest-side at 100% 100%, color-mix(in srgb, var(--accent-strong) 9%, transparent), transparent 100%) 100% 100% / 50vw 50vw no-repeat,
+    var(--bg);
+}
+
+/* ===================================================================
+   2. Header / top bar — brand tile + back button, like the home topbar
+   =================================================================== */
+.clipboard-inner, .standalone-app-inner, .ailab-inner { position: relative; z-index: 1; }
+.clipboard-header, .standalone-app-header, .ailab-header { min-height: 64px; }
+.back-settings {
+  width: 40px; height: 40px; border-radius: var(--ms-r-btn);
+  border: 1px solid var(--ms-btn-bd); background: var(--ms-btn-bg); color: var(--ms-btn-fg); box-shadow: var(--ms-btn-sh);
+  transition: background .2s, border-color .2s, transform .25s var(--ms-ease);
+}
+.back-settings:hover { background: var(--ms-btn-bg-hover); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-strong)); transform: translateX(-3px); }
+.back-settings svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* brand tiles: same gradient tile + accent ring + glow as .home-brand-mark */
+.clipboard-title .app-icon, .forge-brand-mark, .ailab-header-icon, .sidebar .brand-mark {
+  width: 44px; height: 44px; border-radius: var(--ms-r-sm); display: grid; place-items: center;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 17%, transparent), color-mix(in srgb, var(--accent-strong) 13%, transparent));
+  border: 0; color: var(--accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 10px 30px -10px color-mix(in srgb, var(--accent-strong) 70%, transparent);
+}
+.clipboard-title .app-icon svg, .forge-brand-mark svg, .ailab-header-icon svg, .sidebar .brand-mark svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* keep each app's own hue, as the home cards do */
+.clipboard-screen .clipboard-title .app-icon-notes { color: var(--ms-mint); background: color-mix(in srgb, var(--ms-mint) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ms-mint) 36%, transparent), 0 10px 30px -12px color-mix(in srgb, var(--ms-mint) 60%, transparent); }
+.forge-brand-mark.app-icon-prompt { color: var(--ms-lilac); background: color-mix(in srgb, var(--ms-lilac) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ms-lilac) 36%, transparent), 0 10px 30px -12px color-mix(in srgb, var(--ms-lilac) 60%, transparent); width: 44px; height: 44px; }
+body[data-workspace-app="ai-lab"] .ailab-header-icon.app-icon-playground { color: var(--ms-sky); background: color-mix(in srgb, var(--ms-sky) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ms-sky) 36%, transparent), 0 10px 30px -12px color-mix(in srgb, var(--ms-sky) 60%, transparent); }
+
+
+/* header: no boxed cluster — brand tile + name on the left, tools on the right (like the home top bar) */
+.app-header-cluster { width: 100%; max-width: 100%; min-height: 64px; padding: 0; gap: 14px; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.app-header-cluster :is(.clipboard-header-actions, .forge-header-actions, .ailab-header-actions) { margin-left: auto; }
+.clipboard-header { display: flex; }
+.clipboard-header > .app-header-cluster { grid-column: 1 / -1; }
+.clipboard-screen .clipboard-title { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; justify-self: start; grid-column: auto; flex: 0 1 auto; width: auto; min-width: 0; gap: 14px; padding: 0; border: 0; background: none; box-shadow: none; text-align: left; margin: 0; }
+.page-brand-text { display: grid; gap: 5px; min-width: 0; }
+.page-brand-name { font-size: 21px; font-weight: 800; line-height: 1; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.page-brand-tag { font-size: 10px; font-weight: 600; line-height: 1; letter-spacing: .26em; text-transform: uppercase; color: var(--muted-2); white-space: nowrap; }
+@media (max-width: 760px) { .page-brand-tag { display: none; } .page-brand-name { font-size: 17px; } }
+
+/* header icon buttons (settings, notifications, lock, sidebar toggle) */
+:is(.clipboard-header-actions, .forge-header-actions, .ailab-header-actions, .sidebar .brand) .icon-only,
+.standalone-settings-btn, .standalone-notification-btn {
+  width: 40px; height: 40px; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--ms-btn-bd); border-radius: var(--ms-r-btn);
+  background: var(--ms-btn-bg); color: var(--ms-btn-fg); box-shadow: var(--ms-btn-sh);
+  transition: background .2s, border-color .2s, transform .25s var(--ms-ease);
+}
+:is(.clipboard-header-actions, .forge-header-actions, .ailab-header-actions, .sidebar .brand) .icon-only:hover,
+.standalone-settings-btn:hover, .standalone-notification-btn:hover { background: var(--ms-btn-bg-hover); filter: brightness(1.08); }
+.standalone-settings-btn:hover svg { transform: rotate(75deg); }
+.standalone-settings-btn svg { transition: transform .6s var(--ms-ease); }
+
+
+/* header buttons must follow the theme (some older rules hard-coded white, invisible in Light theme) */
+body .app-header-cluster :is(.back-settings, .icon-only, .standalone-settings-btn, .standalone-notification-btn),
+body .sidebar .brand :is(.back-settings, .icon-only) { color: var(--ms-btn-fg); }
+body .app-header-cluster :is(.back-settings, .icon-only, .standalone-settings-btn, .standalone-notification-btn) svg,
+body .sidebar .brand :is(.back-settings, .icon-only) svg { stroke: currentColor; }
+
+/* ===================================================================
+   3. Cards — the home "module" look
+   =================================================================== */
+.card, .lab-card, .clipboard-screen .card, .clipboard-stat, .forge-account-panel, .forge-browser-card {
+  position: relative;
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-card);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--text) 6%, transparent), color-mix(in srgb, var(--text) 1.2%, transparent)), var(--ms-card-bg);
+  -webkit-backdrop-filter: var(--ms-card-blur); backdrop-filter: var(--ms-card-blur);
+  box-shadow: var(--ms-card-shadow);
+  transition: transform .3s var(--ms-ease), border-color .3s, box-shadow .3s;
+}
+/* accent edge + cursor-free glow on hover (cards that are content, not controls) */
+:is(.card, .lab-card, .clipboard-stat, .forge-account-panel)::before { /* do not touch settings rows */
+  content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: 0 4px 4px 0;
+  background: var(--accent); box-shadow: 0 0 14px var(--accent); opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+:is(.card, .lab-card, .clipboard-stat, .forge-account-panel):hover { border-color: color-mix(in srgb, var(--accent) 38%, var(--ms-card-border)); box-shadow: var(--ms-card-shadow), 0 22px 60px -30px color-mix(in srgb, var(--accent) 55%, transparent); }
+:is(.card, .lab-card, .clipboard-stat, .forge-account-panel):hover::before { opacity: 1; }
+.card.note { background: transparent; border-style: dashed; }
+body[data-border-style="neon"] :is(.card, .lab-card), body[data-border-style="neon2"] :is(.card, .lab-card) {
+  box-shadow: var(--ms-card-shadow), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 16px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.card-ico, .settings-screen .card-ico {
+  width: 40px; height: 40px; border-radius: var(--ms-r-sm); color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 36%, transparent);
+}
+.card-ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.card-head h3, .clipboard-section-head h2, .utility-section-head h3, .utility-list-head h3, .forge-card-head h2 { font-weight: 750; letter-spacing: -.01em; }
+
+/* the Save clip card must sit level with its neighbours (old sticky offset no longer applies) */
+.clipboard-screen .clipboard-compose { top: 0; }
+
+/* eyebrow / section labels: uppercase, wide tracking, with the home "label" rule */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; color: var(--accent);
+  font-size: 10.5px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase;
+}
+.eyebrow::before { content: ""; width: 18px; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+
+/* ===================================================================
+   4. Buttons, inputs, chips
+   =================================================================== */
+.primary, .primary.with-ico {
+  height: 40px; padding: 0 18px; border: 1px solid transparent; border-radius: var(--ms-r-btn);
+  background: var(--ms-fire); color: var(--bg); font-weight: 800; letter-spacing: .01em;
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--accent-strong) 75%, transparent);
+  transition: transform .25s var(--ms-ease), box-shadow .25s, filter .2s;
+}
+.primary:hover { opacity: 1; filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 14px 34px -10px color-mix(in srgb, var(--accent-strong) 85%, transparent); }
+.primary:active { transform: scale(.98); }
+body[data-button-background="outline"] .primary { background: transparent; color: var(--accent); border-color: var(--accent); box-shadow: none; }
+body[data-button-background="ghost"] .primary, body[data-button-background="text"] .primary { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); box-shadow: none; }
+body[data-button-background="contrast"] .primary { background: var(--text); color: var(--bg); }
+
+.secondary, .secondary-btn, .ghost-btn, .tiny-btn, .icon-only {
+  border: 1px solid var(--ms-btn-bd); border-radius: var(--ms-r-btn);
+  background: var(--ms-btn-bg); color: var(--ms-btn-fg); box-shadow: var(--ms-btn-sh);
+  transition: background .2s, border-color .2s, color .2s, transform .25s var(--ms-ease);
+}
+.secondary:hover, .secondary-btn:hover, .ghost-btn:hover, .tiny-btn:hover, .icon-only:hover { background: var(--ms-btn-bg-hover); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-strong)); color: var(--ms-btn-fg); }
+.tiny-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select {
+  border-radius: var(--ms-r-xs);
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus, textarea:focus, select:focus {
+  border-color: var(--accent); outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+kbd { border-radius: 6px; border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--text) 6%, transparent); }
+
+/* chips / pills (the home .home-chips look) */
+.forge-fix-chips span, .clipboard-type-pill, .utility-count {
+  padding: 4px 10px; border: 0; border-radius: var(--ms-r-btn); font-size: 10.5px; font-weight: 650; letter-spacing: .02em;
+  color: color-mix(in srgb, var(--accent) 70%, var(--text)); background: color-mix(in srgb, var(--accent) 11%, transparent);
+}
+.utility-count { font-weight: 750; }
+
+/* segmented controls / tab strips: a floating pill track */
+.clipboard-tabs, .arena-subtabs, .arena-nav-card, .clipboard-filters, .todo-filters {
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-btn);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+.arena-nav-card.lab-card { border-radius: var(--ms-r-card); }
+.clipboard-tab, .arena-subtab, .arena-nav-card-btn, .clipboard-filter, .todo-filter {
+  border-radius: var(--ms-r-btn); font-weight: 700; letter-spacing: .01em; transition: background .2s, color .2s, box-shadow .2s;
+}
+.clipboard-tab.active, .arena-subtab.active, .arena-nav-card-btn.active, .clipboard-filter.active, .todo-filter.active {
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+/* ===================================================================
+   5. Notes & Tasks — Clips, Notes, To-Do list
+   =================================================================== */
+.clipboard-inner { width: min(1240px, calc(100% - 56px)); }
+.clipboard-title h1, .clipboard-title strong {
+  font-size: 15px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase;
+}
+.clipboard-tabs { width: fit-content; margin: 18px auto 22px; padding: 5px; gap: 4px; }
+.clipboard-tab .tab-ico { display: inline-grid; place-items: center; }
+.clipboard-tab .tab-ico svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+.utility-hero { align-items: flex-end; padding: 6px 4px 0; }
+.utility-hero h2 {
+  font-size: clamp(26px, 3.2vw, 38px); font-weight: 850; letter-spacing: -.04em; line-height: 1.05;
+  background: linear-gradient(120deg, var(--text) 40%, color-mix(in srgb, var(--accent) 70%, var(--text)));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.clipboard-stats { gap: var(--ms-gap); }
+.clipboard-stat { padding: var(--ms-pad-y) var(--ms-pad-x); }
+.clipboard-stat > span { font-size: 10.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted-2); }
+.clipboard-stat strong { font-size: 30px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+
+.clipboard-item, .note-card, .todo-row {
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-sm);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--text) 5%, transparent), color-mix(in srgb, var(--text) 1%, transparent)), var(--surface-2);
+  transition: transform .25s var(--ms-ease), border-color .25s, box-shadow .25s;
+}
+.clipboard-item:hover, .note-card:hover, .todo-row:hover {
+  transform: translateX(4px); border-color: color-mix(in srgb, var(--accent) 45%, var(--ms-card-border));
+  box-shadow: 0 16px 40px -22px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.clipboard-item.is-pinned { border-color: color-mix(in srgb, var(--accent) 50%, var(--ms-card-border)); box-shadow: inset 3px 0 0 var(--accent); }
+.todo-row.done, .todo-row.completed { opacity: .62; }
+.clipboard-compose textarea, .note-editor textarea, .note-editor input, .todo-composer input { background: color-mix(in srgb, var(--bg) 40%, var(--surface-2)); border-color: var(--line-strong); }
+
+/* ===================================================================
+   6. Prompt Studio
+   =================================================================== */
+.standalone-app-inner, .forge-app-inner { width: min(1320px, calc(100% - 56px)); margin-inline: auto; }
+.forge-header-brand { display: flex; align-items: center; gap: 14px; }
+.forge-brief-card, .forge-result-card { padding: calc(var(--ms-pad-y) + 4px) calc(var(--ms-pad-x) + 2px); }
+.forge-card-head h2 { font-size: 19px; letter-spacing: -.02em; }
+.forge-brief-card textarea, .forge-result-card textarea { border-radius: var(--ms-r-sm); background: color-mix(in srgb, var(--bg) 40%, var(--surface-2)); border-color: var(--line-strong); }
+.forge-account-panel { padding: 14px; }
+.forge-account-panel-head .eyebrow { letter-spacing: .18em; }
+.forge-account-panel-head .eyebrow::before { display: none; }
+.forge-account-tab { border-radius: var(--ms-r-sm); border: 1px solid var(--ms-card-border); background: color-mix(in srgb, var(--text) 4%, transparent); transition: transform .25s var(--ms-ease), border-color .25s, background .25s; }
+.forge-account-tab:hover { transform: translateX(4px); border-color: color-mix(in srgb, var(--accent) 45%, var(--ms-card-border)); }
+.forge-account-tab.active, .forge-account-tab[aria-selected="true"] { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: color-mix(in srgb, var(--accent) 12%, transparent); box-shadow: inset 3px 0 0 var(--accent); }
+.forge-account-tab-icon, .forge-account-tab-index { border-radius: var(--ms-r-icon); }
+.forge-address-bar { border-radius: var(--ms-r-btn); border: 1px solid var(--ms-btn-bd); background: color-mix(in srgb, var(--text) 5%, transparent); }
+.forge-browser-nav-btn { border-radius: var(--ms-r-btn); }
+
+/* ===================================================================
+   7. AI Playground
+   =================================================================== */
+.ailab-inner { width: min(1380px, calc(100% - 56px)); margin-inline: auto; }
+.arena-three-card-row { gap: calc(var(--ms-gap) * 2); }
+.lab-card { padding: calc(var(--ms-pad-y) + 1px) var(--ms-pad-x); }
+.lab-card select, .lab-card input, .lab-card textarea { border-radius: var(--ms-r-xs); background: color-mix(in srgb, var(--bg) 40%, var(--surface-2)); border-color: var(--line-strong); }
+.lab-card label { font-size: 10.5px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-2); }
+
+/* ===================================================================
+   8. AI Hub — sidebar as a station panel
+   =================================================================== */
+.sidebar { border-right: 1px solid var(--ms-card-border); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 5%, var(--sidebar)), var(--sidebar) 38%); }
+.sidebar::after { content: ""; position: absolute; inset: 0 -1px 0 auto; width: 1px; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 45%, transparent) 30%, transparent 80%); pointer-events: none; opacity: .5; }
+.search-wrap { border-radius: var(--ms-r-btn); }
+.search-wrap .search, .search { border-radius: var(--ms-r-btn); }
+.provider-tiles > * { border-radius: var(--ms-r-sm); transition: transform .25s var(--ms-ease), border-color .25s, background .25s; }
+.provider-tiles > *:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-strong)); }
+.provider-tiles > .active, .provider-tiles > [aria-selected="true"] { border-color: color-mix(in srgb, var(--accent) 60%, transparent); background: color-mix(in srgb, var(--accent) 13%, var(--surface)); box-shadow: 0 10px 28px -14px color-mix(in srgb, var(--accent) 80%, transparent); }
+.tile-icon { border-radius: var(--ms-r-icon); }
+.list-title { font-size: 10.5px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: var(--muted-2); }
+.account-btn { position: relative; border-radius: var(--ms-r-sm); border: 1px solid var(--ms-card-border); background: linear-gradient(160deg, color-mix(in srgb, var(--text) 5%, transparent), color-mix(in srgb, var(--text) 1%, transparent)), var(--surface); transition: transform .25s var(--ms-ease), border-color .25s, box-shadow .25s; }
+.account-btn:hover { transform: translateX(4px); border-color: color-mix(in srgb, var(--accent) 45%, var(--ms-card-border)); box-shadow: 0 16px 40px -22px color-mix(in srgb, var(--accent) 60%, transparent); }
+.account-btn.active { border-color: color-mix(in srgb, var(--accent) 60%, transparent); background: color-mix(in srgb, var(--accent) 11%, var(--surface)); box-shadow: inset 3px 0 0 var(--accent), 0 16px 40px -22px color-mix(in srgb, var(--accent) 60%, transparent); }
+.account-icon { border-radius: var(--ms-r-icon); }
+.sidebar-dl, .org-bar .tiny-btn { border-radius: var(--ms-r-btn); }
+.org-bar .tiny-btn.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+
+/* ===================================================================
+   9. Settings
+   =================================================================== */
+.settings-screen .st-nav { border-right: 1px solid var(--ms-card-border); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 5%, var(--sidebar)), var(--sidebar) 40%); }
+.settings-screen .st-nav-label { font-size: 10.5px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: var(--muted-2); }
+.settings-screen .card-body .row { border-radius: 0; }
+.settings-screen .card-body .row:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.settings-screen .card-head { border-bottom-color: var(--ms-card-border); }
+.settings-screen .card:hover::before { opacity: 0; } /* long settings cards: no edge bar */
+.switch input:checked + .knob, .switch input:checked ~ .knob { box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent); }
+.about-logo.big { border-radius: var(--ms-r-card); box-shadow: 0 20px 60px -24px color-mix(in srgb, var(--accent-strong) 80%, transparent); }
+
+/* ===================================================================
+   10. Modals & overlays share the same material
+   =================================================================== */
+.modal-card { border: 1px solid var(--ms-card-border); border-radius: calc(var(--ms-r-card) + 2px); background: linear-gradient(160deg, color-mix(in srgb, var(--text) 6%, transparent), color-mix(in srgb, var(--text) 1.2%, transparent)), var(--surface); box-shadow: 0 40px 110px -30px rgba(0, 0, 0, .6), 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent); }
+.modal-title { font-weight: 800; letter-spacing: -.02em; }
+.ctx-menu { border-radius: var(--ms-r-sm); border: 1px solid var(--ms-card-border); box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .55); }
+
+/* ===================================================================
+   11. Entrance, focus and motion — same behaviour as Home
+   =================================================================== */
+@keyframes page-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+:is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .ms-screen):not(.hidden) :is(.clipboard-header, .standalone-app-header, .ailab-header) { animation: page-in .6s var(--ms-ease) both; }
+:is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .ms-screen):not(.hidden) :is(.clipboard-tabs, .clipboard-stats, .utility-hero, .forge-workspace > *, .ailab-panel > *, .clipboard-workspace > *) { animation: page-in .7s var(--ms-ease) .12s both; }
+.forge-composer-react-mount { display: contents; }
+#instructionForgeComposerLegacy[hidden], #instructionForgeComposerReactMount[hidden] { display: none !important; }
+:is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen) :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+body.no-hover-animation :is(.card, .lab-card, .clipboard-item, .note-card, .todo-row, .account-btn, .forge-account-tab, .back-settings, .provider-tiles > *):hover { transform: none; }
+body.reduce-motion :is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen, .sidebar) *,
+body.reduce-motion :is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen)::before { animation: none !important; transition-duration: .01ms !important; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.clipboard-screen, .standalone-app-screen, .ailab-screen, .settings-screen, .ms-screen, .sidebar) * { animation: none !important; transition-duration: .01ms !important; }
+}
+@media (max-width: 760px) {
+  .clipboard-inner, .standalone-app-inner, .ailab-inner { width: calc(100% - 28px); }
+  .clipboard-tabs { max-width: 100%; overflow-x: auto; }
+}
+
+/* ===================================================================
+   12. Browser Controller Bar — canonical AI Hub treatment in embedded apps
+   =================================================================== */
+body[data-workspace-app="instruction-forge"] .forge-browser-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--ms-card-border);
+  border-radius: 0;
+  background: var(--surface-2);
+}
+body[data-workspace-app="instruction-forge"] .forge-browser-nav { gap: 2px; }
+body[data-workspace-app="instruction-forge"] .forge-browser-nav-btn {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--ms-r-btn) !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  box-shadow: none !important;
+}
+body[data-workspace-app="instruction-forge"] .forge-browser-nav-btn:hover:not(:disabled) {
+  border-color: var(--ms-card-border) !important;
+  background: var(--surface-3) !important;
+  color: var(--text) !important;
+}
+body[data-workspace-app="instruction-forge"] .forge-browser-nav-btn svg { width: 18px; height: 18px; }
+body[data-workspace-app="instruction-forge"] .forge-address-bar { flex: 1 1 auto; min-width: 0; }
+body[data-workspace-app="instruction-forge"] .forge-browser-url { font-size: 13px; line-height: 1.2; }
+body[data-workspace-app="instruction-forge"] .forge-browser-page-title {
+  flex: 0 1 170px;
+  min-width: 0;
+  max-width: 170px;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+}
+body[data-workspace-app="instruction-forge"] .forge-open-external-btn { max-width: 160px; }
+body[data-workspace-app="instruction-forge"] .forge-browser-toolbar.is-loading::after { bottom: -1px; }
+
+/* AI Playground: each Arena browser uses the same controller, with its account
+   picker retained inside the address/status field rather than removed. */
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% + 16px);
+  margin: -8px -8px 9px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--ms-card-border);
+  border-radius: var(--ms-r-card) var(--ms-r-card) 0 0;
+  background: var(--surface-2);
+  box-sizing: border-box;
+}
+body[data-workspace-app="ai-lab"] .arena-browser-nav { gap: 2px; }
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar .arena-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--ms-r-btn);
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  font-size: 13px;
+}
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar .arena-nav-btn:hover:not(:disabled) {
+  border-color: var(--ms-card-border);
+  background: var(--surface-3);
+  color: var(--text);
+}
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar .arena-nav-btn svg { display: block; width: 18px; height: 18px; }
+body[data-workspace-app="ai-lab"] .arena-account-address { flex: 1 1 auto; min-width: 0; gap: 9px; }
+body[data-workspace-app="ai-lab"] .arena-account-address .browser-index {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: var(--surface-3);
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 800;
+}
+body[data-workspace-app="ai-lab"] .arena-account-address .provider-icon.small {
+  display: grid;
+  place-items: center;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+body[data-workspace-app="ai-lab"] .arena-account-address .provider-icon.small .provider-icon-img,
+body[data-workspace-app="ai-lab"] .arena-account-address .provider-icon.small img,
+body[data-workspace-app="ai-lab"] .arena-account-address .provider-icon.small svg { width: 16px; height: 16px; }
+body[data-workspace-app="ai-lab"] .ms-browser-account-select {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 22px 0 0;
+  border: 0;
+  border-radius: 0;
+  outline-offset: 2px;
+  background-color: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+body[data-workspace-app="ai-lab"] .ms-browser-account-select:focus-visible { outline: 2px solid var(--accent); }
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar .arena-open-external-btn { max-width: 160px; }
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar .arena-open-external-btn:disabled { opacity: .42; }
+
+/* Video Hub already uses the shared markup; normalize its tool group to the
+   reference sizing without changing account selection or browser handlers. */
+body[data-workspace-app="image-hub"] .image-hub-browser-toolbar,
+body[data-workspace-app="video-hub"] .video-hub-browser-toolbar { gap: 10px; padding: 0 12px; }
+body[data-workspace-app="image-hub"] .image-hub-browser-actions,
+body[data-workspace-app="video-hub"] .video-hub-browser-actions { gap: 2px; }
+body[data-workspace-app="image-hub"] .image-hub-active-copy,
+body[data-workspace-app="video-hub"] .video-hub-active-copy { flex: 1 1 auto; min-width: 0; }
+body[data-workspace-app="image-hub"] .image-hub-active-copy .ms-browser-address-icon-wrap,
+body[data-workspace-app="video-hub"] .video-hub-active-copy .ms-browser-address-icon-wrap { width: 18px; height: 18px; flex-basis: 18px; }
+body[data-workspace-app="image-hub"] .image-hub-active-copy .ms-browser-address-icon-wrap svg,
+body[data-workspace-app="video-hub"] .video-hub-active-copy .ms-browser-address-icon-wrap svg { width: 16px; height: 16px; }
+body[data-workspace-app="image-hub"] .image-hub-open-external-btn,
+body[data-workspace-app="video-hub"] .video-hub-open-external-btn { max-width: 160px; }
+
+@media (max-width: 1100px) {
+  body[data-workspace-app="instruction-forge"] .forge-browser-page-title { display: none; }
+}
+@media (max-width: 720px) {
+  body[data-workspace-app="image-hub"] .image-hub-browser-toolbar,
+body[data-workspace-app="instruction-forge"] .forge-browser-toolbar,
+body[data-workspace-app="ai-lab"] .arena-browser-toolbar,
+body[data-workspace-app="video-hub"] .video-hub-browser-toolbar { gap: 5px; padding-right: 8px; padding-left: 8px; }
+  body[data-workspace-app="image-hub"] .image-hub-open-external-btn,
+body[data-workspace-app="instruction-forge"] .forge-open-external-btn,
+body[data-workspace-app="ai-lab"] .arena-open-external-btn,
+body[data-workspace-app="video-hub"] .video-hub-open-external-btn { width: 34px; min-width: 34px; padding: 0; }
+  body[data-workspace-app="image-hub"] .image-hub-open-external-btn > span,
+body[data-workspace-app="instruction-forge"] .forge-open-external-btn > span,
+body[data-workspace-app="ai-lab"] .arena-open-external-btn > span,
+body[data-workspace-app="video-hub"] .video-hub-open-external-btn > span { display: none; }
+  body[data-workspace-app="ai-lab"] .arena-browser-toolbar .arena-account-address { gap: 5px; }
+  body[data-workspace-app="ai-lab"] .arena-browser-toolbar .browser-index { display: none; }
+}
+
+/* Image Hub uses the shared compact account icon grid from design-kit.css.
+   The list/grid preference is controlled by .is-list-view on the account list;
+   avoid oversized cards here so the sidebar behaves like AI Hub. */
+#imageHubAccountList.image-hub-grid-view { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 7px; }
+#imageHubAccountList.image-hub-grid-view .image-hub-tile { min-width: 0; }
+#imageHubAccountList.image-hub-grid-view .image-hub-tile .account-btn { min-height: 0; height: auto; aspect-ratio: 1 / 1; align-items: center; flex-wrap: nowrap; justify-content: center; padding: 6px; gap: 0; }
+#imageHubAccountList.image-hub-grid-view .image-hub-account-labels { display: none; }
+#imageHubAccountList.image-hub-grid-view .image-hub-row-active { display: none; }
+
+/* The AI Hub accounts sidebar lives in shared renderer.html, so scope it to the
+   AI Hub workspace explicitly. Without this guard its fixed positioning and
+   z-index let it cover launcher themes and unrelated apps. */
+body:not([data-workspace-app="ai-hub"]) .sidebar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

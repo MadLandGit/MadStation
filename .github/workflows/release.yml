@@ -1,0 +1,50 @@
+name: Windows build and publish release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up pinned Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Set up pinned npm
+        shell: pwsh
+        run: |
+          npm install --global npm@10.9.2
+          npm --version
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Verify the pinned environment
+        run: npm run env:check
+
+      - name: Run project tests
+        run: npm test
+
+      - name: Build the Windows NSIS installer
+        run: npm run dist
+
+      - name: Publish GitHub Release with installer
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Mad Station ${{ github.ref_name }}
+          generate_release_notes: true
+          files: dist/Mad-Station-Setup-*.exe

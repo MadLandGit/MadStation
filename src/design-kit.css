@@ -1,0 +1,555 @@
+/* =====================================================================
+   Mad Station — Component kit  (.ms-*)
+
+   The "night station" design system, layer 3 of 3. Build every NEW app and
+   every MIGRATED section from these classes. They use ONLY tokens
+   (design-tokens.css) and core palette variables (--bg --surface --text
+   --muted --line --accent …), so they follow Light / Dark / System, the
+   accent colour, and every Appearance option automatically.
+
+   Hard rules (enforced by tests/design-system.test.js):
+     • no hex colours, rgb()/rgba()/hsl() literals, url() or @import here
+     • radii, padding, gaps, borders, shadows and button looks come from --ms-*
+     • never declare Appearance (body[data-*]) rules here — add them to
+       design-tokens.css instead
+
+   Catalog — see docs/design/DESIGN_SYSTEM.md for markup examples:
+     screen    .ms-screen  .ms-inner  .ms-header  .ms-grid
+     brand     .ms-brand  .ms-brand-tile[--sky|mint|lilac|amber|rose]
+               .ms-brand-text  .ms-brand-name  .ms-brand-tag
+     controls  .ms-btn  .ms-btn--primary  .ms-btn--sm  .ms-icon-btn  .ms-input  .ms-chip
+               .ms-tabs  .ms-tab  .ms-browser-toolbar  .ms-browser-address
+     surfaces  .ms-card  .ms-card--flat  .ms-card-head  .ms-row  .ms-stat  .ms-code-block
+     text      .ms-title  .ms-eyebrow  .ms-muted  .ms-empty
+   ===================================================================== */
+
+/* ---- Screen shell: same footprint as the existing workspace screens.
+        pages.css adds the backdrop glow, focus ring and reduce-motion rules
+        to .ms-screen automatically. ---- */
+.ms-screen {
+  position: fixed; inset: 0; z-index: var(--ms-screen-z, 35); overflow: auto;
+  background: var(--bg); color: var(--text); font-family: var(--ms-font-ui);
+}
+.ms-inner { position: relative; z-index: 1; width: min(1240px, calc(100% - 56px)); margin: 0 auto; padding: 28px 0 44px; }
+.ms-header { display: flex; align-items: center; gap: 14px; min-height: 64px; }
+.ms-header > .ms-spacer, .ms-header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.ms-grid { display: grid; gap: calc(var(--ms-gap) * 2); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+@media (max-width: 760px) {
+  .ms-inner { width: calc(100% - 28px); }
+  .ms-brand-tag { display: none; }
+}
+
+/* ---- Brand: gradient tile + letter-spaced name, like the home top bar ---- */
+.ms-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.ms-brand-tile {
+  --ms-tile-hue: var(--accent);
+  width: 44px; height: 44px; flex: 0 0 auto; display: grid; place-items: center;
+  border-radius: var(--ms-r-sm); color: var(--ms-tile-hue);
+  background: color-mix(in srgb, var(--ms-tile-hue) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ms-tile-hue) 36%, transparent), 0 10px 30px -12px color-mix(in srgb, var(--ms-tile-hue) 60%, transparent);
+}
+.ms-brand-tile svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ms-brand-tile--sky   { --ms-tile-hue: var(--ms-sky); }
+.ms-brand-tile--mint  { --ms-tile-hue: var(--ms-mint); }
+.ms-brand-tile--lilac { --ms-tile-hue: var(--ms-lilac); }
+.ms-brand-tile--amber { --ms-tile-hue: var(--ms-amber); }
+.ms-brand-tile--rose  { --ms-tile-hue: var(--ms-rose); }
+.ms-brand-text { display: grid; gap: 5px; min-width: 0; }
+.ms-brand-name { font-size: 21px; font-weight: 800; line-height: 1; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.ms-brand-tag { font-size: 10px; font-weight: 600; line-height: 1; letter-spacing: .26em; text-transform: uppercase; color: var(--muted-2); white-space: nowrap; }
+
+/* ---- Text ---- */
+.ms-eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--accent); font-size: 10.5px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; }
+.ms-eyebrow::before { content: ""; width: 18px; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); }
+.ms-title {
+  margin: 0; font-size: clamp(26px, 3.2vw, 38px); font-weight: 850; letter-spacing: -.04em; line-height: 1.05;
+  background: linear-gradient(120deg, var(--text) 40%, color-mix(in srgb, var(--accent) 70%, var(--text)));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ms-muted { color: var(--muted); }
+
+/* ---- Buttons ---- */
+.ms-btn, .ms-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  border: 1px solid var(--ms-btn-bd); border-radius: var(--ms-r-btn);
+  background: var(--ms-btn-bg); color: var(--ms-btn-fg); box-shadow: var(--ms-btn-sh);
+  font: inherit; font-weight: 700; letter-spacing: .01em;
+  transition: background .2s, border-color .2s, color .2s, transform .25s var(--ms-ease);
+}
+.ms-btn { height: 40px; padding: 0 18px; }
+.ms-btn--sm { height: 30px; padding: 0 12px; font-size: 12px; }
+.ms-icon-btn { width: 40px; height: 40px; padding: 0; }
+.ms-icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ms-btn:hover, .ms-icon-btn:hover { background: var(--ms-btn-bg-hover); border-color: color-mix(in srgb, var(--accent) 45%, var(--line-strong)); }
+.ms-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.ms-btn--primary {
+  border-color: transparent; background: var(--ms-fire); color: var(--bg); font-weight: 800;
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--accent-strong) 75%, transparent);
+  transition: transform .25s var(--ms-ease), box-shadow .25s, filter .2s;
+}
+.ms-btn--primary:hover { background: var(--ms-fire); border-color: transparent; filter: brightness(1.08); transform: translateY(-1px); }
+.ms-btn--primary:active { transform: scale(.98); }
+body[data-button-background="outline"] .ms-btn--primary { background: transparent; color: var(--accent); border-color: var(--accent); box-shadow: none; }
+body[data-button-background="ghost"] .ms-btn--primary, body[data-button-background="text"] .ms-btn--primary { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); box-shadow: none; }
+body[data-button-background="contrast"] .ms-btn--primary { background: var(--text); color: var(--bg); }
+
+/* ---- Embedded Browser Controller Bar: canonical AI Hub hierarchy ---- */
+.ms-browser-toolbar {
+  position: relative; display: flex; align-items: center; gap: 10px; min-width: 0;
+  height: 50px; min-height: 50px; padding: 0 12px; box-sizing: border-box;
+  border: 0; border-bottom: 1px solid var(--ms-card-border); border-radius: 0;
+  background: var(--surface-2); flex: 0 0 auto; -webkit-app-region: drag; app-region: drag;
+}
+/* Blank space in browser chrome can drag the frameless window, while every control and
+   focusable/address field remains an ordinary interactive target. */
+.ms-browser-toolbar :is(button, a, input, select, textarea, summary, [role], [tabindex], [contenteditable="true"]) {
+  -webkit-app-region: no-drag; app-region: no-drag;
+}
+.ms-browser-nav { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; min-width: 0; }
+.ms-browser-tool-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 34px;
+  width: 34px; min-width: 34px; height: 34px; min-height: 34px; padding: 0;
+  border: 1px solid transparent; border-radius: var(--ms-r-btn); background: transparent;
+  color: var(--muted); box-shadow: none; cursor: pointer;
+}
+.ms-browser-tool-btn:hover:not(:disabled) { color: var(--text); background: var(--surface-3); border-color: var(--ms-card-border); }
+.ms-browser-tool-btn:active:not(:disabled) { transform: scale(.97); }
+.ms-browser-tool-btn:disabled { color: var(--muted-2); background: transparent; border-color: transparent; opacity: .42; cursor: not-allowed; }
+.ms-browser-tool-btn svg, .ms-browser-open-external svg {
+  display: block; width: 18px; height: 18px; flex: 0 0 auto;
+  fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.ms-browser-address {
+  display: flex; align-items: center; gap: 9px; flex: 1 1 auto; min-width: 0; height: 34px; min-height: 34px;
+  padding: 0 6px 0 11px; box-sizing: border-box; border: 1px solid var(--ms-card-border);
+  border-radius: 17px; background: var(--surface); color: var(--text);
+}
+.ms-browser-address-icon-wrap { display: grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px; color: var(--muted); }
+.ms-browser-address-icon-wrap svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ms-browser-address-icon { display: block; width: 16px; height: 16px; object-fit: contain; }
+.ms-browser-address-lock { display: block; flex: 0 0 13px; width: 13px; height: 13px; fill: none; stroke: var(--muted-2); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ms-browser-address-location { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; line-height: 1.2; }
+.ms-browser-address-account {
+  display: inline-flex; align-items: center; flex: 0 1 auto; max-width: 38%; min-width: 0;
+  padding: 3px 10px; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--ms-card-border)); border-radius: var(--ms-r-btn);
+  background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--text); font-size: 11px; font-weight: 650;
+}
+.ms-browser-open-external {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex: 0 0 auto;
+  height: 34px; min-height: 34px; padding: 0 12px; white-space: nowrap;
+  border-radius: var(--ms-r-btn); font-size: 12px; font-weight: 650;
+}
+.ms-browser-open-external:disabled { opacity: .42; cursor: not-allowed; }
+.ms-browser-toolbar.is-loading::after {
+  content: ""; position: absolute; z-index: 2; left: 0; bottom: -1px; width: 34%; height: 2px;
+  background: var(--accent); pointer-events: none; animation: ms-browser-progress 1.45s ease-in-out infinite alternate;
+}
+@keyframes ms-browser-progress { from { transform: translateX(0); } to { transform: translateX(190%); } }
+@media (max-width: 720px) {
+  .ms-browser-toolbar { gap: 5px; padding-right: 8px; padding-left: 8px; }
+  .ms-browser-address-account, .ms-browser-open-external > span { display: none; }
+  .ms-browser-open-external { width: 34px; min-width: 34px; padding: 0; }
+  .ms-browser-address { gap: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ms-browser-toolbar.is-loading::after { animation: none; width: 45%; }
+}
+
+/* ---- Fields ---- */
+.ms-input {
+  width: 100%; min-height: 40px; padding: 0 12px; box-sizing: border-box;
+  border: 1px solid var(--line-strong); border-radius: var(--ms-r-xs);
+  background: color-mix(in srgb, var(--bg) 40%, var(--surface-2)); color: var(--text); font: inherit;
+  transition: border-color .2s, box-shadow .2s;
+}
+textarea.ms-input { padding: 10px 12px; resize: vertical; }
+.ms-input::placeholder { color: var(--muted-2); }
+.ms-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+
+/* ---- Chips and tabs ---- */
+.ms-chip { display: inline-block; padding: 4px 10px; border-radius: var(--ms-r-btn); font-size: 10.5px; font-weight: 650; letter-spacing: .02em; color: color-mix(in srgb, var(--accent) 70%, var(--text)); background: color-mix(in srgb, var(--accent) 11%, transparent); }
+.ms-tabs { display: flex; gap: 4px; width: fit-content; max-width: 100%; padding: 5px; overflow-x: auto; border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-btn); background: color-mix(in srgb, var(--text) 4%, transparent); }
+.ms-tab { padding: 8px 16px; border: 0; border-radius: var(--ms-r-btn); background: transparent; color: var(--muted); font: inherit; font-weight: 700; letter-spacing: .01em; cursor: pointer; transition: background .2s, color .2s, box-shadow .2s; }
+.ms-tab:hover { color: var(--text); }
+.ms-tab.active, .ms-tab[aria-selected="true"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent); }
+
+/* ---- Surfaces ---- */
+.ms-card {
+  position: relative; min-width: 0; padding: var(--ms-pad-y) var(--ms-pad-x);
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-card);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--text) 6%, transparent), color-mix(in srgb, var(--text) 1.2%, transparent)), var(--ms-card-bg);
+  -webkit-backdrop-filter: var(--ms-card-blur); backdrop-filter: var(--ms-card-blur);
+  box-shadow: var(--ms-card-shadow);
+  transition: transform .3s var(--ms-ease), border-color .3s, box-shadow .3s;
+}
+.ms-card::before { content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: 0 4px 4px 0; background: var(--accent); box-shadow: 0 0 14px var(--accent); opacity: 0; transition: opacity .3s; pointer-events: none; }
+.ms-card:hover { border-color: color-mix(in srgb, var(--accent) 38%, var(--ms-card-border)); box-shadow: var(--ms-card-shadow), 0 22px 60px -30px color-mix(in srgb, var(--accent) 55%, transparent); }
+.ms-card:hover::before { opacity: 1; }
+.ms-card--flat:hover { border-color: var(--ms-card-border); box-shadow: var(--ms-card-shadow); }
+.ms-card--flat:hover::before { opacity: 0; }
+body[data-border-style="neon"] .ms-card, body[data-border-style="neon2"] .ms-card {
+  box-shadow: var(--ms-card-shadow), 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 16px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.ms-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ms-card-head h2, .ms-card-head h3 { margin: 0; font-weight: 750; letter-spacing: -.01em; }
+
+.ms-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-sm);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--text) 5%, transparent), color-mix(in srgb, var(--text) 1%, transparent)), var(--surface-2);
+  transition: transform .25s var(--ms-ease), border-color .25s, box-shadow .25s;
+}
+.ms-row:hover { transform: translateX(4px); border-color: color-mix(in srgb, var(--accent) 45%, var(--ms-card-border)); box-shadow: 0 16px 40px -22px color-mix(in srgb, var(--accent) 60%, transparent); }
+.ms-row.is-active { border-color: color-mix(in srgb, var(--accent) 50%, var(--ms-card-border)); box-shadow: inset 3px 0 0 var(--accent); }
+
+.ms-stat { display: grid; gap: 6px; padding: var(--ms-pad-y) var(--ms-pad-x); border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-card); background: var(--ms-card-bg); box-shadow: var(--ms-card-shadow); }
+.ms-stat > span { font-size: 10.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted-2); }
+.ms-stat > strong { font-size: 30px; font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+
+.ms-empty { padding: 20px; border: 1px dashed var(--line-strong); border-radius: var(--ms-r-sm); text-align: center; color: var(--muted); font-size: 12px; line-height: 1.6; }
+
+/* Reusable, theme-aware read-only code/prompt surface. */
+.ms-code-block {
+  display: block; min-width: 0; padding: var(--ms-pad-y) var(--ms-pad-x);
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-sm);
+  background: var(--surface-2); color: var(--muted); font: 12px/1.6 var(--ms-font-ui);
+  overflow-wrap: anywhere;
+}
+
+/* Reusable embedded-content frame (browser, preview, or live canvas). */
+.ms-browser-frame {
+  min-width: 0; min-height: 0; overflow: hidden;
+  border: 1px solid var(--ms-card-border); border-radius: var(--ms-r-sm);
+  background: var(--surface-2);
+}
+
+
+/* ---- Appearance → "Animate hover" off: no movement on hover ---- */
+body.no-hover-animation :is(.ms-card, .ms-row, .ms-btn, .ms-icon-btn):hover { transform: none; }
+
+
+/* Video Hub: layout uses the shared .ms-* component surfaces. Keep this
+   section layout-only so all appearance variants remain token-driven.
+   Structure mirrors AI Hub: account sidebar (search, site tiles, pins, recents)
+   + one large browser panel. */
+.image-hub-inner,
+.video-hub-inner { width: calc(100% - 32px); max-width: none; height: 100%; box-sizing: border-box; padding: 16px 0; overflow: hidden; }
+.image-hub-workspace,
+.video-hub-workspace { height: 100%; min-height: 0; display: grid; grid-template-columns: minmax(300px, 368px) minmax(0, 1fr); gap: var(--ms-gap); }
+.image-hub-workspace.is-collapsed,
+.video-hub-workspace.is-collapsed { grid-template-columns: minmax(0, 1fr); }
+.image-hub-workspace.is-collapsed .image-hub-aside,
+.video-hub-workspace.is-collapsed .video-hub-aside { display: none; }
+.image-hub-main,
+.video-hub-main { display: flex; flex-direction: column; gap: var(--ms-gap); min-width: 0; min-height: 0; }
+.image-hub-workspace-chrome-mount { display: contents; }
+.image-hub-tab-panel,
+.video-hub-tab-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.image-hub-tab-panel.hidden,
+.video-hub-tab-panel.hidden { display: none !important; }
+.image-hub-tab-panel > .image-hub-browser-panel,
+.video-hub-tab-panel > .video-hub-browser-panel { flex: 1 1 auto; }
+
+/* Top bar: the whole bar drags the window; controls stay clickable and clear of the window buttons. */
+.image-hub-header,
+.video-hub-header { flex: 0 0 auto; flex-wrap: nowrap; min-height: 56px; padding-right: 148px; box-sizing: border-box; -webkit-app-region: drag; app-region: drag; }
+.image-hub-header :is(button, input, select, a, .ms-tabs),
+.video-hub-header :is(button, input, select, a, .ms-tabs) { -webkit-app-region: no-drag; app-region: no-drag; }
+.image-hub-header .ms-brand,
+.video-hub-header .ms-brand { flex: 1 1 auto; min-width: 0; margin-left: 6px; }
+.image-hub-header .ms-tabs,
+.video-hub-header .ms-tabs { flex: 0 0 auto; }
+.image-hub-header .ms-brand-text,
+.video-hub-header .ms-brand-text { min-width: 0; }
+.image-hub-header .ms-brand-tag,
+.video-hub-header .ms-brand-tag { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.video-hub-tab { white-space: nowrap; }
+.image-hub-header .ms-brand-name,
+.video-hub-header .ms-brand-name { font-size: clamp(20px, 2vw, 25px); }
+.image-hub-header .ms-header-actions,
+.video-hub-header .ms-header-actions { flex-wrap: nowrap; justify-content: flex-end; }
+
+/* Left panel: the AI Hub sidebar, built from the same brand / search / tile / filter pieces */
+.image-hub-aside,
+.video-hub-aside { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; padding: 12px; gap: 0; }
+.image-hub-aside svg,
+.video-hub-aside svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+.image-hub-aside .brand-mark-ai svg,
+.video-hub-aside .brand-mark-ai svg { width: 23px; height: 23px; }
+.image-hub-aside .icon-only svg,
+.video-hub-aside .icon-only svg { width: 17px; height: 17px; }
+.image-hub-aside .tile-icon svg,
+.video-hub-aside .tile-icon svg { width: 17px; height: 17px; }
+.image-hub-aside > .brand,
+.video-hub-aside > .brand { flex: 0 0 auto; width: auto; margin: 0 0 8px; padding: 5px 7px; min-height: 46px; gap: var(--rail-gap, 8px); border-radius: 15px; background: color-mix(in srgb, var(--surface-2) 88%, var(--sidebar)); -webkit-app-region: drag; app-region: drag; }
+.image-hub-aside > .brand :is(button, input),
+.video-hub-aside > .brand :is(button, input) { -webkit-app-region: no-drag; app-region: no-drag; }
+.image-hub-aside > .brand .brand-copy-aihub-monitor,
+.video-hub-aside > .brand .brand-copy-aihub-monitor { min-width: 0; flex: 0 1 auto; }
+.image-hub-aside > .brand .resource-monitor-mount--sidebar,
+.video-hub-aside > .brand .resource-monitor-mount--sidebar { margin: 0; }
+.image-hub-aside > .brand .aihub-hide-sidebar-btn,
+.video-hub-aside > .brand .aihub-hide-sidebar-btn { margin-left: auto; }
+.image-hub-aside > .search-wrap,
+.image-hub-aside > .provider-tiles,
+.image-hub-aside > .org-bar,
+.image-hub-aside > .list-head,
+.video-hub-aside > .search-wrap,
+.video-hub-aside > .provider-tiles,
+.video-hub-aside > .org-bar,
+.video-hub-aside > .list-head { flex: 0 0 auto; }
+.image-hub-aside .provider-tiles,
+.video-hub-aside .provider-tiles { max-height: 188px; overflow-y: auto; }
+.image-hub-aside .org-bar,
+.video-hub-aside .org-bar { border-bottom: 0; padding-top: 2px; }
+.image-hub-aside .search-clear,
+.video-hub-aside .search-clear { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.image-hub-aside .search-clear svg,
+.video-hub-aside .search-clear svg { width: 13px; height: 13px; }
+.image-hub-aside .list-head .ms-chip,
+.video-hub-aside .list-head .ms-chip { flex: 0 0 auto; white-space: nowrap; }
+.image-hub-recent,
+.video-hub-recent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex: 0 0 auto; padding: 0 4px 8px; }
+.image-hub-recent .ms-eyebrow,
+.video-hub-recent .ms-eyebrow { flex: 0 0 100%; }
+.image-hub-recent .ms-btn,
+.video-hub-recent .ms-btn { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.image-hub-aside > .image-hub-account-list,
+.video-hub-aside > .video-hub-account-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 2px 4px 4px; }
+
+.image-hub-section-head,
+.video-hub-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ms-gap); margin-bottom: 3px; }
+.image-hub-section-head > div,
+.video-hub-section-head > div { display: grid; gap: 6px; min-width: 0; }
+.image-hub-section-head .ms-title,
+.video-hub-section-head .ms-title { font-size: clamp(19px, 1.7vw, 23px); line-height: 1.15; }
+.video-hub-section-caption { font-size: 11px; line-height: 1.4; }
+.video-hub-field-label { font-size: 12px; font-weight: 750; color: var(--text); }
+.video-hub-add-btn { width: 100%; margin-top: 2px; }
+.video-hub-manage-card { display: flex; flex-direction: column; gap: calc(var(--ms-gap) * .85); min-width: 0; min-height: 0; }
+.video-hub-manage-card .ms-input, .video-hub-provider-form .ms-input { width: 100%; min-width: 0; box-sizing: border-box; }
+
+/* Account collection: grid matches AI Hub's compact icon view; list is a first-class alternative. */
+.image-hub-account-list,
+.video-hub-account-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 7px; align-content: start; min-width: 0; min-height: 80px; }
+.image-hub-account-list > .ms-empty,
+.video-hub-account-list > .ms-empty { grid-column: 1 / -1; }
+.image-hub-tile,
+.video-hub-tile { min-width: 0; }
+.image-hub-tile .account-btn,
+.video-hub-tile .account-btn { height: auto; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: 6px; text-align: center; }
+.image-hub-tile .account-icon,
+.video-hub-tile .account-icon { width: 32px; height: 32px; }
+.image-hub-tile .account-icon .provider-icon-img,
+.video-hub-tile .account-icon .provider-icon-img { width: 23px; height: 23px; }
+.image-hub-tile .more-btn,
+.video-hub-tile .more-btn { right: 2px; top: 2px; transform: none; width: 22px; height: 22px; }
+.image-hub-tile-pin,
+.video-hub-tile-pin { position: absolute; right: 5px; bottom: 3px; font-size: 10px; line-height: 1; color: var(--accent); pointer-events: none; }
+.image-hub-account-labels,
+.video-hub-account-labels { display: none; }
+.image-hub-row-pin,
+.image-hub-row-active,
+.video-hub-row-pin,
+.video-hub-row-active { display: none; }
+.image-hub-account-row.hidden,
+.image-hub-tile.hidden,
+.video-hub-account-row.hidden,
+.video-hub-tile.hidden { display: none !important; }
+.image-hub-account-list.is-list-view,
+.video-hub-account-list.is-list-view { grid-template-columns: minmax(0, 1fr); gap: 6px; align-content: start; }
+.image-hub-account-list.is-list-view .image-hub-tile,
+.video-hub-account-list.is-list-view .video-hub-tile { width: 100%; }
+.image-hub-account-list.is-list-view .image-hub-tile .account-btn,
+.video-hub-account-list.is-list-view .video-hub-tile .account-btn { width: 100%; height: 60px; aspect-ratio: auto; display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding: 7px 40px 7px 9px; text-align: left; }
+.image-hub-account-list.is-list-view .image-hub-tile .account-icon,
+.video-hub-account-list.is-list-view .video-hub-tile .account-icon { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 11px; }
+.image-hub-account-list.is-list-view .image-hub-tile .account-icon .provider-icon-img,
+.image-hub-account-list.is-list-view .image-hub-tile .account-icon .image-hub-real-icon,
+.video-hub-account-list.is-list-view .video-hub-tile .account-icon .provider-icon-img,
+.video-hub-account-list.is-list-view .video-hub-tile .account-icon .video-hub-real-icon { width: 26px; height: 26px; object-fit: contain; }
+.image-hub-account-list.is-list-view .image-hub-account-labels,
+.video-hub-account-list.is-list-view .video-hub-account-labels { display: grid; flex: 1 1 auto; min-width: 0; gap: 3px; }
+.image-hub-account-list.is-list-view .image-hub-account-name-line,
+.video-hub-account-list.is-list-view .video-hub-account-name-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.image-hub-account-list.is-list-view .image-hub-account-name,
+.video-hub-account-list.is-list-view .video-hub-account-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; line-height: 1.25; font-weight: 750; }
+.image-hub-account-list.is-list-view .image-hub-account-provider,
+.video-hub-account-list.is-list-view .video-hub-account-provider { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 10.5px; line-height: 1.3; }
+.image-hub-account-list.is-list-view .image-hub-row-pin,
+.video-hub-account-list.is-list-view .video-hub-row-pin { display: inline-flex; flex: 0 0 auto; align-items: center; padding: 2px 5px; border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--line)); border-radius: 999px; color: var(--accent); font-size: 9px; line-height: 1.2; font-weight: 700; }
+.image-hub-account-list.is-list-view .image-hub-row-active,
+.video-hub-account-list.is-list-view .video-hub-row-active { display: inline-flex; flex: 0 0 auto; align-items: center; padding: 4px 7px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-size: 9px; line-height: 1.2; font-weight: 750; }
+.image-hub-account-list.is-list-view .image-hub-tile-pin,
+.image-hub-account-list.is-list-view .account-name-popover,
+.video-hub-account-list.is-list-view .video-hub-tile-pin,
+.video-hub-account-list.is-list-view .account-name-popover { display: none !important; }
+.image-hub-account-list.is-list-view .image-hub-tile .more-btn,
+.video-hub-account-list.is-list-view .video-hub-tile .more-btn { right: 5px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; }
+.image-hub-account-list.is-list-view .image-hub-rename-row,
+.video-hub-account-list.is-list-view .video-hub-rename-row { grid-column: 1; }
+@media (max-width: 420px) {
+  .image-hub-account-list.is-list-view .image-hub-row-active,
+.video-hub-account-list.is-list-view .video-hub-row-active { display: none; }
+  .image-hub-account-list.is-list-view .image-hub-tile .account-btn,
+.video-hub-account-list.is-list-view .video-hub-tile .account-btn { gap: 8px; padding-right: 36px; }
+}
+
+/* Rename row (the original row with its input and Save/Cancel buttons) */
+.image-hub-rename-row,
+.video-hub-rename-row { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; min-width: 0; }
+.image-hub-account-copy,
+.video-hub-account-copy { grid-column: 1; grid-row: 1; min-width: 0; display: grid; gap: 5px; }
+.image-hub-account-copy strong,
+.video-hub-account-copy strong { overflow-wrap: anywhere; font-size: 12px; font-weight: 800; }
+.image-hub-account-copy span,
+.video-hub-account-copy span { line-height: 1.45; font-size: 11px; }
+.image-hub-rename-row > .ms-btn,
+.video-hub-rename-row > .ms-btn { grid-column: 2; grid-row: 1; }
+.image-hub-account-actions,
+.video-hub-account-actions { grid-column: 1 / -1; grid-row: 2; display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.image-hub-account-actions .ms-btn,
+.video-hub-account-actions .ms-btn { flex: 0 0 auto; max-width: 100%; }
+.image-hub-rename-input,
+.video-hub-rename-input { min-width: 0; width: 100%; }
+
+/* The React-owned Video Hub rename row keeps its logo and edit controls in a stable three-column layout. */
+.video-hub-rename-row--react { grid-template-columns: 38px minmax(0, 1fr) auto; }
+.video-hub-rename-row--react > .video-hub-logo { grid-column: 1; grid-row: 1; }
+.video-hub-rename-row--react > .video-hub-account-copy { grid-column: 2; grid-row: 1; }
+.video-hub-rename-row--react > .ms-btn { grid-column: 3; grid-row: 1; }
+.video-hub-rename-row--react > .video-hub-account-actions { grid-column: 1 / -1; grid-row: 2; }
+
+
+/* Browser panel */
+.image-hub-browser-panel,
+.video-hub-browser-panel { display: flex; flex-direction: column; min-width: 0; min-height: 0; gap: var(--ms-gap); }
+/* Video Hub toolbar placement only; component visuals come from the shared kit above. */
+.image-hub-browser-toolbar,
+.video-hub-browser-toolbar { flex: 0 0 auto; }
+.image-hub-active-copy,
+.video-hub-active-copy { flex: 1 1 240px; }
+.image-hub-browser-actions,
+.video-hub-browser-actions { display: flex; align-items: center; flex: 0 0 auto; flex-wrap: nowrap; gap: calc(var(--ms-gap) / 2); }
+.image-hub-open-external-btn,
+.video-hub-open-external-btn { flex: 0 0 auto; white-space: nowrap; }
+.image-hub-browser-slot,
+.video-hub-browser-slot { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: hidden; }
+.image-hub-browser-placeholder,
+.video-hub-browser-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; }
+.image-hub-browser-placeholder strong,
+.video-hub-browser-placeholder strong { font-weight: 800; letter-spacing: -.02em; }
+.image-hub-browser-placeholder > span:last-child,
+.video-hub-browser-placeholder > span:last-child { max-width: 420px; font-size: 12px; line-height: 1.7; }
+.image-hub-play-mark,
+.video-hub-play-mark { display: grid; place-items: center; width: 58px; height: 58px; border-radius: var(--ms-r-icon); border: 1px solid var(--ms-card-border); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 22px; }
+
+/* Add Accounts page */
+.video-hub-accounts-page { height: 100%; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: var(--ms-gap); padding: 1px; }
+.video-hub-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ms-gap); }
+.video-hub-quickstart { display: grid; gap: var(--ms-gap); }
+.video-hub-site-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--ms-gap); }
+.video-hub-site-card { display: flex; flex-direction: column; gap: var(--ms-gap); min-width: 0; }
+.video-hub-site-card .ms-card-head { margin-bottom: 0; min-width: 0; }
+.video-hub-site-copy { display: grid; gap: 4px; min-width: 0; }
+.video-hub-site-copy strong { font-size: 13px; font-weight: 800; overflow-wrap: anywhere; }
+.video-hub-site-copy span { font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+.video-hub-site-foot .ms-btn, .video-hub-site-foot .ms-chip { white-space: nowrap; }
+.video-hub-site-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.video-hub-account-setup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ms-gap); align-items: start; }
+.video-hub-account-setup > * { min-width: 0; }
+.video-hub-custom-site { display: grid; gap: var(--ms-gap); }
+.video-hub-provider-form { display: grid; gap: 8px; align-content: start; }
+.video-hub-provider-form .video-hub-field-label { display: block; margin: 0; padding: 0; line-height: 1.3; }
+.video-hub-provider-list { display: grid; gap: 6px; }
+.video-hub-provider-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.video-hub-provider-row span { min-width: 0; overflow-wrap: anywhere; }
+.video-hub-privacy-note { margin: 0 3px; font-size: 10px; line-height: 1.6; }
+
+@media (max-width: 900px) {
+  #imageHubScreen,
+#videoHubScreen { overflow: auto; }
+  .image-hub-inner,
+.video-hub-inner { height: auto; min-height: 100%; overflow: visible; }
+  .image-hub-workspace,
+.video-hub-workspace { height: auto; grid-template-columns: minmax(0, 1fr); }
+  .image-hub-aside,
+.video-hub-aside { max-height: 560px; }
+  .image-hub-header,
+.video-hub-header { padding-right: 0; }
+  .image-hub-browser-panel,
+.video-hub-browser-panel { min-height: 420px; }
+  .image-hub-browser-slot,
+.video-hub-browser-slot { flex: 1; min-height: 340px; }
+  .video-hub-accounts-page { overflow: visible; height: auto; }
+}
+@media (max-width: 760px) {
+  .video-hub-account-setup, .video-hub-stats { grid-template-columns: minmax(0, 1fr); }
+  .image-hub-browser-toolbar,
+.video-hub-browser-toolbar { flex-wrap: wrap; }
+  .image-hub-header,
+.video-hub-header { flex-wrap: wrap; }
+}
+
+/* Image Hub — layout-only rules. Sidebar, global bar, tabs and browser controller reuse the
+   Video Hub / AI Hub rules above (same selectors with the image-hub prefix); only the
+   Image Hub-specific pieces live here. All visual values come from shared tokens. */
+.image-hub-aside .image-hub-account-list { flex: 1 1 auto; min-height: 0; }
+#imageHubProviderTiles > .ms-empty { grid-column: 1 / -1; }
+.image-hub-webview-wrap { position: absolute; inset: 0; min-width: 0; min-height: 0; }
+.image-hub-webview { display: flex; width: 100%; height: 100%; }
+.image-hub-play-mark svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ms-browser-address-location strong { font-weight: 700; color: var(--text); }
+.ms-browser-address-lock.is-insecure { stroke: var(--ms-amber); }
+.ms-browser-address-account.hidden, .ms-browser-address-lock.hidden { display: none; }
+.image-hub-discover { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: var(--ms-gap); padding: 1px; }
+.image-hub-welcome { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: clamp(20px, 4vw, 42px); }
+.image-hub-welcome h1 { margin: 0; }
+.image-hub-welcome p { max-width: 680px; line-height: 1.7; margin: 0; }
+.image-hub-quick-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.image-hub-section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 6px 2px 0; }
+.image-hub-section-head > div { display: grid; gap: 6px; min-width: 0; }
+.image-hub-section-head h2 { margin: 0; font-size: clamp(19px, 1.7vw, 23px); line-height: 1.15; }
+.image-hub-section-head p { margin: 0; font-size: 11px; line-height: 1.4; }
+.image-hub-grid { grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: var(--ms-gap); }
+.image-hub-tool-card { display: flex; flex-direction: column; gap: var(--ms-gap); min-width: 0; }
+.image-hub-tool-card .ms-card-head { margin-bottom: 0; min-width: 0; }
+.image-hub-tool-copy { display: grid; gap: 4px; min-width: 0; }
+.image-hub-tool-copy strong { font-size: 13px; font-weight: 800; overflow-wrap: anywhere; }
+.image-hub-tool-copy .ms-muted { font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+.image-hub-tool-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: auto; }
+.image-hub-tool-actions .ms-chip { margin-right: auto; }
+.image-hub-star { width: 34px; height: 34px; }
+.image-hub-quickstart { display: grid; gap: var(--ms-gap); }
+.image-hub-account-setup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ms-gap); align-items: start; }
+.image-hub-account-setup > * { min-width: 0; }
+.image-hub-manage-card { display: flex; flex-direction: column; gap: calc(var(--ms-gap) * .85); min-width: 0; }
+.image-hub-manage-card .ms-input { width: 100%; min-width: 0; box-sizing: border-box; }
+.image-hub-account-form { display: grid; gap: 8px; align-content: start; }
+.image-hub-tool-card .ms-brand-tile .image-hub-real-icon { width: 28px; height: 28px; }
+.image-hub-custom-tool { display: grid; gap: var(--ms-gap); }
+.image-hub-tool-form { display: grid; gap: 8px; align-content: start; max-width: 520px; }
+.image-hub-tool-form .ms-input { width: 100%; min-width: 0; box-sizing: border-box; }
+.image-hub-validation-error { margin: 0; color: var(--ms-rose); font-size: 11px; line-height: 1.4; }
+.image-hub-field-label { font-size: 12px; font-weight: 750; color: var(--text); }
+.image-hub-note { margin: 0 3px; font-size: 10px; line-height: 1.6; }
+.image-hub-settings-modal { z-index: 1200; }
+.image-hub-settings-modal .clipboard-settings-card { width: min(640px, calc(100% - 32px)); }
+@media (max-width: 900px) { .image-hub-discover { overflow: visible; } }
+@media (max-width: 760px) { .image-hub-account-setup { grid-template-columns: minmax(0, 1fr); } }
+
+
+/* React-owned Image Hub/Notes mounts preserve the previous layout contracts. */
+.image-hub-browser-state-mount { position: absolute; inset: 0; min-width: 0; min-height: 0; pointer-events: none; }
+.image-hub-browser-state-mount .image-hub-browser-placeholder { pointer-events: auto; }
+#imageHubSidebarBrandReactMount,
+#imageHubSidebarActionsReactMount,
+#imageHubSidebarListHeadingReactMount { display: contents; }
+#notesHeaderReactMount,
+#notesComposerReactMount,
+#notesListHeaderReactMount,
+#notesSettingsReactMount { min-width: 0; }
+#notesComposerReactMount > .note-editor { height: 100%; }
+.notes-settings-react-content { width: 100%; display: flex; justify-content: center; }

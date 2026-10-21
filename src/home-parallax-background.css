@@ -1,0 +1,50 @@
+/* The shared Parallax preset uses the same depth stack as the 3D Parallax home,
+   but is scoped to Simple and is shown only for Appearance → Background → Parallax. */
+.home-parallax-bg[hidden] { display: none !important; }
+.home-parallax-bg {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  background: var(--bg); isolation: isolate;
+}
+.home-parallax-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.home-parallax-layers { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.home-parallax-layers > i { position: absolute; display: block; will-change: transform; transform: translate3d(var(--hp-tx,0px),var(--hp-ty,0px),0); }
+.home-parallax-bg ~ #launcherScreen.home { z-index: 1; }
+body[data-background-style="parallax"] #launcherScreen.home { background: transparent !important; }
+.hp-grid3d {
+  inset: -10% -10% 30% -10%;
+  background: linear-gradient(color-mix(in srgb, var(--accent) 7%, transparent) 1px,transparent 1px), linear-gradient(90deg,color-mix(in srgb, var(--accent) 7%, transparent) 1px,transparent 1px);
+  background-size: 56px 56px; mask: linear-gradient(var(--text) 0,transparent 85%); -webkit-mask: linear-gradient(var(--text) 0,transparent 85%);
+  transform: translate3d(var(--hp-tx,0px),var(--hp-ty,0px),0) perspective(600px) rotateX(58deg) translateY(-12%);
+  transform-origin: 50% 0; animation: hp-floor 7s linear infinite;
+}
+@keyframes hp-floor { to { background-position: 0 56px, 0 0; } }
+.hp-orb { border-radius: 50%; filter: blur(90px); }
+.hp-orb--one { width:52vmax; height:52vmax; left:-16%; top:-28%; background:var(--accent); opacity:.26; }
+.hp-orb--two { width:42vmax; height:42vmax; right:-14%; top:6%; background:var(--ms-lilac,var(--accent-strong)); opacity:.2; }
+.hp-orb--three { width:34vmax; height:34vmax; left:34%; bottom:-30%; background:var(--ms-rose,var(--accent)); opacity:.12; }
+.hp-ring { border-radius:50%; border:1px solid color-mix(in srgb, var(--accent) 22%, transparent); }
+.hp-ring--one { width: min(380px, 52vw); aspect-ratio:1; right:6%; top:9%; border-style:dashed; animation:hp-spin 60s linear infinite; }
+.hp-ring--two { width:min(220px, 34vw); aspect-ratio:1; left:8%; bottom:14%; animation:hp-spin 40s linear infinite reverse; }
+.hp-ring--three { width:130px; aspect-ratio:1; left:44%; top:3%; border-color:color-mix(in srgb, var(--accent) 30%, transparent); animation:hp-spin 28s linear infinite; }
+.hp-ring--three::after { content:""; position:absolute; left:50%; top:-4px; width:7px; height:7px; margin-left:-3.5px; border-radius:50%; background:var(--accent); box-shadow:0 0 14px var(--accent); }
+.hp-hex { width:90px; height:100px; right:22%; bottom:18%; background:color-mix(in srgb, var(--accent) 10%, transparent); clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); animation:hp-float 7s ease-in-out infinite; }
+.hp-cube { width:74px; height:74px; left:5%; top:30%; perspective:420px; }
+.hp-cube b { position:absolute; inset:0; transform-style:preserve-3d; animation:hp-tumble 22s linear infinite; }
+.hp-cube s { position:absolute; inset:0; border:1px solid color-mix(in srgb, var(--accent) 38%, transparent); background:color-mix(in srgb, var(--accent) 5%, transparent); box-shadow:inset 0 0 18px color-mix(in srgb, var(--accent) 12%, transparent); }
+.hp-cube s:nth-child(1){transform:translateZ(37px)}.hp-cube s:nth-child(2){transform:rotateY(90deg) translateZ(37px)}.hp-cube s:nth-child(3){transform:rotateY(180deg) translateZ(37px)}
+.hp-cube s:nth-child(4){transform:rotateY(-90deg) translateZ(37px)}.hp-cube s:nth-child(5){transform:rotateX(90deg) translateZ(37px)}.hp-cube s:nth-child(6){transform:rotateX(-90deg) translateZ(37px)}
+.hp-cube--two { width:44px; height:44px; right:30%; top:58%; perspective:300px; }
+.hp-cube--two b { animation-duration:15s; animation-direction:reverse; }
+.hp-cube--two s:nth-child(1){transform:translateZ(22px)}.hp-cube--two s:nth-child(2){transform:rotateY(90deg) translateZ(22px)}.hp-cube--two s:nth-child(3){transform:rotateY(180deg) translateZ(22px)}
+.hp-cube--two s:nth-child(4){transform:rotateY(-90deg) translateZ(22px)}.hp-cube--two s:nth-child(5){transform:rotateX(90deg) translateZ(22px)}.hp-cube--two s:nth-child(6){transform:rotateX(-90deg) translateZ(22px)}
+@keyframes hp-tumble { from { transform:rotateX(-24deg) rotateY(0); } to { transform:rotateX(336deg) rotateY(360deg); } }
+.hp-triangle { width:64px; height:58px; right:5%; bottom:30%; background:color-mix(in srgb, var(--accent) 12%, transparent); clip-path:polygon(50% 0,100% 100%,0 100%); animation:hp-float 9s ease-in-out infinite reverse; }
+.hp-plus { width:22px; height:22px; opacity:.5; background:linear-gradient(var(--accent),var(--accent)) center/100% 2px no-repeat,linear-gradient(var(--accent),var(--accent)) center/2px 100% no-repeat; animation:hp-float 6s ease-in-out infinite; }
+.hp-plus--one { left:27%; top:19%; }.hp-plus--two { right:14%; top:46%; animation-delay:-2s; }.hp-plus--three { left:19%; bottom:9%; animation-delay:-4s; }
+@keyframes hp-spin { to { rotate:360deg; } } @keyframes hp-float { 50% { translate:0 -16px; } }
+@media (max-width:700px) { .hp-orb { filter:blur(60px); } .hp-cube--two { right:18%; } .hp-ring--one { right:-20%; } }
+@media (prefers-reduced-motion:reduce) { .home-parallax-bg *, .home-parallax-bg *::before, .home-parallax-bg *::after { animation:none !important; transition:none !important; } }
+body.reduce-motion .home-parallax-bg *, body.reduce-motion .home-parallax-bg *::before, body.reduce-motion .home-parallax-bg *::after,
+body.no-hover-animation .home-parallax-bg *, body.no-hover-animation .home-parallax-bg *::before, body.no-hover-animation .home-parallax-bg *::after { animation:none !important; transition:none !important; }
+
+body[data-background-style="parallax"] #launcherScreen.home::after { display: none; }

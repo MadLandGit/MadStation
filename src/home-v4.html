@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https: file:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"/>
+<link href="developer-visual-debug.css" rel="stylesheet"/>
+<title>Mad Station — 3D Parallax Big App</title>
+<link href="design-tokens.css" rel="stylesheet"/>
+<link href="home-v4.css" rel="stylesheet"/>
+ <link href="home-style-chrome.css" rel="stylesheet"/>
+ <link href="home-topbar-theme.css" rel="stylesheet"/>
+ <link href="home-quick-access-theme.css" rel="stylesheet"/>
+</head>
+<body data-home-isolated="true" data-theme="dark" data-home-style="parallax-big">
+<canvas class="fx" id="fx" aria-hidden="true"></canvas>
+<div class="layers" aria-hidden="true">
+  <i class="grid3d" data-d="8"></i>
+  <i class="orb o1" data-d="22"></i><i class="orb o2" data-d="34"></i><i class="orb o3" data-d="14"></i>
+  <i class="ring r1" data-d="46"></i><i class="ring r2" data-d="62"></i><i class="ring r3" data-d="30"></i><i class="hex" data-d="78"></i>
+  <i class="cube" data-d="58"><b><s></s><s></s><s></s><s></s><s></s><s></s></b></i><i class="cube cube2" data-d="92"><b><s></s><s></s><s></s><s></s><s></s><s></s></b></i>
+  <i class="tri" data-d="70"></i><i class="plus p1" data-d="40"></i><i class="plus p2" data-d="84"></i><i class="plus p3" data-d="52"></i>
+</div>
+
+<div class="spot" id="spot" aria-hidden="true"></div>
+<main class="home" id="launcherScreen" aria-label="Mad Station home">
+  <header class="top">
+    <div class="brand"><span class="mark"><svg viewBox="0 0 32 32"><path d="M16 3.5 27.5 10v12L16 28.5 4.5 22V10L16 3.5Z" opacity=".5"/><path d="M10.5 21V12l5.5 5.2L21.5 12v9"/></svg></span><span><b>Mad</b> Station</span></div>
+    <div class="top-r">
+      <span class="chip" aria-label="Current time" hidden><i class="dot"></i><b id="clock">--:--</b></span>
+      <span class="chip hide-s" hidden>RAM <b id="chipRam">–</b><i class="bar"><u id="ramBar"></u></i></span>
+      <span class="chip hide-s" hidden>CPU <b id="chipCpu">–</b><i class="bar cb"><u id="cpuBar"></u></i></span>
+      <div class="menu-wrap">
+        <button class="icon" id="homeCustomizeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+        <div class="menu" id="homeMenu" hidden></div>
+      </div>
+      <button class="icon" id="themeBtn" type="button" aria-label="Toggle theme" title="Day / night"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button>
+      <div class="madstation-theme-quick-access" data-theme-quick-access data-qa-skin="parallax-big">
+        <button class="madstation-theme-quick-trigger" data-theme-quick-trigger type="button" aria-label="Quick Access: theme and appearance" title="Theme &amp; appearance" aria-haspopup="dialog" aria-expanded="false" aria-controls="themeQuickAccessMenu">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="madstation-theme-quick-glyph"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-.6-.3-1-.6-1.4-.4-.5-.6-.9-.6-1.5 0-1 .8-1.8 1.8-1.8H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.6 16.7 3.5 12 3.5Z"/><path d="M7.6 11h.01M10.2 7.6h.01M14.4 7.6h.01"/></svg><span class="madstation-theme-quick-sr">Quick Access</span>
+        </button>
+        <div class="madstation-theme-quick-menu" id="themeQuickAccessMenu" data-theme-quick-menu role="dialog" aria-label="Theme and appearance" hidden></div>
+      </div>
+      <button class="icon" id="launcherSettingsBtn" type="button" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+  </header>
+
+
+  <div class="layout">
+    <section class="stage" aria-label="Main app"><article class="main" id="mainCard" tabindex="0" role="button"></article></section>
+    <section class="rail" aria-label="More apps">
+      <div class="sec-h"><h2>More apps</h2><span class="hint">Drag a tile onto the main panel to replace it · drag to reorder</span></div>
+      <div class="apps" id="homeApps"></div>
+      <p class="none" id="noMatch" hidden>No app matches that.</p>
+    </section>
+    <section class="card sys" aria-label="Live system">
+      <div class="sec-h"><h2><i class="dot"></i>Live system</h2><div class="sys-head-actions"><span class="hint" id="procs">–</span><button class="sys-refresh-btn" type="button" data-memory-refresh title="Refresh process monitor" aria-label="Refresh process monitor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"></path><path d="M20 4v5h-5"></path></svg></button></div></div>
+      <div class="sys-grid">
+        <div class="metric"><div class="mh"><span>App memory</span><b id="ramBig">–</b></div><svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none"><path class="area" id="ramArea"/><path class="line" id="ramLine"/></svg><small id="ramSub">Measuring…</small></div>
+        <div class="metric cpu"><div class="mh"><span>CPU</span><b id="cpuBig">–</b></div><svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none"><path class="area" id="cpuArea"/><path class="line" id="cpuLine"/></svg><small>System load</small></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="homeToast" role="status" aria-live="polite"></div>
+<script src="appearance.js"></script>
+<script src="home-v4.js"></script>
+<script src="home-v4-bridge.js"></script>
+
+<script src="developer-visual-debug.js"></script>
+<script src="home-style-settings-bridge.js"></script>
+<script src="home-quick-access-theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"/>
+<link href="developer-visual-debug.css" rel="stylesheet"/>
+<title>Mad Station — Simple Retro</title>
+<link href="design-tokens.css" rel="stylesheet"/>
+<style>
+/* Mad Station — retro desktop. CRT phosphor, pixel sprites, starfield + depth-layer parallax, tilt tiles. Self-contained, keeps the app hooks. */
+body{--bg:#04100a;--ink:#a6ffc4;--dim:#3fa56a;--line:#1b5a37;--panel:#071a10;--ph:#33ff7a;--on:#021208;--glow:0 0 7px color-mix(in srgb,currentColor 60%,transparent);color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--ms-home-background,var(--bg));background-size:var(--ms-home-background-size,auto);background-position:var(--ms-home-background-position,center);background-repeat:var(--ms-home-background-repeat,no-repeat);color:var(--ink);font:15px/1.4 "Lucida Console","Courier New",ui-monospace,monospace;text-shadow:var(--glow);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;text-shadow:inherit}
+h1,p{margin:0}
+:focus-visible{outline:2px dashed var(--ph);outline-offset:3px}
+canvas{display:block;image-rendering:pixelated}
+.fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* ---- depth layers ---- */
+.layers{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.l{position:absolute;will-change:transform;transform:translate3d(var(--tx,0px),var(--ty,0px),0)}
+.sp canvas{animation:fl var(--t,8s) ease-in-out infinite;animation-delay:var(--dl,0s);opacity:var(--o,.5)}
+@keyframes fl{50%{translate:0 -20px;rotate:4deg}}
+.blob{border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--ph) 24%,transparent),transparent)}
+.b1{width:60vmax;height:60vmax;left:-22%;top:-30%}.b2{width:46vmax;height:46vmax;right:-16%;bottom:-24%}
+.gw{width:210px;height:130px;border:2px solid var(--ph);opacity:.22;background:linear-gradient(var(--ph) 0 16px,transparent 16px);animation:fl 11s ease-in-out infinite}
+.g1{left:58%;top:8%}.g2{left:3%;top:56%;width:160px;height:100px;animation-delay:-5s}
+.spot{position:fixed;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;z-index:1;pointer-events:none;background:radial-gradient(closest-side,color-mix(in srgb,var(--ph) 13%,transparent),transparent)}
+.crt{position:fixed;inset:0;z-index:90;pointer-events:none;background:repeating-linear-gradient(0deg,rgb(0 0 0/.2) 0 1px,transparent 1px 3px)}
+.crt::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgb(0 0 0/.5));animation:fk 5s steps(2) infinite}
+.roll{position:fixed;left:0;right:0;top:-20vh;height:18vh;z-index:89;pointer-events:none;background:linear-gradient(transparent,rgb(255 255 255/.045),transparent);animation:roll 8s linear infinite}
+@keyframes roll{to{top:110vh}}@keyframes fk{50%{opacity:.9}}
+
+/* ---- boot ---- */
+.boot{position:fixed;inset:0;z-index:120;background:var(--bg);padding:7vh 6vw;white-space:pre-wrap;color:var(--ph);cursor:pointer}
+body.on .boot{display:none}
+.cur{display:inline-block;width:.6em;height:1em;margin-left:3px;vertical-align:-2px;background:currentColor;animation:bk 1s steps(1) infinite}
+@keyframes bk{50%{opacity:0}}
+
+/* ---- shell ---- */
+.home{position:relative;z-index:2;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--ph) var(--bg)}
+body:not(.on) .home{visibility:hidden}
+body.on .home{animation:pwr .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pwr{0%{transform:scale(1,.004);filter:brightness(6)}40%{transform:scale(1,.04);filter:brightness(3)}100%{transform:none;filter:none}}
+body.zap .home{animation:zap .28s steps(3)}
+@keyframes zap{50%{filter:invert(1) brightness(1.4);translate:3px 0}}
+.top{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:auto minmax(180px,1fr) auto;gap:16px;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) clamp(14px,3vw,40px) 12px;background:linear-gradient(var(--bg) 72%,transparent)}
+.brand{font-size:19px;font-weight:700;letter-spacing:.06em;white-space:nowrap}
+.brand b{background:var(--ph);color:var(--on);padding:0 6px;margin-right:6px;text-shadow:none}
+.cmd{display:flex;align-items:center;min-width:0;height:38px;padding:0 12px;border:2px solid var(--line);background:var(--panel);white-space:nowrap;overflow:hidden}
+.cmd em{font-style:normal;color:var(--dim);margin-right:8px}
+.top-r{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.chip{height:38px;display:inline-flex;align-items:center;gap:7px;padding:0 10px;border:2px solid var(--line);background:var(--panel);white-space:nowrap}
+.chip i{font-style:normal;color:var(--dim);letter-spacing:-.1em}
+.chip b{font-weight:400;min-width:3ch;text-align:right}
+.ph{border-color:var(--ph)}.ph:hover{background:var(--ph);color:var(--on);text-shadow:none}
+.layout{width:min(1280px,100%);margin:0 auto;padding:10px clamp(14px,3vw,40px) calc(64px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);grid-template-areas:"st rl" "sy rl";gap:24px;align-items:start}
+.stage{grid-area:st;perspective:1500px}.rail{grid-area:rl}.sys{grid-area:sy}
+
+/* ---- windows ---- */
+.win{--h:var(--ph);--hd:color-mix(in srgb,var(--h) 42%,#000);border:2px solid var(--h);background:var(--panel);box-shadow:7px 7px 0 color-mix(in srgb,var(--h) 32%,transparent)}
+.tb{display:flex;align-items:center;gap:10px;height:26px;padding:0 8px;background:var(--h);color:var(--on);font-size:13px;font-weight:700;letter-spacing:.08em;text-shadow:none;white-space:nowrap}
+.tb::before,.tb::after{content:"";flex:1;height:12px;background:repeating-linear-gradient(0deg,var(--on) 0 2px,transparent 2px 4px);opacity:.5}
+.tb::before{max-width:26px}
+body.on .win,body.on .tile{animation:up .55s steps(6) both;animation-delay:calc(var(--i,0)*.12s + .35s)}
+@keyframes up{from{opacity:0;translate:0 22px}}
+.tilt{--rx:0;--ry:0;--dx:0;--dy:0;transform:rotateX(calc(var(--rx)*1deg)) rotateY(calc(var(--ry)*1deg));transition:transform .15s ease-out,box-shadow .2s}
+.tilt::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s;background:radial-gradient(240px circle at var(--gx,50%) var(--gy,0%),color-mix(in srgb,var(--h) 26%,transparent),transparent 70%)}
+.tilt:hover::after{opacity:1}
+
+/* ---- main app ---- */
+.main{position:relative;overflow:hidden;cursor:pointer;transition:transform .15s ease-out,box-shadow .2s}
+.main:hover{box-shadow:calc(var(--dx)*-12px + 7px) calc(var(--dy)*-10px + 7px) 0 color-mix(in srgb,var(--h) 45%,transparent)}
+.mb{position:relative;z-index:2;display:grid;grid-template-columns:auto minmax(0,1fr);gap:30px;align-items:center;padding:26px 28px 6px}
+.orbw{position:relative;width:200px;height:200px;display:grid;place-items:center}
+.pq{position:absolute;inset:8px;border:2px solid var(--h);opacity:0;animation:pq 3s steps(8) infinite;translate:calc(var(--dx)*-16px) calc(var(--dy)*-10px)}.pq.q2{animation-delay:-1.5s}
+@keyframes pq{from{scale:.3;opacity:1}to{scale:1.1;opacity:0}}
+.o4{position:absolute;inset:18px;border:2px dashed var(--h);opacity:.7;animation:spin 26s steps(52) infinite}
+@keyframes spin{to{rotate:360deg}}
+.big{position:relative;animation:bob 3s steps(6) infinite;translate:calc(var(--dx)*22px) calc(var(--dy)*22px);filter:drop-shadow(0 0 12px var(--h))}
+@keyframes bob{50%{transform:translateY(-12px)}}
+.nm{display:block;font-size:clamp(28px,4vw,52px);line-height:1.08;color:var(--h);letter-spacing:.03em;text-shadow:1px 1px 0 var(--hd),2px 2px 0 var(--hd),3px 3px 0 var(--hd),4px 4px 0 var(--hd);translate:calc(var(--dx)*5px) calc(var(--dy)*4px)}
+.nm span{display:inline-block;animation:wv 2.4s steps(4) infinite;animation-delay:calc(var(--i)*-.14s)}
+@keyframes wv{50%{translate:0 -7px}}
+.tg{margin-top:14px;color:var(--dim)}
+.tg b{margin-right:12px;font-weight:400;color:var(--ink);animation:fb 3.2s steps(1) infinite;animation-delay:calc(var(--i)*-.8s)}
+@keyframes fb{0%,92%{opacity:1}96%{opacity:.2}}
+.open{margin-top:22px;height:46px;padding:0 20px;border:2px solid var(--h);background:var(--h);color:var(--on);font-weight:700;letter-spacing:.06em;text-shadow:none;box-shadow:4px 4px 0 var(--hd);transition:translate .1s,box-shadow .1s}
+.open:hover{translate:-2px -2px;box-shadow:6px 6px 0 var(--hd)}.open:active{translate:4px 4px;box-shadow:0 0 0 var(--hd)}
+.eq{position:relative;z-index:2;display:flex;align-items:flex-end;gap:4px;height:58px;margin:18px 28px 24px}
+.eq i{flex:1;height:100%;background:repeating-linear-gradient(0deg,var(--h) 0 5px,transparent 5px 8px);transform-origin:bottom;animation:eq 1.1s steps(7) infinite;animation-delay:calc(var(--i)*-.11s)}
+@keyframes eq{0%,100%{transform:scaleY(.18)}50%{transform:scaleY(1)}}
+.main.swap{animation:zap .28s steps(3)}
+
+/* ---- tiles ---- */
+.apps{display:grid;gap:12px;padding:14px;perspective:1100px}
+.tile{--h:var(--ph);position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:10px 12px;border:2px solid var(--line);background:var(--bg);cursor:pointer;overflow:hidden}
+.tile:hover,.tile:focus-visible{border-color:var(--h);box-shadow:calc(var(--dx)*-8px + 4px) calc(var(--dy)*-6px + 4px) 0 color-mix(in srgb,var(--h) 45%,transparent)}
+.ib{width:54px;height:54px;display:grid;place-items:center;border:2px solid var(--h);background:color-mix(in srgb,var(--h) 12%,transparent);translate:calc(var(--dx)*4px) calc(var(--dy)*3px)}
+.tt{min-width:0;display:grid;translate:calc(var(--dx)*3px) calc(var(--dy)*2px)}
+.tt strong{font-size:16px;color:var(--h)}.tt span{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.star{width:34px;height:34px;border:2px solid transparent;background:none;color:var(--dim)}.star:hover{border-color:var(--h);color:var(--h)}
+.key{font-size:12px;color:var(--dim);border:1px solid var(--line);padding:0 6px}
+.hint{color:var(--on);font-weight:400;font-size:12px;opacity:.85}
+
+/* ---- system ---- */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:16px 18px 18px}
+.mh{display:flex;justify-content:space-between;margin-bottom:8px}.mh b{font-size:20px;font-weight:400}
+.sg canvas{width:100%;height:56px;border-bottom:2px solid var(--line)}
+.sg small{display:block;margin-top:6px;color:var(--dim)}
+.toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:100;transform:translate(-50%,16px);padding:8px 16px;border:2px solid var(--ph);background:var(--panel);opacity:0;pointer-events:none;transition:.2s steps(4)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.sys{position:relative}
+.tile{cursor:grab;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.tile.lifted{opacity:.25;border-style:dashed}
+.ghost{position:fixed;left:0;top:0;z-index:100;margin:0;pointer-events:none;animation:none!important;transition:none;box-shadow:0 16px 0 rgb(0 0 0/.35);border-color:var(--h)}
+body.dragging,body.dragging *{cursor:grabbing!important}
+.main.drop{outline:3px dashed var(--h);outline-offset:6px}
+/* per-app main visuals */
+.vis{position:relative;z-index:2;height:74px;margin:18px 28px 24px;color:var(--h)}
+.nn{width:100%;height:100%;fill:none;stroke:var(--h);stroke-width:2}
+.nn .ln{stroke-dasharray:4 6;opacity:.7;animation:flow 1s steps(5) infinite}
+@keyframes flow{to{stroke-dashoffset:-20}}
+.nn .nd{fill:var(--panel);transform-box:fill-box;transform-origin:center;animation:nd 1.6s steps(4) infinite}.nn .nd:nth-of-type(2n){animation-delay:-.5s}.nn .nd:nth-of-type(3n){animation-delay:-1s}.nn .core{fill:var(--h)}
+@keyframes nd{50%{scale:1.45;fill:var(--h)}}
+.pr,.ar,.ck{display:grid;gap:9px;align-content:center;height:100%}
+.pr b{display:block;height:9px;width:0;background:var(--h);animation:ty 4s steps(14) infinite}
+.pr b:nth-child(1){--w:92%}.pr b:nth-child(2){--w:64%;animation-delay:.5s}.pr b:nth-child(3){--w:78%;animation-delay:1s}
+@keyframes ty{0%{width:0}60%,100%{width:var(--w)}}
+.pr i{width:10px;height:15px;background:var(--ink);animation:bk 1s steps(1) infinite}
+.ar b{position:relative;height:16px;border:2px solid var(--h)}
+.ar b::after{content:"";position:absolute;inset:2px;background:var(--h);transform-origin:left;animation:rc var(--d,2s) steps(10) infinite alternate}
+.ar b:nth-child(1){--d:2.2s}.ar b:nth-child(2){--d:3.1s}.ar b:nth-child(3){--d:1.7s}
+@keyframes rc{from{transform:scaleX(.08)}to{transform:scaleX(1)}}
+.fm{height:100%;overflow:hidden;border-block:6px dashed var(--h);display:flex;align-items:center}
+.fm div{display:flex;gap:8px;width:max-content;animation:sc .6s steps(6) infinite}
+.fm i{width:54px;height:40px;border:2px solid var(--h);background:color-mix(in srgb,var(--h) 16%,transparent)}.fm i:nth-child(3n){background:var(--h)}
+@keyframes sc{to{translate:-62px 0}}
+.im{display:grid;grid-template-columns:repeat(16,1fr);grid-auto-rows:1fr;gap:2px;height:100%}
+.im b{background:var(--h);animation:px 2.4s steps(3) infinite;animation-delay:calc(var(--i)*-.19s)}
+@keyframes px{0%{opacity:.12}33%{opacity:.55}66%{opacity:1}100%{opacity:.2}}
+.ck p{display:flex;align-items:center;gap:10px}
+.ck i{position:relative;flex:none;width:18px;height:18px;border:2px solid var(--h)}
+.ck i::after{content:"";position:absolute;inset:2px;background:var(--h);animation:tk 4.5s steps(1) infinite;animation-delay:calc(var(--k)*-1.1s)}
+@keyframes tk{0%,20%{opacity:0}30%,85%{opacity:1}100%{opacity:0}}
+.ck s{height:7px;flex:1;max-width:var(--w);background:var(--dim)}
+/* more parallax */
+.tx{font-size:13px;color:var(--dim);opacity:.55;white-space:nowrap;animation:fl 9s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.fg{z-index:3}.fg .sp canvas{filter:blur(1.5px)}
+.sq{width:120px;height:120px;border:2px dashed var(--ph);opacity:.2;animation:spin 40s steps(80) infinite}
+.q1{left:44%;top:62%}.q2s{right:6%;top:72%;width:84px;height:84px;animation-direction:reverse}.q3{left:12%;top:5%;width:70px;height:70px}
+.pf{width:150px;height:14px;border:2px solid var(--ph);opacity:.28}
+.pf::after{content:"";position:absolute;inset:2px;background:var(--ph);transform-origin:left;animation:rc 3s steps(10) infinite alternate}
+.pf1{left:30%;top:90%}.pf2{left:66%;top:36%;width:110px}
+.g3{left:80%;top:62%;width:150px;height:90px;animation-delay:-3s}.g4{left:30%;top:36%;width:120px;height:76px;animation-delay:-8s;opacity:.14}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;grid-template-areas:"st" "rl" "sy"}}
+@media(max-width:700px){.top{grid-template-columns:1fr auto}.cmd{grid-column:1/-1;order:3}.hide-s{display:none}.mb{grid-template-columns:1fr;justify-items:center;text-align:center;gap:6px}.sg{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Host Appearance adapters retain the pixel/CRT identity while following global settings. */
+body.retro-flat .layers, body.retro-flat #fx { opacity: .24; }
+body.retro-glass .win, body.retro-glass .tile, body.retro-glass .chip, body.retro-glass .cmd { background-color: color-mix(in srgb, var(--panel) 72%, transparent); backdrop-filter: blur(14px); }
+body.retro-compact .layout { gap: 16px; }
+body.retro-compact .mb { padding-top: 18px; padding-inline: 20px; }
+body.retro-compact .apps { gap: 8px; padding: 10px; }
+body.no-hover-animation .tilt, body.no-hover-animation .tile, body.no-hover-animation .open { transition: none !important; }
+body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after { animation: none !important; transition: none !important; }
+
+
+/* ===== Audit fit pass (Simple Retro): one shared content width with the top bar, a viewport-filling two-column desktop, compact minimum size ===== */
+@media (min-width: 900px) and (min-height: 480px) {
+  html, body { height: 100%; overflow: hidden; }
+  .home { display: flex; flex-direction: column; overflow: hidden; }
+  .top { flex: none; padding-inline: max(clamp(14px, 3vw, 40px), calc((100vw - 1840px) / 2)); }
+  .layout {
+    flex: 1 1 auto; min-height: 0; width: 100%; max-width: none; margin: 0;
+    padding: 12px max(clamp(14px, 3vw, 40px), calc((100vw - 1840px) / 2)) 22px;
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+    grid-template-areas: "st rl" "sy rl";
+    grid-template-rows: minmax(0, 1fr) auto; gap: 18px 24px; align-items: stretch;
+  }
+  .stage { min-height: 0; }
+  .stage .main { height: 100%; display: flex; flex-direction: column; }
+  .stage .main .mb { flex: 1 1 auto; align-content: center; padding-top: 10px; }
+  .stage .main .vis { flex: none; height: clamp(46px, 8vh, 84px); margin: 6px 28px clamp(10px, 2.4vh, 24px); }
+  .rail { min-height: 0; display: flex; flex-direction: column; }
+  .rail .apps { flex: 1 1 auto; min-height: 0; grid-auto-rows: minmax(0, 1fr); gap: clamp(6px, 1.2vh, 12px); padding: clamp(8px, 1.4vh, 14px); }
+  .rail .tile { min-height: 0; padding-block: 4px; }
+  .sg canvas { height: clamp(40px, 7vh, 84px); }
+}
+@media (min-width: 900px) and (min-height: 480px) and (max-height: 700px) {
+  .top { padding-top: 6px; padding-bottom: 6px; gap: 10px; }
+  .layout { padding-top: 8px; padding-bottom: 10px; gap: 10px 16px; }
+  .stage .main .mb { gap: 18px; padding: 8px 16px 0; }
+  .stage .main .orbw { width: 100px; height: 100px; }
+  .stage .main .nm { font-size: 28px; }
+  .stage .main .tg { margin-top: 6px; }
+  .stage .main .open { height: 30px; margin-top: 8px; }
+  .stage .main .vis { height: 34px; margin: 2px 16px 8px; }
+  .rail .apps { gap: 5px; padding: 6px; }
+  .rail .tile { padding: 2px 8px; gap: 8px; }
+  .sg { gap: 14px; padding: 8px 12px 10px; }
+  .sg canvas { height: 30px; }
+  .sg small { margin-top: 2px; }
+  .home { overflow-y: auto; }
+}
+
+/* Theme-matched process-monitor refresh control. */
+.sys-head-actions { display:inline-flex; align-items:center; gap:7px; min-width:0; }
+.sys-refresh-btn { flex:none; display:inline-grid; place-items:center; width:22px; height:20px; padding:0; border:2px solid var(--line); border-radius:0; background:var(--panel); color:var(--ph); box-shadow:inset 1px 1px 0 color-mix(in srgb,var(--ph) 18%,transparent), 2px 2px 0 #0008; text-shadow:none; }
+.sys-refresh-btn svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:square; stroke-linejoin:miter; transition:transform .48s steps(6); }
+.sys-refresh-btn:hover { background:var(--ph); color:var(--on); }
+.sys-refresh-btn.is-refreshing svg { transform:rotate(360deg); }
+</style>
+ <link href="home-style-chrome.css" rel="stylesheet"/>
+ <link href="home-topbar-theme.css" rel="stylesheet"/>
+ <link href="home-quick-access-theme.css" rel="stylesheet"/>
+</head>
+<body data-ph="accent" data-home-isolated="true" data-theme="dark" data-home-style="retro">
+<canvas class="fx" id="fx" aria-hidden="true"></canvas>
+<div class="layers" id="ls" aria-hidden="true"><i class="l blob b1" data-d="18"></i><i class="l blob b2" data-d="34"></i><i class="l gw g1" data-d="52"></i><i class="l gw g2" data-d="76"></i><i class="l gw g3" data-d="110"></i><i class="l gw g4" data-d="40"></i><i class="l sq q1" data-d="64"></i><i class="l sq q2s" data-d="96"></i><i class="l sq q3" data-d="28"></i><i class="l pf pf1" data-d="58"></i><i class="l pf pf2" data-d="82"></i></div><div class="layers fg" id="fg" aria-hidden="true"></div>
+<div class="spot" id="spot" aria-hidden="true"></div>
+<div class="crt" aria-hidden="true"></div><div class="roll" aria-hidden="true"></div>
+<div class="boot" id="boot" aria-label="Starting up. Click or press any key to skip."><span id="bt"></span><i class="cur"></i></div>
+
+<main class="home" id="home" aria-label="Mad Station home">
+  <header class="top">
+    <div class="brand"><b>MAD</b>Station</div>
+    <div class="cmd" aria-hidden="true"><em>C:\MAD&gt;</em><span id="pt"></span><i class="cur"></i></div>
+    <div class="top-r">
+      <span class="chip" aria-label="Current time" hidden><b id="clock">--:--</b></span>
+      <span class="chip hide-s" hidden>MEM <i id="mi">░░░░░░░░</i><b id="cm">–</b></span>
+      <span class="chip hide-s" hidden>CPU <i id="ci">░░░░░░░░</i><b id="cc">–</b></span>
+      <button class="chip" id="themeBtn" type="button" title="Toggle Day / Night" aria-label="Toggle Day / Night">Day / Night</button>
+      <div class="madstation-theme-quick-access" data-theme-quick-access data-qa-skin="retro">
+        <button class="madstation-theme-quick-trigger" data-theme-quick-trigger type="button" aria-label="Quick Access: theme and appearance" title="Theme &amp; appearance" aria-haspopup="dialog" aria-expanded="false" aria-controls="themeQuickAccessMenu">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="madstation-theme-quick-glyph"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-.6-.3-1-.6-1.4-.4-.5-.6-.9-.6-1.5 0-1 .8-1.8 1.8-1.8H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.6 16.7 3.5 12 3.5Z"/><path d="M7.6 11h.01M10.2 7.6h.01M14.4 7.6h.01"/></svg><span class="madstation-theme-quick-sr">Quick Access</span>
+        </button>
+        <div class="madstation-theme-quick-menu" id="themeQuickAccessMenu" data-theme-quick-menu role="dialog" aria-label="Theme and appearance" hidden></div>
+      </div>
+      <button class="chip ph" id="launcherSettingsBtn" type="button" title="Open Mad Station Settings" aria-label="Settings">Settings</button>
+    </div>
+  </header>
+  <div class="layout">
+    <section class="stage" aria-label="Main app"><article class="win main tilt" id="mainCard" tabindex="0" role="button"></article></section>
+    <section class="win rail" aria-label="More apps" style="--i:1"><div class="tb"><span>Desktop</span><span class="hint">drag · ★ main</span></div><div class="apps" id="apps"></div></section>
+    <section class="win sys" aria-label="Live system" style="--i:2"><div class="tb"><span>Sysmon</span><div class="sys-head-actions"><span class="hint" id="procs">–</span><button class="sys-refresh-btn" type="button" data-memory-refresh title="Refresh process monitor" aria-label="Refresh process monitor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"></path><path d="M20 4v5h-5"></path></svg></button></div></div>
+      <div class="sg"><div><div class="mh"><span>App memory</span><b id="ramBig">–</b></div><canvas id="ramCv" width="160" height="56"></canvas><small id="ramSub">Measuring…</small></div>
+      <div><div class="mh"><span>CPU</span><b id="cpuBig">–</b></div><canvas id="cpuCv" width="160" height="56"></canvas><small>System load</small></div></div></section>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="appearance.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
+  const reduce = () => document.body.classList.contains('reduce-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MAXT = 17, cl = (v, m) => Math.max(-m, Math.min(m, v)); // MAXT = max tilt in degrees
+  const HUE = ['#ff5d73', '#ffb000', '#3dff9c', '#4cc9ff', '#c792ff', '#ff8bd1'];
+
+  /* ---------- pixel sprites ('#' = pixel) ---------- */
+  const SP = {
+    chip: ['.#.#.#.#..', '.########.', '##......##', '.#.####.#.', '##.#..#.##', '.#.#..#.#.', '##.####.##', '.#......#.', '.########.', '..#.#.#.#.'],
+    bubble: ['..........', '.########.', '.#......#.', '.#.####.#.', '.#......#.', '.#.###..#.', '.#......#.', '.########.', '...##.....', '....#.....'],
+    flask: ['...####...', '....##....', '....##....', '...####...', '..######..', '.###..###.', '.#..##..#.', '.#.####.#.', '.########.', '..######..'],
+    tv: ['##########', '#........#', '#.#......#', '#.###....#', '#.#####..#', '#.###....#', '#.#......#', '#........#', '##########', '.########.'],
+    pic: ['##########', '#........#', '#....##..#', '#....##..#', '#........#', '#.#...#..#', '###..###.#', '#####.####', '#........#', '##########'],
+    pad: ['...####...', '.########.', '.#......#.', '.#.####.#.', '.#......#.', '.#.###..#.', '.#......#.', '.#.####.#.', '.#......#.', '.########.'],
+    floppy: ['#########.', '#..####.##', '#..####..#', '#........#', '#.######.#', '#.#....#.#', '#.#....#.#', '#.#....#.#', '#.######.#', '##########'],
+    inv: ['..#.....#..', '...#...#...', '..#######..', '.##.###.##.', '###########', '#.#######.#', '#.#.....#.#', '...##.##...'],
+    plus: ['.#.', '###', '.#.'],
+    mac: ['.########.', '.#......#.', '.#.####.#.', '.#.#..#.#.', '.#.####.#.', '.#......#.', '.########.', '.#..##..#.', '.########.', '..######..'],
+    cass: ['############', '#..........#', '#.##....##.#', '#.##....##.#', '#..........#', '#.########.#', '#.#.#..#.#.#', '############'],
+    joy: ['...###...', '...###...', '....#....', '....#....', '....#....', '.#######.', '#########', '#.#####.#', '#.......#', '#########'],
+    heart: ['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...'],
+    arrow: ['#.....', '##....', '###...', '####..', '#####.', '######', '###...', '#.#...', '..#...', '..#...'],
+  };
+  function spr(key, px, col) {
+    const rows = SP[key], c = document.createElement('canvas'); c.width = rows[0].length * px; c.height = rows.length * px;
+    const g = c.getContext('2d'); g.fillStyle = col;
+    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (ch === '#') g.fillRect(x * px, y * px, px, px); }));
+    return c;
+  }
+  const APPS = [
+    { id: 'ai-hub', name: 'AI Hub', h: 0, s: 'chip', tag: 'Accounts · Providers · Sessions' },
+    { id: 'instruction-forge', name: 'Prompt Studio', h: 4, s: 'bubble', tag: 'Refine · Clarify · Structure' },
+    { id: 'ai-lab', name: 'AI Playground', h: 1, s: 'flask', tag: 'Arena · API · Local AI' },
+    { id: 'video-hub', name: 'Video Hub', h: 3, s: 'tv', tag: 'AI Video · Daily Credits' },
+    { id: 'image-hub', name: 'Image Hub', h: 2, s: 'pic', tag: 'AI Images · Edit · Upscale' },
+    { id: 'clipboard', name: 'Notes & Tasks', h: 5, s: 'pad', tag: 'Notes · Checklists' },
+  ];
+  const byId = (id) => APPS.find((a) => a.id === id);
+  /* big animated visual for each app when it is the main app */
+  const VIS = {
+    'ai-hub': () => '<svg class="nn" viewBox="0 0 200 60"><path class="ln" d="M20 10 100 22M20 30 100 22M20 30 100 42M20 50 100 42M20 10 100 42M20 50 100 22M100 22 180 30M100 42 180 30"/>' + [[20, 10], [20, 30], [20, 50], [100, 22], [100, 42]].map(([x, y]) => `<circle class="nd" cx="${x}" cy="${y}" r="5"/>`).join('') + '<circle class="nd core" cx="180" cy="30" r="8"/></svg>',
+    'instruction-forge': () => '<div class="pr"><b></b><b></b><b></b><i></i></div>',
+    'ai-lab': () => '<div class="ar"><b></b><b></b><b></b></div>',
+    'video-hub': () => '<div class="fm"><div>' + '<i></i>'.repeat(14) + '</div></div>',
+    'image-hub': () => '<div class="im">' + Array.from({ length: 64 }, (_, i) => `<b style="--i:${i * 7 % 13}"></b>`).join('') + '</div>',
+    'clipboard': () => '<div class="ck">' + [70, 52, 62].map((w, k) => `<p style="--k:${k}"><i></i><s style="--w:${w}%"></s></p>`).join('') + '</div>',
+  };
+  const K_MAIN = 'mad-retro-main';
+  let main = 'ai-hub', launcher = null;
+  try { const m = localStorage.getItem(K_MAIN); if (byId(m)) main = m; } catch (e) {}
+  const K_ORD = 'mad-retro-order'; let ord = APPS.map((a) => a.id);
+  try { const o = JSON.parse(localStorage.getItem(K_ORD)); if (Array.isArray(o)) ord = [...o.filter((i) => byId(i)), ...ord.filter((i) => !o.includes(i))]; } catch (e) {}
+
+  /* ---------- host hooks (same names as the current home) ---------- */
+  window.MadHomeApps = { setLauncher(fn) { if (typeof fn === 'function') launcher = fn; } };
+  window.MadHome = { inApp: window.parent !== window || !!window.MadStationMemoryMonitor, setStats() {} };
+  function toast(t) { const n = $('#toast'); n.textContent = '> ' + t; n.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => n.classList.remove('show'), 1700); }
+  function launch(id) {
+    const a = byId(id); if (!a) return;
+    if (!reduce()) { document.body.classList.remove('zap'); void document.body.offsetWidth; document.body.classList.add('zap'); }
+    if (launcher) launcher(id); else toast('Launching ' + a.name + '…');
+  }
+
+  /* ---------- native phosphor palette; global Accent belongs to workspace apps ---------- */
+  let PH = getComputedStyle(document.body).getPropertyValue('--ph').trim() || '#33ff7a';
+  let hostAppearance = null;
+  function applyHostAppearance(settings) {
+    hostAppearance = settings && typeof settings === 'object' ? settings : hostAppearance;
+    const s = hostAppearance || {};
+    const p = s.hostPalette && typeof s.hostPalette === 'object' ? s.hostPalette : {};
+    const root = getComputedStyle(document.documentElement);
+    const body = document.body;
+    const set = (name, value) => { if (typeof value === 'string' && value.trim() && value.length <= 400 && !/[;{}]/.test(value)) body.style.setProperty(name, value.trim()); };
+    set('--bg', p['--bg'] || root.getPropertyValue('--bg').trim() || '#04100a');
+    set('--ink', p['--text'] || root.getPropertyValue('--text').trim() || '#a6ffc4');
+    set('--dim', p['--muted'] || root.getPropertyValue('--muted').trim() || '#3fa56a');
+    set('--line', p['--line-strong'] || p['--line'] || root.getPropertyValue('--line').trim() || '#1b5a37');
+    set('--panel', p['--surface'] || p['--surface-2'] || root.getPropertyValue('--surface').trim() || '#071a10');
+    const nativePh = getComputedStyle(body).getPropertyValue('--ph').trim() || '#33ff7a';
+    const accent = s.preserveNativeAccent ? nativePh : (p['--accent'] || root.getPropertyValue('--accent').trim() || nativePh);
+    PH = accent;
+    set('--ph', PH);
+    const h = PH.match(/^#([0-9a-f]{6})$/i);
+    let lum = .5;
+    if (h) { const rgb = [1,3,5].map(i => parseInt(h[1].slice(i-1,i+1),16)/255).map(v => v <= .04045 ? v/12.92 : Math.pow((v+.055)/1.055,2)); lum = .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]; }
+    set('--on', lum > .48 ? '#06120a' : '#f4f7fb');
+    set('--glow', s.shadowStyle === 'none' || s.reduceMotion ? 'none' : '0 0 7px color-mix(in srgb, var(--ph) 60%, transparent)');
+    body.classList.toggle('retro-flat', ['plain','custom'].includes(s.backgroundStyle));
+    body.classList.toggle('retro-glass', ['glass','frosted'].includes(s.surfaceStyle));
+    body.classList.toggle('retro-compact', s.density === 'compact' || s.cardSpacing === 'compact');
+    body.classList.toggle('no-hover-animation', s.animateHover === false);
+    const effectiveTheme = s.theme === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : (s.theme === 'light' ? 'light' : 'dark');
+    body.style.colorScheme = effectiveTheme;
+    decor(); drawSys();
+  }
+  /* ---------- parallax decor: pixel objects on depth layers ---------- */
+  const DECOR = [['floppy', 6, 24, 6, 60, .55, 8, 0], ['inv', 80, 14, 6, 92, .5, 6, -2], ['chip', 72, 64, 7, 40, .32, 9, -4], ['floppy', 38, 80, 4, 24, .3, 10, -1],
+    ['inv', 13, 72, 4, 70, .35, 7, -3], ['plus', 46, 5, 5, 32, .5, 6, -2], ['plus', 92, 48, 4, 84, .5, 5, -1], ['plus', 25, 12, 4, 50, .45, 7, -3], ['arrow', 56, 42, 5, 100, .42, 9, -5]];
+  DECOR.push(['mac', 20, 38, 6, 56, .45, 9, -2], ['cass', 64, 10, 5, 78, .4, 8, -4], ['joy', 90, 80, 6, 66, .42, 10, -1], ['heart', 34, 50, 4, 46, .35, 7, -3], ['inv', 50, 70, 5, 36, .3, 8, -2],
+    ['floppy', 2, 8, 4, 110, .3, 9, -6, 1], ['chip', 88, 30, 10, 150, .16, 11, -3, 1], ['inv', 60, 90, 9, 170, .14, 9, -2, 1], ['mac', 44, 22, 8, 130, .14, 12, -5, 1], ['plus', 10, 50, 6, 140, .2, 7, -1, 1], ['arrow', 78, 52, 7, 120, .22, 8, -4, 1]);
+  const TXT = [['READY.', 18, 34, 44, 0], ['0x7F3A 00FF', 60, 20, 64, -3], ['A:\\>', 8, 88, 30, -1], ['SYS 64738', 70, 78, 88, -4], ['38911 BYTES FREE', 30, 62, 54, -2], ['10 GOTO 10', 88, 60, 120, -5], ['OK', 52, 92, 100, -2]];
+  let layers = [];
+  function decor() {
+    $$('#ls .sp,#ls .tx,#fg .sp').forEach((n) => n.remove());
+    DECOR.forEach(([k, x, y, px, d, o, t, dl, fg]) => {
+      const w = document.createElement('i'); w.className = 'l sp'; w.dataset.d = d; w.style.left = x + '%'; w.style.top = y + '%';
+      w.style.setProperty('--o', o); w.style.setProperty('--t', t + 's'); w.style.setProperty('--dl', dl + 's'); w.appendChild(spr(k, px, PH)); $(fg ? '#fg' : '#ls').appendChild(w);
+    });
+    TXT.forEach(([s, x, y, d, dl]) => { const w = document.createElement('i'); w.className = 'l tx'; w.dataset.d = d; w.style.left = x + '%'; w.style.top = y + '%'; w.style.setProperty('--dl', dl + 's'); w.textContent = s; $('#ls').appendChild(w); });
+    layers = $$('.layers .l');
+  }
+
+  /* ---------- tilt: per-element 3D tilt, glare and inner parallax ---------- */
+  function tilt(el, amt) {
+    el.classList.add('tilt');
+    el.addEventListener('pointermove', (e) => {
+      if (reduce() || e.pointerType === 'touch') return;
+      const r = el.getBoundingClientRect(), x = cl((e.clientX - r.left) / r.width - .5, .5) + .5, y = cl((e.clientY - r.top) / r.height - .5, .5) + .5;
+      el.style.setProperty('--ry', cl((x - .5) * amt, MAXT).toFixed(2)); el.style.setProperty('--rx', cl((.5 - y) * amt, MAXT).toFixed(2));
+      el.style.setProperty('--gx', (x * 100).toFixed(0) + '%'); el.style.setProperty('--gy', (y * 100).toFixed(0) + '%');
+      el.style.setProperty('--dx', ((x - .5) * 2).toFixed(2)); el.style.setProperty('--dy', ((y - .5) * 2).toFixed(2));
+    });
+    el.addEventListener('pointerleave', () => ['--rx', '--ry', '--dx', '--dy'].forEach((p) => el.style.setProperty(p, 0)));
+  }
+
+  /* ---------- main app + tiles ---------- */
+  const mc = $('#mainCard'), grid = $('#apps');
+  tilt(mc, 9);
+  function renderMain(pop) {
+    const a = byId(main), col = HUE[a.h];
+    mc.style.setProperty('--h', col); mc.dataset.id = a.id; mc.setAttribute('aria-label', 'Main app: ' + a.name + '. Enter to open.');
+    const nm = [...a.name].map((c, i) => `<span style="--i:${i}">${c === ' ' ? '&nbsp;' : c.replace('&', '&amp;')}</span>`).join('');
+    const tg = a.tag.split(' · ').map((t, i) => `<b style="--i:${i}">[${t}]</b>`).join('');
+    mc.innerHTML = `<div class="tb"><span>★ Main · ${a.id}.exe</span></div><div class="mb"><div class="orbw"><i class="pq"></i><i class="pq q2"></i><i class="o4"></i><span class="big"></span></div>
+      <div><h1 class="nm" aria-label="${a.name}">${nm}</h1><p class="tg">${tg}</p><button class="open" type="button">▶ Open ${a.name.replace('&', '&amp;')}</button></div></div>
+      <div class="vis">${VIS[a.id]()}</div>`;
+    mc.querySelector('.big').appendChild(spr(a.s, 9, col));
+    if (pop && !reduce()) { mc.classList.remove('swap'); void mc.offsetWidth; mc.classList.add('swap'); }
+  }
+  function renderTiles() {
+    grid.innerHTML = '';
+    ord.filter((i) => i !== main).map(byId).forEach((a, n) => {
+      const t = document.createElement('div'); t.className = 'tile'; t.dataset.id = a.id; t.style.setProperty('--h', HUE[a.h]); t.style.setProperty('--i', n + 2);
+      t.tabIndex = 0; t.setAttribute('role', 'button'); t.setAttribute('aria-label', a.name + '. Enter to open.');
+      t.innerHTML = `<span class="ib"></span><span class="tt"><strong>${a.name.replace('&', '&amp;')}</strong><span>${a.tag}</span></span><button class="star" type="button" aria-label="Make ${a.name.replace('&', '&amp;')} the main app" title="Make main app">★</button><span class="key">${n + 2}</span>`;
+      t.querySelector('.ib').appendChild(spr(a.s, 4, HUE[a.h])); tilt(t, 14); grid.appendChild(t);
+    });
+  }
+  function setMain(id) { if (id === main || !byId(id)) return; const i = ord.indexOf(id), j = ord.indexOf(main); ord[i] = main; ord[j] = id; main = id; try { localStorage.setItem(K_MAIN, id); localStorage.setItem(K_ORD, JSON.stringify(ord)); } catch (e) {} renderMain(true); renderTiles(); toast(byId(id).name + ' is now your main app'); }
+  tilt($('.sys'), 5);
+  /* ---------- drag to rearrange: animated reorder, 3D lag clamped to MAXT degrees ---------- */
+  let dg = null, suppress = false;
+  const numbers = () => [...grid.children].forEach((c, i) => { c.querySelector('.key').textContent = i + 2; });
+  const overMain = () => { if (!dg) return false; const r = mc.getBoundingClientRect(); return dg.x > r.left && dg.x < r.right && dg.y > r.top && dg.y < r.bottom; };
+  function flip(fn) {
+    const els = [...grid.children], from = new Map(els.map((e) => [e, e.getBoundingClientRect()])); fn();
+    if (reduce()) return;
+    els.forEach((e) => { const a = from.get(e), b = e.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top; if (dx || dy) e.animate([{ translate: dx + 'px ' + dy + 'px' }, { translate: '0 0' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' }); });
+  }
+  function place() {
+    const k = dg; if (!k || !k.on) return;
+    k.ghost.style.transform = `perspective(700px) translate(${(k.gx - k.ox).toFixed(1)}px,${(k.gy - k.oy).toFixed(1)}px) rotateY(${cl((k.x - k.gx) * .6, MAXT).toFixed(1)}deg) rotateX(${cl((k.gy - k.y) * .6, MAXT).toFixed(1)}deg) scale(1.04)`;
+  }
+  function startDrag() {
+    if (!dg || dg.on) return; dg.on = true; const r = dg.t.getBoundingClientRect(), a = byId(dg.t.dataset.id);
+    dg.ox = dg.x - r.left; dg.oy = dg.y - r.top; dg.gx = dg.x; dg.gy = dg.y;
+    dg.ghost = dg.t.cloneNode(true); dg.ghost.classList.add('ghost'); dg.ghost.style.width = r.width + 'px'; dg.ghost.style.height = r.height + 'px';
+    dg.ghost.querySelector('.ib').replaceChildren(spr(a.s, 4, HUE[a.h])); document.body.appendChild(dg.ghost);
+    dg.t.classList.add('lifted'); document.body.classList.add('dragging'); if (navigator.vibrate) navigator.vibrate(10); place();
+  }
+  grid.addEventListener('pointerdown', (e) => {
+    const t = e.target.closest('.tile'); if (!t || e.target.closest('.star') || (e.button && e.button !== 0)) return;
+    dg = { t, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, type: e.pointerType, on: false };
+    if (e.pointerType === 'touch') dg.timer = setTimeout(startDrag, 300);
+  });
+  document.addEventListener('pointermove', (e) => {
+    if (!dg) return; dg.x = e.clientX; dg.y = e.clientY;
+    if (!dg.on) { const far = Math.hypot(dg.x - dg.sx, dg.y - dg.sy); if (dg.type === 'touch') { if (far > 9) { clearTimeout(dg.timer); dg = null; } } else if (far > 6) startDrag(); return; }
+    if (reduce()) { dg.gx = dg.x; dg.gy = dg.y; } place(); mc.classList.toggle('drop', overMain());
+    const hr = home.getBoundingClientRect(); if (dg.y < hr.top + 90) home.scrollTop -= 12; else if (dg.y > hr.bottom - 60) home.scrollTop += 12;
+    const over = document.elementFromPoint(dg.x, dg.y), tg = over && over.closest && over.closest('.tile');
+    if (tg && tg !== dg.t && tg.parentNode === grid) { const r = tg.getBoundingClientRect(), ref = dg.y > r.top + r.height / 2 ? tg.nextElementSibling : tg; if (ref !== dg.t && ref !== dg.t.nextElementSibling) flip(() => grid.insertBefore(dg.t, ref)); }
+  }, { passive: true });
+  document.addEventListener('touchmove', (e) => { if (dg && dg.on) e.preventDefault(); }, { passive: false });
+  function endDrag() {
+    if (!dg) return; clearTimeout(dg.timer); const k = dg, toMain = overMain(); dg = null; if (!k.on) return;
+    suppress = true; setTimeout(() => { suppress = false; }, 0); mc.classList.remove('drop');
+    const done = () => { k.ghost.remove(); k.t.classList.remove('lifted'); document.body.classList.remove('dragging'); };
+    if (toMain) { done(); setMain(k.t.dataset.id); return; }
+    const r = k.t.getBoundingClientRect(); k.ghost.style.transition = reduce() ? 'none' : 'transform .24s cubic-bezier(.2,.8,.2,1)'; k.ghost.style.transform = `translate(${r.left}px,${r.top}px)`;
+    setTimeout(() => { done(); const ids = [...grid.children].map((c) => c.dataset.id); let n = 0; ord = ord.map((id) => (id === main ? id : ids[n++])); try { localStorage.setItem(K_ORD, JSON.stringify(ord)); } catch (e) {} numbers(); }, reduce() ? 0 : 240);
+  }
+  document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
+
+  mc.addEventListener('click', () => launch(main));
+  mc.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); launch(main); } });
+  grid.addEventListener('click', (e) => { const t = e.target.closest('.tile'); if (!t || suppress) return; if (e.target.closest('.star')) setMain(t.dataset.id); else launch(t.dataset.id); });
+  grid.addEventListener('keydown', (e) => { const t = e.target.closest('.tile'); if (t && !e.target.closest('.star') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); launch(t.dataset.id); } });
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || !document.body.classList.contains('on')) return;
+    if (/^[1-6]$/.test(e.key)) { const ids = [main, ...ord.filter((i) => i !== main)]; if (ids[+e.key - 1]) launch(ids[+e.key - 1]); }
+  });
+
+  /* ---------- clock, hints, live system ---------- */
+  const p2 = (n) => String(n).padStart(2, '0');
+  const clock = $('#clock'); let colon = true;
+  function tick() { const n = new Date(); colon = !colon; clock.textContent = p2(n.getHours()) + (colon ? ':' : ' ') + p2(n.getMinutes()); }
+  tick(); setInterval(tick, 1000);
+  const HINTS = ['launch ai-hub', 'press 1 to open your main app', 'drag apps to rearrange them', 'drop an app on the big window to make it main', 'scroll to warp the starfield'];
+  let hi = 0, hc = 0, hd = 1;
+  setInterval(() => { const h = HINTS[hi]; hc += hd; $('#pt').textContent = h.slice(0, Math.max(0, hc)); if (hd > 0 && hc >= h.length + 22) hd = -1; else if (hd < 0 && hc <= 0) { hd = 1; hi = (hi + 1) % HINTS.length; } }, 70);
+  const hist = { ram: [], cpu: [] }, last = { ram: 0, cpu: 0 };
+  const blk = (v) => { const n = Math.round(Math.min(100, v) / 12.5); return '█'.repeat(n) + '░'.repeat(8 - n); };
+  function bars(cv, arr) {
+    const g = cv.getContext('2d'), w = cv.width, h = cv.height, bw = w / 40; g.clearRect(0, 0, w, h); g.fillStyle = PH;
+    arr.forEach((v, i) => { const n = Math.round(v / 100 * 8); for (let k = 0; k < n; k++) { g.globalAlpha = .35 + .65 * k / 8; g.fillRect(i * bw + 1, h - (k + 1) * (h / 8) + 1, bw - 2, h / 8 - 2); } }); g.globalAlpha = 1;
+  }
+  function drawSys() { bars($('#ramCv'), hist.ram); bars($('#cpuCv'), hist.cpu); }
+  function setSys(m) {
+    const ram = +m.appPercent || 0, cpu = +m.systemCpuPercent || 0;
+    $('#ramBig').textContent = $('#cm').textContent = Math.round(ram) + '%'; $('#cpuBig').textContent = $('#cc').textContent = Math.round(cpu) + '%';
+    $('#mi').textContent = blk(ram * 2.2); $('#ci').textContent = blk(cpu);
+    $('#ramSub').textContent = (m.totalLabel || '—') + ' used by Mad Station'; if (m.processCountLabel) $('#procs').textContent = m.processCountLabel + ' processes';
+    hist.ram.push(Math.min(100, ram * 2.2)); hist.cpu.push(Math.min(100, cpu)); [hist.ram, hist.cpu].forEach((a) => { if (a.length > 40) a.shift(); }); drawSys();
+  }
+  document.addEventListener('mad:memory-model', (e) => setSys(e.detail || {}));
+  if (!window.MadHome.inApp) {
+    let ram = 9; const step = () => { ram = Math.max(5, Math.min(40, ram + (Math.random() - .5) * 3)); setSys({ appPercent: ram, systemCpuPercent: 14 + Math.random() * 40, totalLabel: (ram * 0.16).toFixed(2) + ' GB', processCountLabel: '6' }); };
+    for (let i = 0; i < 30; i++) step(); setInterval(step, 1800);
+  }
+
+  /* ---------- animation loop: mouse + scroll parallax, warp starfield ---------- */
+  const home = $('#home'), spot = $('#spot'), cv = $('#fx'), g = cv.getContext('2d');
+  let mx = 0, my = 0, cx = 0, cy = 0, W = 0, H = 0, stars = [], lastSy = 0, boost = 0, motionRunning = false;
+  addEventListener('pointermove', (e) => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
+  const star = (z) => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: z === undefined ? Math.random() : z });
+  function size() { W = cv.width = innerWidth; H = cv.height = innerHeight; stars = Array.from({ length: Math.min(220, Math.round(W * H / 6500)) }, () => star()); }
+  size(); let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(size, 150); });
+  function frame() {
+    if (document.hidden || reduce()) { motionRunning = false; return; }
+    requestAnimationFrame(frame);
+    cx += (mx - cx) * .06; cy += (my - cy) * .06; const sy = home.scrollTop;
+    boost = Math.max(boost * .93, Math.min(.03, Math.abs(sy - lastSy) * .0006)); lastSy = sy;
+    spot.style.transform = `translate3d(${((cx + .5) * innerWidth).toFixed(0)}px,${((cy + .5) * innerHeight).toFixed(0)}px,0)`;
+    layers.forEach((l) => { const k = +l.dataset.d; l.style.setProperty('--tx', (-cx * k).toFixed(1) + 'px'); l.style.setProperty('--ty', (-cy * k - sy * k / 90).toFixed(1) + 'px'); });
+    if (!mc.matches(':hover')) { mc.style.setProperty('--ry', (cx * 9).toFixed(2)); mc.style.setProperty('--rx', (-cy * 9).toFixed(2)); mc.style.setProperty('--dx', (cx * 2).toFixed(2)); mc.style.setProperty('--dy', (cy * 2).toFixed(2)); }
+    if (dg && dg.on) { dg.gx += (dg.x - dg.gx) * .3; dg.gy += (dg.y - dg.gy) * .3; place(); }
+    g.clearRect(0, 0, W, H); g.fillStyle = PH; const vx = W / 2 - cx * W * .3, vy = H / 2 - cy * H * .3, sp = .004 + boost;
+    stars.forEach((s, i) => {
+      s.z -= sp; if (s.z <= .03) { stars[i] = star(1); return; }
+      const px = vx + s.x / s.z * W * .16, py = vy + s.y / s.z * H * .16, sz = 1 + Math.floor((1 - s.z) * 3.2);
+      g.globalAlpha = (1 - s.z) * .85; g.fillRect(px | 0, py | 0, sz, sz + (boost > .005 ? Math.round(boost * 500) : 0));
+    }); g.globalAlpha = 1;
+  }
+
+  /* ---------- boot sequence, then the screen powers on ---------- */
+  const LOG = ['MAD-BIOS v7.0  (C) 1987 MAD STATION', 'CPU ........ 8086 @ 4.77 MHZ ... OK', 'MEMORY ..... 640K ... OK', 'KEYBOARD ... OK', 'DISK A: .... 6 PROGRAMS FOUND', '', 'LOADING DESKTOP.SYS'];
+  let booted = false;
+  function powerOn() { if (booted) return; booted = true; clearInterval(powerOn.t); document.body.classList.add('on'); }
+  function boot() {
+    if (reduce()) { powerOn(); return; }
+    const bt = $('#bt'); let li = 0, ci = 0;
+    powerOn.t = setInterval(() => {
+      if (li >= LOG.length) { clearInterval(powerOn.t); setTimeout(powerOn, 350); return; }
+      const ln = LOG[li]; bt.textContent += ln.charAt(ci++);
+      if (ci > ln.length) { bt.textContent += '\n'; li++; ci = 0; }
+    }, 14);
+    $('#boot').addEventListener('pointerdown', powerOn); addEventListener('keydown', powerOn, { once: true });
+  }
+
+  PH = getComputedStyle(document.body).getPropertyValue('--ph').trim() || PH;
+  decor(); drawSys();
+  renderMain(false); renderTiles();
+  function startMotion() { if (!reduce() && !document.hidden && !motionRunning) { motionRunning = true; requestAnimationFrame(frame); } }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) motionRunning = false; else startMotion(); });
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', () => { if (reduce()) motionRunning = false; else startMotion(); });
+  window.MadRetroAppearance = { applyHostAppearance, refreshMotion: startMotion };
+  if (!reduce()) startMotion();
+  boot();
+  window.MadHome.setMain = setMain; window.MadHome.getMain = () => main;
+})();
+</script>
+<script src="home-retro-bridge.js"></script>
+
+<script src="developer-visual-debug.js"></script>
+<script src="home-style-settings-bridge.js"></script>
+<script src="home-quick-access-theme.js"></script>
+</body>
+</html>

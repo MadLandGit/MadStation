@@ -1,0 +1,223 @@
+/* Opt-in Developer Options diagnostics. All overlays are pointer-transparent. */
+html.ms-dev-debug-enabled.ms-dev-debug-option-outlines body *:not(.ms-dev-debug-layer):not(.ms-dev-debug-layer *):not(.ms-dev-debug-context-menu):not(.ms-dev-debug-context-menu *):not(script):not(style):not(link):not(meta) {
+  outline: 1px solid rgba(255, 77, 109, .55) !important;
+  outline-offset: -1px !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-outlines body :is(main, header, footer, nav, aside, section, article, form, fieldset, dialog, [role="dialog"], [role="region"], [class*="container"], [class*="panel"], [class*="card"], [class*="grid"], [class*="layout"], [class*="shell"]):not(.ms-dev-debug-layer):not(.ms-dev-debug-layer *):not(.ms-dev-debug-context-menu):not(.ms-dev-debug-context-menu *) {
+  outline: 1px solid rgba(0, 196, 255, .85) !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-outlines body :is(button, input, textarea, select, a, [role="button"], [tabindex]):not(.ms-dev-debug-layer):not(.ms-dev-debug-layer *):not(.ms-dev-debug-context-menu):not(.ms-dev-debug-context-menu *) {
+  outline: 1px solid rgba(73, 255, 140, .9) !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-containers body :is(main, header, footer, nav, aside, section, article, form, fieldset, dialog, [role="dialog"], [role="region"], [class*="container"], [class*="panel"], [class*="card"], [class*="grid"], [class*="layout"], [class*="shell"]):not(.ms-dev-debug-layer):not(.ms-dev-debug-layer *):not(.ms-dev-debug-context-menu):not(.ms-dev-debug-context-menu *) {
+  background-color: rgba(0, 196, 255, .075) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 196, 255, .2) !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-grid::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0, 200, 255, .17) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 200, 255, .17) 1px, transparent 1px), linear-gradient(rgba(0, 200, 255, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 200, 255, .07) 1px, transparent 1px);
+  background-size: 16px 16px, 16px 16px, 4px 4px, 4px 4px;
+}
+/* Safe animation inspection: only pause the exact animated element under the pointer.
+   Never pause all page animations because apps may use animationend for visibility/state.
+   Elements resume automatically as the pointer moves away or Debug Mode is disabled. */
+html.ms-dev-debug-enabled.ms-dev-debug-option-pause-animations [data-ms-dev-debug-paused-animation="true"] {
+  animation-play-state: paused !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-pause-animations [data-ms-dev-debug-paused-animation="true"]::before,
+html.ms-dev-debug-enabled.ms-dev-debug-option-pause-animations [data-ms-dev-debug-paused-animation="true"]::after {
+  animation-play-state: paused !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-focusable body :is(button, a[href], input:not([type="hidden"]), select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):not(.ms-dev-debug-layer):not(.ms-dev-debug-layer *):not(.ms-dev-debug-context-menu):not(.ms-dev-debug-context-menu *) {
+  outline: 2px dashed #a6ff00 !important;
+  outline-offset: 2px !important;
+}
+html.ms-dev-debug-enabled.ms-dev-debug-option-overflow [data-ms-dev-debug-overflow] {
+  outline: 3px solid #ff1744 !important;
+  outline-offset: -3px !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 23, 68, .3) !important;
+}
+html.ms-dev-debug-enabled [data-ms-dev-debug-hovered="true"] {
+  outline: 3px solid #ff00d4 !important;
+  outline-offset: -3px !important;
+}
+.ms-dev-debug-layer, .ms-dev-debug-layer * { box-sizing: border-box !important; pointer-events: none !important; }
+.ms-dev-debug-layer { user-select: none !important; -webkit-user-select: none !important; touch-action: none !important; }
+.ms-dev-debug-layer { position: fixed !important; inset: 0 !important; z-index: 2147483647 !important; overflow: visible !important; border: 0 !important; outline: 0 !important; background: transparent !important; color: #eaf7ff !important; font: 11px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace !important; text-shadow: none !important; }
+.ms-dev-debug-element-label { position: fixed !important; z-index: 2147483647 !important; display: block !important; max-width: 238px !important; padding: 1px 3px !important; border: 1px solid rgba(255, 228, 123, .8) !important; background: rgba(45, 25, 0, .92) !important; color: #fff0a6 !important; font: 9px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; text-shadow: none !important; box-shadow: none !important; pointer-events: none !important; }
+
+
+/* Debug mode is for observing theme switches, so never retain a page-wide blur veil or
+   blur/filter entrance animation while the inspector is active. */
+html.ms-dev-debug-enabled .home-style-transition-curtain {
+  display: none !important;
+  opacity: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+html.ms-dev-debug-enabled .home-style-transition-enter,
+html.ms-dev-debug-enabled .homepage-style-transition-exit {
+  animation: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+html.ms-dev-debug-enabled [data-ms-dev-debug-selected="true"] {
+  outline: 4px solid #ffd166 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 7px rgba(255, 209, 102, .32), 0 0 26px rgba(255, 209, 102, .65) !important;
+  scroll-margin: 24px !important;
+}
+
+/* Element Explorer can temporarily hide a page element without deleting it or
+   editing its inline styles. Highlighting a hidden result opens its hidden ancestor
+   chain and surfaces the selected node as a short-lived, amber debug card. */
+html.ms-dev-debug-enabled [data-ms-dev-debug-hidden="true"] {
+  display: none !important;
+}
+html.ms-dev-debug-enabled [data-ms-dev-debug-reveal-ancestor="true"] {
+  display: contents !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+html.ms-dev-debug-enabled [data-ms-dev-debug-revealed="true"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 12px !important;
+  left: 12px !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: max-content !important;
+  height: auto !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100vh - 24px) !important;
+  overflow: auto !important;
+  z-index: 2147483646 !important;
+  padding: 8px !important;
+  background: #111827 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 4px #ffd166, 0 12px 38px rgba(0, 0, 0, .72) !important;
+  outline: 4px solid #ffd166 !important;
+  outline-offset: 2px !important;
+  scroll-margin: 24px !important;
+}
+
+/* Right-click element menu. It is created only while Debug Mode is enabled; the
+   rest of the visual overlay remains pointer-transparent. */
+.ms-dev-debug-context-menu {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  left: 8px;
+  top: 8px;
+  display: block !important;
+  width: min(370px, calc(100vw - 16px)) !important;
+  max-width: calc(100vw - 16px) !important;
+  max-height: min(760px, calc(100vh - 16px)) !important;
+  overflow: auto !important;
+  padding: 0 !important;
+  border: 1px solid rgba(83, 213, 255, .85) !important;
+  border-radius: 10px !important;
+  background: rgba(5, 15, 27, .98) !important;
+  color: #eaf7ff !important;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, .68), 0 0 0 1px rgba(0, 196, 255, .12) !important;
+  font: 12px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  text-shadow: none !important;
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  touch-action: auto !important;
+  -webkit-app-region: no-drag !important;
+  isolation: isolate !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.ms-dev-debug-context-menu,
+.ms-dev-debug-context-menu * {
+  box-sizing: border-box !important;
+  outline: none !important;
+  text-shadow: none !important;
+}
+.ms-dev-debug-context-menu * { pointer-events: auto !important; -webkit-app-region: no-drag !important; }
+.ms-dev-debug-context-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 11px 12px 9px !important;
+  border-bottom: 1px solid rgba(83, 213, 255, .28) !important;
+  background: linear-gradient(120deg, rgba(0, 196, 255, .14), rgba(5, 15, 27, .8)) !important;
+}
+.ms-dev-debug-context-identity { display: grid !important; gap: 3px !important; min-width: 0 !important; }
+.ms-dev-debug-context-tag { color: #79e7ff !important; font: 700 13px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace !important; overflow-wrap: anywhere !important; }
+.ms-dev-debug-context-meta { color: #ffd166 !important; font-size: 11px !important; overflow-wrap: anywhere !important; }
+.ms-dev-debug-context-classes { color: #abbfce !important; font-size: 10px !important; overflow-wrap: anywhere !important; }
+.ms-dev-debug-context-close {
+  flex: 0 0 auto !important;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(160, 190, 210, .34) !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, .04) !important;
+  color: #dff6ff !important;
+  cursor: pointer !important;
+  font: 18px/1 ui-sans-serif, system-ui, sans-serif !important;
+}
+.ms-dev-debug-context-selector {
+  padding: 8px 12px !important;
+  border-bottom: 1px solid rgba(160, 190, 210, .14) !important;
+  color: #d2e7f3 !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+  overflow-wrap: anywhere !important;
+  user-select: text !important;
+}
+.ms-dev-debug-context-actions { display: grid !important; gap: 3px !important; padding: 7px !important; }
+.ms-dev-debug-context-action {
+  display: block !important;
+  width: 100% !important;
+  min-height: 30px !important;
+  padding: 7px 9px !important;
+  border: 1px solid transparent !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: #dceaf2 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  cursor: pointer !important;
+  font: 11px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace !important;
+}
+.ms-dev-debug-context-action:hover,
+.ms-dev-debug-context-action:focus-visible {
+  border-color: rgba(83, 213, 255, .52) !important;
+  background: rgba(0, 196, 255, .12) !important;
+  color: #ffffff !important;
+}
+.ms-dev-debug-context-action.is-primary { color: #8ff0ff !important; }
+.ms-dev-debug-context-action:disabled { opacity: .42 !important; cursor: not-allowed !important; }
+.ms-dev-debug-context-status {
+  padding: 8px 12px !important;
+  border-top: 1px solid rgba(160, 190, 210, .16) !important;
+  color: #90a9ba !important;
+  font: 10px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  overflow-wrap: anywhere !important;
+}
+.ms-dev-debug-context-status[data-error="true"] { color: #ff9baf !important; }
+/* Prevent the global element-outlining rules from outlining the inspector menu itself. */
+html.ms-dev-debug-enabled .ms-dev-debug-context-menu,
+html.ms-dev-debug-enabled .ms-dev-debug-context-menu * {
+  outline: none !important;
+}
+html.ms-dev-debug-enabled .ms-dev-debug-context-menu button:focus-visible {
+  outline: 2px solid #79e7ff !important;
+  outline-offset: -2px !important;
+}

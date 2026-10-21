@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Mad Station — design kit preview</title>
+<!-- Shared token/component laboratory. Open from the project checkout; not shipped in the app.
+     It loads the checked-in shared CSS. Theme-specific layouts have separate kits in docs/design/theme-kits/. -->
+<link href="../src/styles.css" rel="stylesheet"/>
+<link href="../src/design-tokens.css" rel="stylesheet"/>
+<link href="../src/design-kit.css" rel="stylesheet"/>
+<link href="../src/pages.css" rel="stylesheet"/>
+</head>
+<body>
+<main class="ms-screen">
+  <div class="ms-inner">
+    <header class="ms-header">
+      <div class="ms-brand">
+        <div class="ms-brand-tile"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <div class="ms-brand-text"><span class="ms-brand-name">Design Kit</span><span class="ms-brand-tag">Shared tokens & components</span></div>
+      </div>
+      <nav class="ms-header-actions" aria-label="Design documentation"><a class="ms-btn" href="design/homepage-theme-gallery.html">Homepage theme gallery ↗</a><a class="ms-btn" href="design/DESIGN_SYSTEM.md">Design system guide ↗</a></nav>
+      <div class="ms-header-actions">
+        <button class="ms-icon-btn" aria-label="Example icon button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></button>
+      </div>
+    </header>
+
+    <section class="ms-card ms-card--flat" style="margin: 14px 0 24px">
+      <div class="ms-card-head"><span class="ms-eyebrow">Shared Appearance controls (subset preview)</span></div>
+      <p class="ms-muted" style="margin:0 0 12px">This page exercises all standard token-mapped Appearance values plus motion/status toggles, but it does not reproduce the full Settings UI or saved custom-background import/manage flow. Custom backgrounds require a saved HTTPS/local-file URL in the app. For theme-specific layouts, bridges, palettes and test pointers, open the <a href="design/homepage-theme-gallery.html">10-theme gallery</a>.</p>
+      <div id="controls" class="ms-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"></div>
+    </section>
+
+    <div style="display:grid; gap:12px; margin-bottom: 24px">
+      <span class="ms-eyebrow">Components</span>
+      <h1 class="ms-title">Everything follows the settings</h1>
+    </div>
+
+    <div class="ms-tabs" id="tabs" style="margin-bottom: 22px">
+      <button class="ms-tab active">Clips</button><button class="ms-tab">Notes</button><button class="ms-tab">To-do</button>
+    </div>
+
+    <div class="ms-grid" style="margin-bottom: 22px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))">
+      <div class="ms-stat"><span>Clips</span><strong>128</strong></div>
+      <div class="ms-stat"><span>Pinned</span><strong>7</strong></div>
+      <div class="ms-stat"><span>Notes</span><strong>42</strong></div>
+    </div>
+
+    <div class="ms-grid" style="margin-bottom: 22px">
+      <article class="ms-card">
+        <div class="ms-card-head">
+          <div class="ms-brand-tile ms-brand-tile--mint" style="width:36px;height:36px"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></div>
+          <h3>Card with a hue tile</h3>
+          <span class="ms-chip" style="margin-left:auto">chip</span>
+        </div>
+        <p class="ms-muted" style="margin:0 0 12px">Hover me: accent edge and border glow. Uses tokens only.</p>
+        <input class="ms-input" placeholder="Input field"/>
+        <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap">
+          <button class="ms-btn ms-btn--primary">Primary</button>
+          <button class="ms-btn">Secondary</button>
+          <button class="ms-btn ms-btn--sm">Small</button>
+        </div>
+      </article>
+      <article class="ms-card ms-card--flat">
+        <div class="ms-card-head"><h3>Flat card + rows</h3></div>
+        <div style="display:grid; gap:var(--ms-gap)">
+          <div class="ms-row is-active"><strong>Active row</strong><span class="ms-muted" style="margin-left:auto">pinned</span></div>
+          <div class="ms-row"><strong>Regular row</strong><span class="ms-muted" style="margin-left:auto">hover</span></div>
+        </div>
+      </article>
+      <article class="ms-card ms-card--flat">
+        <div class="ms-card-head"><h3>Hues</h3></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <div class="ms-brand-tile ms-brand-tile--sky"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg></div>
+          <div class="ms-brand-tile ms-brand-tile--mint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg></div>
+          <div class="ms-brand-tile ms-brand-tile--lilac"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg></div>
+          <div class="ms-brand-tile ms-brand-tile--amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg></div>
+          <div class="ms-brand-tile ms-brand-tile--rose"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="ms-empty">Empty state: nothing here yet.</div>
+  </div>
+</main>
+
+<script src="../src/appearance.js"></script>
+<script>
+  // Option lists mirror appearance.js. tests/design-system.test.js keeps tokens and options in sync.
+  const OPTIONS = {
+    theme: ['dark', 'light', 'system'],
+    accent: Object.keys(window.MAD_ACCENTS),
+    surfaceStyle: ['solid', 'glass', 'elevated', 'frosted'],
+    cornerStyle: ['soft', 'sharp', 'square', 'ultra'],
+    buttonCorner: ['soft', 'pill', 'square', 'sharp', 'glass', 'neon'],
+    buttonBackground: ['solid', 'outline', 'ghost', 'contrast', 'glass', 'neon', 'text'],
+    borderStyle: ['subtle', 'balanced', 'strong', 'neon', 'neon2', 'glass', 'none'],
+    shadowStyle: ['none', 'soft', 'strong', 'neon', 'glass'],
+    cardSpacing: ['compact', 'comfortable', 'spacious'],
+    borderSpacing: ['compact', 'comfortable', 'spacious'],
+    density: ['comfortable', 'compact'],
+    backgroundStyle: ['plain', 'parallax', 'aurora', 'grid', 'spotlight', 'mesh', 'neon', 'dots', 'rings', 'hex', 'waves', 'diagonal', 'circuit', 'constellation', 'tiles'],
+  };
+  const state = { theme: 'dark', accent: 'blue', surfaceStyle: 'solid', cornerStyle: 'soft', buttonCorner: 'pill', buttonBackground: 'solid', borderStyle: 'subtle', shadowStyle: 'soft', cardSpacing: 'comfortable', borderSpacing: 'comfortable', density: 'comfortable', backgroundStyle: 'aurora', reduceMotion: false, animateHover: true, showStatusBar: true };
+  const box = document.getElementById('controls');
+  for (const [key, values] of Object.entries(OPTIONS)) {
+    const label = document.createElement('label');
+    label.className = 'ms-muted';
+    label.style.cssText = 'display:grid;gap:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase';
+    label.textContent = key.replace(/([A-Z])/g, ' $1');
+    const select = document.createElement('select');
+    select.className = 'ms-input';
+    for (const v of values) { const o = document.createElement('option'); o.value = v; o.textContent = v; select.appendChild(o); }
+    select.value = state[key];
+    select.addEventListener('change', () => { state[key] = select.value; window.applyAppearance(state); });
+    label.appendChild(select);
+    box.appendChild(label);
+  }
+  const toggleBox = document.createElement('div');
+  toggleBox.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;margin-top:14px';
+  for (const [key, labelText] of [['reduceMotion', 'Reduce motion'], ['animateHover', 'Animate hover effects'], ['showStatusBar', 'Show status information']]) {
+    const label = document.createElement('label');
+    label.className = 'ms-muted';
+    label.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:12px';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = Boolean(state[key]);
+    input.addEventListener('change', () => { state[key] = input.checked; window.applyAppearance(state); });
+    label.append(input, document.createTextNode(labelText));
+    toggleBox.appendChild(label);
+  }
+  box.parentElement.appendChild(toggleBox);
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const tab = e.target.closest('.ms-tab'); if (!tab) return;
+    document.querySelectorAll('#tabs .ms-tab').forEach((t) => t.classList.toggle('active', t === tab));
+  });
+  window.applyAppearance(state);
+</script>
+</body>
+</html>

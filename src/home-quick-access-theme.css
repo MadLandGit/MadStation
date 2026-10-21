@@ -1,0 +1,457 @@
+/* Quick Access lives inside each theme's own header. Common layout, deliberately different art direction per theme. */
+.madstation-theme-quick-access {
+  position: relative;
+  z-index: 88;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  isolation: isolate;
+}
+.madstation-theme-quick-trigger {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  box-sizing: border-box;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  line-height: 0;
+  cursor: pointer;
+  transition: background .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease, transform .22s ease, filter .22s ease;
+}
+.madstation-theme-quick-glyph { display: block; width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.madstation-theme-quick-sr { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+.madstation-theme-quick-menu {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  z-index: 160;
+  box-sizing: border-box;
+  width: 254px;
+  max-width: min(254px, calc(100vw - 20px));
+  max-height: min(460px, calc(100vh - 58px));
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--text, var(--ink, #eef4ff));
+  font: 12px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+  text-shadow: none;
+  transform-origin: top right;
+  scrollbar-width: thin;
+  animation: mqa-arrive .2s cubic-bezier(.2,.8,.2,1) both;
+}
+.madstation-theme-quick-menu[hidden] { display: none !important; }
+.madstation-theme-quick-access.mqa-open-up .madstation-theme-quick-menu { top: auto; bottom: calc(100% + 9px); transform-origin: bottom right; }
+.mqa-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 1px 2px 8px; }
+.mqa-head > div { display: grid; gap: 1px; }
+.mqa-head strong { font: inherit; font-size: 14px; font-weight: 700; letter-spacing: -.015em; }
+.mqa-eyebrow { font-size: 8px; font-weight: 800; letter-spacing: .16em; opacity: .62; }
+.mqa-close { display: grid; place-items: center; flex: 0 0 23px; width: 23px; height: 23px; padding: 0; font-size: 17px; line-height: 1; border: 0; background: transparent; color: inherit; border-radius: 6px; cursor: pointer; }
+.mqa-mode { width: 100%; min-height: 35px; display: flex; align-items: center; gap: 9px; padding: 5px 8px; text-align: left; color: inherit; cursor: pointer; }
+.mqa-mode-glyph { display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 25px; font-size: 16px; line-height: 1; }
+.mqa-mode-copy { min-width: 0; display: grid; gap: 1px; }
+.mqa-mode-copy small { font-size: 8px; font-weight: 800; letter-spacing: .12em; opacity: .6; }
+.mqa-mode-copy strong { font-size: 11px; font-weight: 650; }
+.mqa-mode-state { margin-left: auto; opacity: .55; font-size: 14px; }
+.mqa-section { margin-top: 8px; }
+.mqa-section-title { display: flex; align-items: center; gap: 6px; margin: 0 2px 5px; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; opacity: .68; }
+.mqa-theme-list { display: grid; grid-template-columns: minmax(0,1fr); gap: 2px; }
+.mqa-theme-option { min-width: 0; width: 100%; min-height: 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 3px 7px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: inherit; text-align: left; font: inherit; font-size: 10.5px; cursor: pointer; transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease; }
+.mqa-theme-option > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mqa-check { opacity: 0; flex: 0 0 14px; text-align: center; font-size: 11px; }
+.mqa-theme-option[aria-pressed="true"] .mqa-check { opacity: 1; }
+.mqa-theme-option:hover { transform: translateX(2px); }
+.mqa-settings { display: flex; align-items: center; width: 100%; gap: 7px; min-height: 29px; margin-top: 8px; padding: 5px 8px; border-radius: 7px; color: inherit; font: inherit; font-size: 10px; text-align: left; cursor: pointer; }
+.mqa-settings svg { flex: 0 0 14px; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.mqa-settings-arrow { margin-left: auto; opacity: .55; }
+@keyframes mqa-arrive { from { opacity: 0; transform: translateY(-4px) scale(.985); } to { opacity: 1; transform: none; } }
+
+/* SIMPLE — a small beveled hex-console button, matching the hexagonal mark. */
+body[data-home-style="simple"] .madstation-theme-quick-trigger {
+  border: 1px solid color-mix(in srgb, var(--accent, #69d9ff) 42%, var(--line, #25364c));
+  border-radius: 11px; color: var(--text, #e8f4ff);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface, #132238) 92%, #fff), var(--surface, #132238));
+  box-shadow: inset 0 1px rgb(255 255 255 / .1), 0 3px 0 rgb(0 0 0 / .22);
+}
+body[data-home-style="simple"] .madstation-theme-quick-trigger:hover { border-color: var(--accent, #69d9ff); transform: translateY(-1px); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #69d9ff) 13%, transparent), inset 0 1px rgb(255 255 255 / .12); }
+body[data-home-style="simple"] .madstation-theme-quick-menu { border: 1px solid color-mix(in srgb, var(--accent, #69d9ff) 30%, var(--line, #2d4057)); border-radius: 13px; background: linear-gradient(145deg, color-mix(in srgb, var(--surface, #0c1628) 95%, var(--accent, #69d9ff) 5%), var(--bg, #080f1b)); box-shadow: 0 16px 32px rgb(0 0 0 / .34), inset 0 1px rgb(255 255 255 / .08); }
+body[data-home-style="simple"] .mqa-mode, body[data-home-style="simple"] .mqa-settings { border: 1px solid color-mix(in srgb, var(--accent, #69d9ff) 20%, var(--line, #2d4057)); border-radius: 8px; background: color-mix(in srgb, var(--surface, #132238) 88%, transparent); }body[data-home-style="simple"] .mqa-theme-option[aria-pressed="true"]{ color: var(--accent, #69d9ff); background: color-mix(in srgb, var(--accent, #69d9ff) 12%, transparent); border-color: color-mix(in srgb, var(--accent, #69d9ff) 35%, transparent); }
+
+/* 3D PARALLAX — angular HUD glass and glowing coordinate lines. */
+body[data-home-style="parallax"] .madstation-theme-quick-trigger { border: 1px solid color-mix(in srgb, var(--a, #7aaeff) 36%, #32415f); border-radius: 8px 14px 8px 14px; background: linear-gradient(135deg, rgb(18 31 55 / .94), rgb(8 16 30 / .9)); color: #c4e8ff; box-shadow: inset 0 0 0 1px rgb(95 172 255 / .08), 0 0 18px rgb(40 128 255 / .09); }
+body[data-home-style="parallax"] .madstation-theme-quick-trigger:hover { color: #fff; border-color: var(--a, #76c7ff); box-shadow: 0 0 15px rgb(88 163 255 / .24), inset 0 0 14px rgb(88 163 255 / .08); }
+body[data-home-style="parallax"] .madstation-theme-quick-menu { border: 1px solid #344b70; border-radius: 9px 18px 9px 18px; background: linear-gradient(145deg, rgb(12 25 46 / .98), rgb(4 11 23 / .98)); box-shadow: 0 15px 42px rgb(0 0 0 / .5), inset 0 0 24px rgb(57 120 207 / .08); color: #dbeaff; }
+body[data-home-style="parallax"] .mqa-mode, body[data-home-style="parallax"] .mqa-settings { border: 1px solid #2a4263; border-radius: 4px 11px 4px 11px; background: rgb(41 74 116 / .17); }body[data-home-style="parallax"] .mqa-theme-option[aria-pressed="true"]{ color: #8ee8ff; background: rgb(81 165 255 / .12); border-color: rgb(100 184 255 / .34); }
+body[data-home-style="parallax"] .mqa-theme-option:hover { background: rgb(96 155 229 / .13); }
+
+/* SIMPLE RETRO — phosphor green, square edges, pixel-sized highlights. */
+body[data-home-style="retro"] .madstation-theme-quick-trigger { border: 2px solid var(--line, #1b5a37); border-radius: 0; background: #071a10; color: var(--ph, #33ff7a); box-shadow: inset 0 0 0 1px rgb(51 255 122 / .08); }
+body[data-home-style="retro"] .madstation-theme-quick-trigger:hover { background: var(--ph, #33ff7a); border-color: var(--ph, #33ff7a); color: var(--on, #021208); box-shadow: 0 0 12px color-mix(in srgb, var(--ph, #33ff7a) 35%, transparent); }
+body[data-home-style="retro"] .madstation-theme-quick-glyph { shape-rendering: crispEdges; stroke-width: 1.9; }
+body[data-home-style="retro"] .madstation-theme-quick-menu { border: 2px solid var(--ph, #33ff7a); border-radius: 0; background: repeating-linear-gradient(0deg, rgb(51 255 122 / .035) 0 1px, transparent 1px 3px), #04100a; color: var(--ink, #a6ffc4); box-shadow: 5px 5px 0 rgb(51 255 122 / .18), inset 0 0 18px rgb(51 255 122 / .05); font-family: "Lucida Console", "Courier New", monospace; }
+body[data-home-style="retro"] .mqa-head strong { text-transform: uppercase; letter-spacing: .08em; }
+body[data-home-style="retro"] .mqa-mode, body[data-home-style="retro"] .mqa-settings { border: 1px solid var(--line, #1b5a37); border-radius: 0; background: #071a10; }body[data-home-style="retro"] .mqa-theme-option[aria-pressed="true"]{ color: #021208; background: var(--ph, #33ff7a); border-color: var(--ph, #33ff7a); }
+body[data-home-style="retro"] .mqa-theme-option { border-radius: 0; }
+
+/* RETRO COMPLEX — a compact CRT bezel and analog instrument details. */
+body[data-home-style="retro-complex"] .madstation-theme-quick-trigger { border: 2px solid #508763; border-radius: 3px; color: #a9ffc2; background: linear-gradient(145deg, #132d1d, #05130b); box-shadow: inset 0 0 0 2px rgb(0 0 0 / .4), 0 2px 0 #020a05; }
+body[data-home-style="retro-complex"] .madstation-theme-quick-trigger:hover { color: #ffcb69; border-color: #ffcb69; box-shadow: inset 0 0 0 2px rgb(0 0 0 / .4), 0 0 12px rgb(255 193 71 / .2); }
+body[data-home-style="retro-complex"] .madstation-theme-quick-glyph { stroke-width: 1.8; }
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu { top: auto; bottom: calc(100% + 8px); border: 2px solid #76ae80; border-radius: 4px; background: repeating-linear-gradient(0deg, rgb(120 255 146 / .025) 0 1px, transparent 1px 3px), #031008; color: #b8ffd0; box-shadow: 0 0 0 3px #06190d, 0 0 24px rgb(55 255 120 / .12); font-family: "Lucida Console", "Courier New", monospace; }
+body[data-home-style="retro-complex"] .mqa-theme-option, body[data-home-style="retro-complex"] .mqa-mode, body[data-home-style="retro-complex"] .mqa-settings { border-radius: 2px; border-color: #284b32; background: #0b1e11; }body[data-home-style="retro-complex"] .mqa-theme-option[aria-pressed="true"]{ color: #07120a; background: #b4ff85; border-color: #b4ff85; }
+
+/* 3D PARALLAX BIG APP — a fuller glass command capsule matching the hero-card edge. */
+body[data-home-style="parallax-big"] .madstation-theme-quick-trigger { border: 1px solid color-mix(in srgb, var(--a, #7aaeff) 38%, var(--edge, #3c4d6b)); border-radius: 13px; color: #e4f0ff; background: linear-gradient(155deg, rgb(43 63 94 / .82), rgb(12 20 36 / .9)); box-shadow: inset 0 1px rgb(255 255 255 / .14), 0 7px 16px rgb(0 0 0 / .19); }
+body[data-home-style="parallax-big"] .madstation-theme-quick-trigger:hover { border-color: #8dd9ff; transform: translateY(-1px); box-shadow: inset 0 1px rgb(255 255 255 / .18), 0 8px 24px rgb(65 141 255 / .2); }
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu { border: 1px solid color-mix(in srgb, var(--a, #7aaeff) 32%, #3d5270); border-radius: 16px; background: linear-gradient(135deg, rgb(32 49 74 / .97), rgb(9 17 32 / .97)); box-shadow: 0 18px 42px rgb(0 0 0 / .38), inset 0 1px rgb(255 255 255 / .1); color: #e4edff; backdrop-filter: blur(18px); }
+body[data-home-style="parallax-big"] .mqa-mode, body[data-home-style="parallax-big"] .mqa-settings { border: 1px solid rgb(170 203 255 / .13); border-radius: 11px; background: rgb(255 255 255 / .05); }body[data-home-style="parallax-big"] .mqa-theme-option[aria-pressed="true"]{ color: #b1ecff; background: rgb(103 171 255 / .12); border-color: rgb(103 171 255 / .28); }
+
+/* GALAXY — the search capsule is hidden, so Quick Access uses the right edge. */
+body[data-home-style="galaxy"] .madstation-theme-quick-access { position: absolute; top: var(--home-window-chrome-height, 42px) !important; right: clamp(14px,3vw,40px); }
+body[data-home-style="galaxy"] .madstation-theme-quick-trigger { border: 1px solid rgb(151 179 255 / .3); border-radius: 50%; color: #c3d4ff; background: radial-gradient(circle at 35% 25%, rgb(115 155 255 / .2), rgb(9 16 35 / .9) 65%); box-shadow: inset 0 0 0 3px rgb(151 179 255 / .035), 0 0 0 2px rgb(151 179 255 / .035); }
+body[data-home-style="galaxy"] .madstation-theme-quick-trigger::before { content: ""; position: absolute; inset: -4px; border: 1px dashed rgb(145 177 255 / .25); border-radius: 50%; pointer-events: none; transition: transform .5s ease; }
+body[data-home-style="galaxy"] .madstation-theme-quick-trigger:hover::before { transform: rotate(35deg); }
+body[data-home-style="galaxy"] .madstation-theme-quick-trigger:hover { color: #fff; border-color: #91b3ff; box-shadow: 0 0 16px rgb(108 146 255 / .24); }
+body[data-home-style="galaxy"] .madstation-theme-quick-menu { border: 1px solid rgb(144 174 255 / .23); border-radius: 20px; background: radial-gradient(circle at top right, rgb(81 108 195 / .2), transparent 45%), rgb(7 11 25 / .96); color: #edf1ff; box-shadow: 0 20px 54px rgb(0 0 0 / .56), inset 0 1px rgb(255 255 255 / .06); backdrop-filter: blur(22px); }
+body[data-home-style="galaxy"] .mqa-mode, body[data-home-style="galaxy"] .mqa-settings { border: 1px solid rgb(147 171 255 / .16); border-radius: 11px; background: rgb(124 153 255 / .07); }body[data-home-style="galaxy"] .mqa-theme-option[aria-pressed="true"]{ color: #b9caff; background: rgb(124 153 255 / .14); border-color: rgb(124 153 255 / .3); }
+
+/* PARALLAX JUNGLE — asymmetric leaf capsule, deep foliage tint, natural green glints. */
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-trigger { border: 1px solid color-mix(in srgb, var(--a, #45a879) 42%, #294d3b); border-radius: 15px 7px 15px 7px; color: #d2f9dd; background: linear-gradient(140deg, rgb(31 83 55 / .9), rgb(8 30 21 / .94)); box-shadow: inset 0 1px rgb(255 255 255 / .12), 0 3px 9px rgb(0 0 0 / .2); }
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-trigger:hover { border-radius: 7px 15px 7px 15px; border-color: #8ee6a5; color: #fff; box-shadow: 0 0 17px rgb(94 211 133 / .19); }
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu { border: 1px solid color-mix(in srgb, var(--a, #45a879) 35%, #294d3b); border-radius: 18px 8px 18px 8px; background: linear-gradient(140deg, rgb(15 45 31 / .98), rgb(5 20 15 / .98)); color: #ddf9e4; box-shadow: 0 16px 40px rgb(0 0 0 / .42), inset 0 0 18px rgb(95 203 131 / .05); }
+body[data-home-style="parallax-jungle"] .mqa-mode, body[data-home-style="parallax-jungle"] .mqa-settings { border: 1px solid rgb(116 204 142 / .18); border-radius: 12px 5px 12px 5px; background: rgb(127 209 147 / .06); }body[data-home-style="parallax-jungle"] .mqa-theme-option[aria-pressed="true"]{ color: #c0f6c7; background: rgb(110 211 131 / .12); border-color: rgb(110 211 131 / .26); }
+
+/* CLAYMORPHISM — tactile, soft raised clay with a gentle pressed state. */
+body[data-home-style="claymorphism"] .madstation-theme-quick-trigger { border: 1px solid rgb(255 255 255 / .48); border-radius: 14px; color: #4d5872; background: linear-gradient(145deg, #f9fbff, #d9e2f5); box-shadow: 5px 5px 11px rgb(107 125 165 / .27), -4px -4px 10px rgb(255 255 255 / .82), inset 0 1px #fff; }
+body[data-home-style="claymorphism"] .madstation-theme-quick-trigger:hover { transform: translateY(-1px); box-shadow: 6px 6px 13px rgb(107 125 165 / .3), -4px -4px 10px rgb(255 255 255 / .8), inset 0 1px #fff; }
+body[data-home-style="claymorphism"] .madstation-theme-quick-trigger[aria-expanded="true"] { transform: translateY(1px); box-shadow: inset 3px 3px 7px rgb(107 125 165 / .24), inset -3px -3px 7px #fff; }
+body[data-home-style="claymorphism"] .madstation-theme-quick-menu { border: 1px solid rgb(255 255 255 / .72); border-radius: 23px; background: linear-gradient(145deg, #f1f5ff, #dfe7f8); color: #424f6d; box-shadow: 13px 13px 24px rgb(107 125 165 / .28), -9px -9px 22px rgb(255 255 255 / .83), inset 0 1px #fff; }
+body[data-home-style="claymorphism"] .mqa-mode, body[data-home-style="claymorphism"] .mqa-settings { border: 1px solid rgb(255 255 255 / .8); border-radius: 12px; background: linear-gradient(145deg, #e6edfc, #f4f7ff); box-shadow: 3px 3px 6px rgb(107 125 165 / .14), -2px -2px 5px rgb(255 255 255 / .7); }body[data-home-style="claymorphism"] .mqa-theme-option[aria-pressed="true"]{ color: #384f91; background: #d9e3fb; border-color: #c4d1f0; box-shadow: inset 2px 2px 5px rgb(107 125 165 / .18), inset -2px -2px 5px #fff; }
+
+/* GLASS — floating glass leaf with a refractive border and quiet reflections. */
+body[data-home-style="glass"] .madstation-theme-quick-trigger { border: 1px solid rgb(255 255 255 / .22); border-radius: 12px; color: var(--text, #eff4ff); background: linear-gradient(145deg, rgb(255 255 255 / .17), rgb(255 255 255 / .035)); backdrop-filter: blur(17px) saturate(170%); box-shadow: inset 0 1px rgb(255 255 255 / .25), 0 4px 12px rgb(0 0 0 / .12); }
+body[data-home-style="glass"] .madstation-theme-quick-trigger:hover { border-color: rgb(255 255 255 / .45); background: linear-gradient(145deg, rgb(255 255 255 / .24), rgb(255 255 255 / .07)); }
+body[data-home-style="glass"] .madstation-theme-quick-menu { border: 1px solid rgb(255 255 255 / .23); border-radius: 22px; background: linear-gradient(135deg, rgb(255 255 255 / .18), rgb(255 255 255 / .06)), rgb(19 25 45 / .78); color: var(--text, #eff4ff); backdrop-filter: blur(26px) saturate(180%); box-shadow: 0 20px 50px rgb(0 0 0 / .32), inset 0 1px rgb(255 255 255 / .17); }
+body[data-home-style="glass"][data-theme="light"] .madstation-theme-quick-menu { background: linear-gradient(135deg, rgb(255 255 255 / .62), rgb(255 255 255 / .18)), rgb(238 243 255 / .82); color: #23314a; }
+body[data-home-style="glass"] .mqa-mode, body[data-home-style="glass"] .mqa-settings { border: 1px solid rgb(255 255 255 / .16); border-radius: 13px; background: rgb(255 255 255 / .06); }body[data-home-style="glass"] .mqa-theme-option[aria-pressed="true"]{ color: var(--a, #a9d6ff); background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .2); }
+
+@media (max-width: 600px) {
+  .madstation-theme-quick-trigger { width: 34px; min-width: 34px; height: 34px; min-height: 34px; flex-basis: 34px; }
+  .madstation-theme-quick-menu { width: min(254px, calc(100vw - 16px)); }
+  body[data-home-style="galaxy"] .madstation-theme-quick-access { top: 14px; right: 12px; }
+}
+@media (max-height: 560px) {
+  .madstation-theme-quick-menu { max-height: calc(100vh - 44px); padding: 8px; }
+  .mqa-section { margin-top: 5px; }
+  .mqa-theme-option { min-height: 20px; padding-top: 2px; padding-bottom: 2px; }
+  .mqa-settings { min-height: 26px; margin-top: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .madstation-theme-quick-trigger, .mqa-theme-option, .madstation-theme-quick-menu { animation: none !important; transition: none !important; }
+}
+
+/* Unified palette-style Quick Access glyphs from the refreshed theme pack. */
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="claymorphism"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:2.2;fill:rgb(77 88 114/.14)}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="galaxy"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:1.6;filter:drop-shadow(0 0 5px rgb(145 179 255/.7))}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="glass"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:1.5;fill:rgb(255 255 255/.14)}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:1.9;fill:rgb(142 230 165/.16)}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="retro-complex"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;shape-rendering:crispEdges;filter:drop-shadow(0 0 3px rgb(169 255 194/.55))}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="retro"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:2;stroke-linecap:square;stroke-linejoin:miter;shape-rendering:crispEdges}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="simple"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:1.7}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="parallax"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:1.75;filter:drop-shadow(0 0 4px rgb(118 199 255/.45))}
+/* Quick Access: one shared palette icon, themed per style */
+body[data-home-style="parallax-big"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{stroke-width:1.85;filter:drop-shadow(0 1px 3px rgb(65 130 255/.4))}
+
+
+/* Retro Complex analog Quick Access: compact paper-panel layout, no internal scrolling. */
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu{width:340px;max-width:min(340px,calc(100vw - 24px));max-height:none!important;overflow:visible!important;padding:10px;background:linear-gradient(145deg,#e5ddc5,#c6bda2 65%,#b4aa8d);border:3px ridge #8b8268;border-radius:3px;color:#302b1e;box-shadow:5px 6px 0 #241c13aa,inset 0 0 0 1px #f8f0d8;font-family:Georgia,"Times New Roman",serif;text-shadow:none;}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu *{scrollbar-width:none}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu::-webkit-scrollbar{display:none}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-head{padding:4px 5px 8px;border-bottom:2px solid #8e8468;color:#332d20}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-head strong{font:700 13px Georgia,serif;letter-spacing:.1em;text-transform:uppercase}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-theme-grid,body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-options,body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-theme-option,body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-mode,body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-settings,body[data-home-style="retro-complex"] .madstation-theme-quick-menu button{min-width:0;min-height:28px;padding:5px 7px;border:1px solid #9a8e70;border-radius:2px;background:linear-gradient(#f1e9d2,#d0c6a8);color:#342d20;box-shadow:inset 0 1px #fff9,0 2px 0 #9d9276;font:12px Georgia,serif;text-shadow:none}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu button:hover,body[data-home-style="retro-complex"] .madstation-theme-quick-menu button:focus-visible{background:linear-gradient(#fff4d6,#ded0a9);border-color:#6f674f;color:#201a11;outline:1px dotted #6f674f;outline-offset:1px}body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-theme-option[aria-pressed="true"]{background:linear-gradient(#a9c69b,#78976a);border-color:#4c6946;color:#162515}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-section,body[data-home-style="retro-complex"] .madstation-theme-quick-menu section{margin:6px 0;padding:6px;border:1px solid #b0a486;background:#d9d0b7}
+@media(max-width:420px){body[data-home-style="retro-complex"] .madstation-theme-quick-menu{width:calc(100vw - 24px);padding:7px}}
+
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-theme-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-theme-option{min-height:25px;padding:4px 5px;gap:3px;font-size:10px}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-section{margin-top:5px}
+body[data-home-style="retro-complex"] .madstation-theme-quick-menu .mqa-section-title{margin-bottom:3px;font-size:8px}
+
+
+/* Retro Complex monitor controls: keep Quick Access, Settings, and Power together on the right. */
+body[data-home-style="retro-complex"] .chin {
+  justify-content: flex-start !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+}
+body[data-home-style="retro-complex"] .chin > span.chip[aria-label="Current time"] {
+  margin-right: auto !important;
+  flex: 0 0 26px;
+}
+body[data-home-style="retro-complex"] .chin .madstation-theme-quick-access,
+body[data-home-style="retro-complex"] .chin #launcherSettingsBtn,
+body[data-home-style="retro-complex"] .chin #monitorPowerBtn {
+  flex: 0 0 auto;
+  margin: 0;
+}
+body[data-home-style="retro-complex"] .chin .led {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  margin-left: -3px;
+}
+
+/* QUICK ACCESS MODE PALETTES
+   Each menu follows the active Day/Night mode while preserving its theme's material. */
+
+/* Claymorphism: dark, soft clay surfaces in Night mode instead of the default pale clay. */
+body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] {
+  border-color: rgb(162 178 215 / .27);
+  background: linear-gradient(145deg, #30394f, #20283b 58%, #171f31);
+  color: #edf2ff;
+  box-shadow: 12px 12px 26px rgb(3 8 20 / .48), -5px -5px 16px rgb(255 255 255 / .035), inset 0 1px rgb(255 255 255 / .09);
+}
+body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] .mqa-head,
+body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] .mqa-section-title { color: #d7e0f5; }
+body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] .mqa-mode,
+body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] .mqa-settings {
+  border-color: rgb(164 184 224 / .2);
+  background: linear-gradient(145deg, #343f57, #252f45);
+  color: #edf2ff;
+  box-shadow: 4px 4px 8px rgb(3 8 20 / .26), -2px -2px 6px rgb(255 255 255 / .035), inset 0 1px rgb(255 255 255 / .055);
+}body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] .mqa-theme-option:hover{ background: rgb(173 193 242 / .1); border-color: rgb(173 193 242 / .2); }body[data-home-style="claymorphism"] .madstation-theme-quick-menu[data-color-mode="dark"] .mqa-theme-option[aria-pressed="true"]{
+  color: #f4f6ff; background: linear-gradient(145deg, #48577a, #34415f); border-color: #7388b5;
+  box-shadow: inset 2px 2px 5px rgb(4 9 20 / .22), inset -1px -1px 4px rgb(255 255 255 / .04);
+}
+
+/* Parallax Jungle: light sage glass in Day mode, retaining the leaf-shaped silhouette. */
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] {
+  border-color: #b5d1bf;
+  background: linear-gradient(145deg, rgb(250 255 251 / .98), rgb(229 241 232 / .98));
+  color: #1b3b29;
+  box-shadow: 0 16px 36px rgb(24 57 36 / .18), inset 0 1px #fff;
+}
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-head { border-bottom: 1px solid #c8dece; }
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-settings {
+  border-color: #c7ddce; background: linear-gradient(145deg, #f7fcf8, #e6f1e9); color: #254a32;
+}body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option:hover{ background: rgb(64 143 88 / .09); border-color: #c1dec9; }body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option[aria-pressed="true"]{ color: #174b2a; background: #d5ecd9; border-color: #94c6a1; }
+
+/* Galaxy: switch the deep-space panel to a frosted, daylight nebula palette. */
+body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] {
+  border-color: #c3cfee;
+  background: radial-gradient(circle at top right, rgb(119 142 219 / .15), transparent 46%), linear-gradient(145deg, rgb(250 252 255 / .98), rgb(229 235 250 / .98));
+  color: #1e2a49;
+  box-shadow: 0 18px 42px rgb(37 50 92 / .2), inset 0 1px #fff;
+  backdrop-filter: blur(22px) saturate(145%);
+}
+body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-head { border-bottom: 1px solid #d2daf0; }
+body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-settings { border-color: #cbd5ef; background: rgb(255 255 255 / .72); color: #273657; }body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option:hover{ background: rgb(87 115 199 / .08); border-color: #d0d9ef; }body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option[aria-pressed="true"]{ color: #233a77; background: #dfe7ff; border-color: #aabbea; }
+
+/* 3D Parallax: a light HUD panel for Day mode. */
+body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] {
+  border-color: #b9cbe6; border-radius: 9px 18px 9px 18px;
+  background: linear-gradient(145deg, rgb(250 253 255 / .98), rgb(225 235 249 / .97));
+  color: #1a2d49; box-shadow: 0 16px 38px rgb(23 43 73 / .2), inset 0 1px #fff; backdrop-filter: blur(18px);
+}
+body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-head { border-bottom: 1px solid #ccd9eb; }
+body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-settings { border-color: #c6d4e8; background: rgb(255 255 255 / .72); color: #263b5a; }
+body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option:hover { background: rgb(77 128 196 / .09); border-color: #c6d6ec; }body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option[aria-pressed="true"]{ color: #174c83; background: #dcecff; border-color: #a9cbed; }
+
+/* 3D Parallax Big App: a brighter translucent panel that matches the daylight hero cards. */
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] {
+  border-color: #c1d1e7; border-radius: 16px;
+  background: linear-gradient(135deg, rgb(252 254 255 / .98), rgb(226 236 249 / .97));
+  color: #1d304d; box-shadow: 0 17px 40px rgb(28 47 77 / .2), inset 0 1px #fff; backdrop-filter: blur(18px) saturate(140%);
+}
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-head { border-bottom: 1px solid #ccd9e9; }
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-settings { border-color: #c8d6e8; background: rgb(255 255 255 / .75); color: #253b5a; }
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option:hover { background: rgb(72 126 194 / .08); border-color: #c8d7ea; }body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option[aria-pressed="true"]{ color: #174b7e; background: #dcecff; border-color: #a8c7e8; }
+
+/* Simple Retro: daylight phosphor-paper palette instead of its dark terminal panel. */
+body[data-home-style="retro"] .madstation-theme-quick-menu[data-color-mode="light"] {
+  border: 2px solid #39764c; border-radius: 0;
+  background: repeating-linear-gradient(0deg, rgb(31 102 55 / .035) 0 1px, transparent 1px 3px), linear-gradient(145deg, #f2f8ed, #e0ecd9);
+  color: #183d25; box-shadow: 5px 5px 0 rgb(32 77 43 / .18), inset 0 0 0 1px #fff;
+}
+body[data-home-style="retro"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-head { border-bottom: 1px solid #b7cfb2; }
+body[data-home-style="retro"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="retro"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-settings { border-color: #b8cfae; border-radius: 0; background: #ebf4e6; color: #214b2d; }
+body[data-home-style="retro"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option:hover { background: #e0eed9; border-color: #aac6a4; }body[data-home-style="retro"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option[aria-pressed="true"]{ color: #13391f; background: #cfe8c7; border-color: #7eaa75; }
+
+/* Glass: stronger refractive edge and readable inner controls on pale glass in Day mode. */
+body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] {
+  border: 1px solid rgb(99 125 158 / .48);
+  background: linear-gradient(135deg, rgb(255 255 255 / .9), rgb(237 244 252 / .78)), rgb(236 243 255 / .86);
+  color: #23314a;
+  box-shadow: 0 20px 46px rgb(35 52 77 / .2), inset 0 1px #fff, inset 0 0 0 1px rgb(112 138 174 / .16);
+}
+body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-head { border-bottom: 1px solid rgb(109 133 164 / .25); }
+body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-settings {
+  border: 1px solid rgb(104 130 164 / .34); background: rgb(255 255 255 / .66); color: #26354e;
+  box-shadow: inset 0 1px rgb(255 255 255 / .95), 0 2px 5px rgb(44 66 96 / .06);
+}body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option:hover{ background: rgb(97 131 177 / .1); border-color: rgb(91 125 168 / .28); }body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-theme-option[aria-pressed="true"]{ color: #214f7a; background: rgb(150 192 232 / .22); border-color: rgb(85 134 186 / .4); }
+
+
+/* Day-mode Quick Access refinements: keep a clear gap between the header divider and mode control. */
+body[data-home-style="glass"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="parallax-jungle"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="galaxy"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="parallax"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode,
+body[data-home-style="parallax-big"] .madstation-theme-quick-menu[data-color-mode="light"] .mqa-mode {
+  margin-top: 8px;
+}
+
+/* Simple Retro: in Day mode Quick Access matches the light Settings/Customize chrome. */
+body[data-home-style="retro"][data-theme="light"] .madstation-theme-quick-trigger {
+  border: 2px solid var(--ph, #33a65c);
+  border-radius: 0;
+  background: var(--panel, #f5f7f2);
+  color: var(--ink, #183d25);
+  box-shadow: inset 0 1px rgb(255 255 255 / .8), 0 2px 0 rgb(38 76 45 / .12);
+}
+body[data-home-style="retro"][data-theme="light"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="retro"][data-theme="light"] .madstation-theme-quick-trigger[aria-expanded="true"] {
+  border-color: var(--ph, #33a65c);
+  background: var(--ph, #33a65c);
+  color: var(--on, #fff);
+  box-shadow: inset 0 1px rgb(255 255 255 / .35), 0 0 0 2px color-mix(in srgb, var(--ph, #33a65c) 14%, transparent);
+}
+
+/* 3D Parallax variants: Day-mode Quick Access uses the same glass control tokens as Settings/Customize. */
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger {
+  border: 1px solid var(--ms-home-control-border, var(--edge, var(--line, #c6d4e8)));
+  border-radius: var(--ms-home-control-radius, 12px);
+  background: #fff;
+  color: var(--ms-home-control-fg, var(--muted, #263b5a));
+  box-shadow: var(--ms-home-control-shadow, 0 4px 12px rgb(33 52 83 / .08));
+  backdrop-filter: var(--ms-home-control-blur, blur(12px));
+  -webkit-backdrop-filter: var(--ms-home-control-blur, blur(12px));
+}
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger[aria-expanded="true"],
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger[aria-expanded="true"] {
+  border-color: var(--a, #7aaeff);
+  background: color-mix(in srgb, var(--ms-home-control-bg, #fff) 86%, var(--a, #7aaeff) 14%);
+  color: var(--text, #1d304d);
+  box-shadow: 0 8px 22px -12px color-mix(in srgb, var(--a, #7aaeff) 35%, transparent);
+}
+
+
+/* Day mode: Quick Access trigger matches the white Settings/Customize control chrome. */
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger {
+  background: #fff;
+  color: var(--ms-home-control-fg, #687386);
+  border: 1px solid var(--ms-home-control-border, #d9dee7);
+  /* These two day-mode controls keep a neutral border even when global button styling uses an accent. */
+  border-color: #d9dee7 !important;
+  box-shadow: var(--ms-home-control-shadow, 0 3px 10px rgb(32 48 70 / .08));
+  -webkit-backdrop-filter: var(--ms-home-control-blur, blur(12px));
+  backdrop-filter: var(--ms-home-control-blur, blur(12px));
+}
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger .madstation-theme-quick-glyph,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger .madstation-theme-quick-glyph {
+  color: #687386;
+  stroke: currentColor;
+  filter: none;
+}
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger:hover {
+  background: #fff;
+  color: #465366;
+  border-color: #bfc8d6;
+  box-shadow: 0 5px 14px rgb(32 48 70 / .12);
+}
+
+/* Keep the Parallax Quick Access surface white while pressed, focused, or left open.
+   The open-state rule above uses an accent-tinted background; override every interactive state. */
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger:active,
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger:focus,
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger:focus-visible,
+body[data-home-style="parallax"][data-theme="light"] .madstation-theme-quick-trigger[aria-expanded="true"],
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger:active,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger:focus,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger:focus-visible,
+body[data-home-style="parallax-big"][data-theme="light"] .madstation-theme-quick-trigger[aria-expanded="true"] {
+  background: #fff !important;
+  border-color: #d9dee7 !important;
+}
+
+
+/* Isometric World: preserve the original glass-header Quick Access control sizing. */
+body[data-home-style="isometric-world"] .madstation-theme-quick-access { position: relative; display: inline-flex; flex: 0 0 auto; }
+body[data-home-style="isometric-world"] .madstation-theme-quick-trigger { width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 15px; color: var(--muted); background: var(--glass); box-shadow: 0 8px 20px -12px rgb(0 0 0 / .5); }
+body[data-home-style="isometric-world"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="isometric-world"] .madstation-theme-quick-trigger[aria-expanded="true"] { border-color: var(--a); color: var(--text); }
+body[data-home-style="isometric-world"] .madstation-theme-quick-trigger .madstation-theme-quick-glyph { width: 19px; height: 19px; stroke: currentColor; }
+body[data-home-style="isometric-world"] .madstation-theme-quick-trigger .madstation-theme-quick-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+body[data-home-style="isometric-world"] .madstation-theme-quick-menu { position: absolute; top: calc(100% + 10px); right: 0; z-index: 60; width: min(320px, calc(100vw - 24px)); max-height: min(75vh, 560px); overflow: auto; border: 1px solid var(--line); border-radius: 18px; background: var(--s1); color: var(--text); box-shadow: 0 24px 54px rgb(0 0 0 / .4); }
+body[data-home-style="isometric-world"] .madstation-theme-quick-access.mqa-open-up .madstation-theme-quick-menu { top: auto; bottom: calc(100% + 10px); }
+
+/* 3D Parallax variants: Night-mode Quick Access matches the adjacent Settings control. */
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:active,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:focus,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:focus-visible,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger[aria-expanded="true"],
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:active,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:focus,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:focus-visible,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger[aria-expanded="true"] {
+  background: #151515 !important;
+  border: 1px solid #34363a !important;
+  color: var(--v3-muted, var(--muted, #aab2bf));
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:active,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:focus,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger:focus-visible,
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger[aria-expanded="true"] {
+  border-radius: 12px !important;
+}
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:hover,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:active,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:focus,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger:focus-visible,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger[aria-expanded="true"] {
+  border-radius: var(--ms-home-control-radius, 12px) !important;
+}
+body[data-home-style="parallax"][data-theme="dark"] .madstation-theme-quick-trigger .madstation-theme-quick-glyph,
+body[data-home-style="parallax-big"][data-theme="dark"] .madstation-theme-quick-trigger .madstation-theme-quick-glyph {
+  color: var(--v3-muted, var(--muted, #aab2bf));
+  filter: none !important;
+}

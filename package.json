@@ -1,0 +1,284 @@
+{
+  "name": "mad-station",
+  "version": "1.6.3",
+  "packageManager": "npm@10.9.2",
+  "description": "A personal Windows workspace for separate persistent AI website accounts.",
+  "main": "src/main.js",
+  "author": "Personal project",
+  "license": "MIT",
+  "scripts": {
+    "prestart": "npm run build",
+    "start": "electron .",
+    "predev": "npm run env:check && npm run build:renderer && npm run build:preload && npm run build:main-modules",
+    "dev": "node scripts/dev.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.electron.json",
+    "build:renderer": "vite build",
+    "build:preload": "esbuild src/preload.ts src/toolbar-preload.ts --bundle --platform=node --format=cjs --external:electron --outdir=build --target=node24",
+    "build:main-modules": "node -e \"require('node:fs').rmSync('build/main',{recursive:true,force:true})\" && esbuild src/main/settings.ts src/main/settings-controller.ts src/main/downloads-controller.ts src/main/settings-ipc.ts src/main/downloads-ipc.ts src/main/video-hub-ipc.ts src/main/video-hub-controller.ts src/main/json-file-store.ts src/main/ai-hub-controller.ts src/main/ai-hub-ipc.ts src/main/ai-hub-read-model.ts src/main/diagnostics-controller.ts src/main/diagnostics-ipc.ts src/main/workspace-transfer-controller.ts src/main/workspace-transfer-ipc.ts src/main/workspace-transfer-files.ts src/main/background-files.ts src/main/background-ipc.ts src/main/ai-lab-credentials.ts src/main/ai-lab-runtime.ts src/main/account-session-security.ts src/main/main-window-runtime.ts src/main/app-bootstrap-runtime.ts src/main/browser-view-policy.ts src/main/browser-view-runtime.ts src/main/browser-view-pruning-runtime.ts src/main/browser-view-reclamation-runtime.ts src/main/workspace-browser-view-runtime.ts src/main/web-contents-view-attachment-runtime.ts src/main/workspace-browser-events.ts src/main/browser-view-layout-runtime.ts src/main/session-lifecycle-runtime.ts src/main/arena-account-data-runtime.ts src/main/arena-store-runtime.ts src/main/account-prompt-runtime.ts src/main/arena-browser-runtime.ts src/main/arena-prompt-runtime.ts src/main/theme-design-export.ts src/main/theme-pack-import.ts src/main/native-operations-runtime.ts src/main/forge-browser-runtime.ts src/main/video-hub-browser-runtime.ts src/main/image-hub-browser-runtime.ts src/main/video-hub-network-runtime.ts src/main/account-browser-runtime.ts src/main/config-schema.ts src/main/config-store.ts src/main/lock-security.ts src/main/app-lifecycle-runtime.ts src/main/lock-ipc.ts src/main/lock-controller.ts src/main/downloads.ts src/main/network-security.ts src/main/public-suffix-list.ts src/main/icon-cache.ts src/main/input-validation.ts src/main/memory-diagnostics-runtime.ts src/main/icon-runtime.ts --bundle --platform=node --format=cjs --outdir=build/main --outbase=src/main --target=node24 && esbuild src/shared/ipc-validation.ts --bundle --platform=node --format=cjs --outdir=build/main --outbase=src/shared --target=node24",
+    "build": "npm run typecheck && npm run build:renderer && npm run build:preload && npm run build:main-modules",
+    "predist": "npm run build && node -e \"require('fs').copyFileSync('package.json','developer-package.json')\"",
+    "dist": "electron-builder --publish=never --win nsis",
+    "audit": "npm audit",
+    "pretest": "npm run env:check && npm run build:main-modules",
+    "test": "node --test tests/home-quick-access-color-modes.test.js tests/home-parallax-jungle-border-fronds.test.js tests/release.test.js tests/renderer-react-ai-playground-api-arena.test.js tests/renderer-react-ai-playground-api-model-settings.test.js tests/renderer-react-ai-playground-settings.test.js tests/renderer-react-ai-playground-arena-setup.test.js tests/renderer-react-ai-playground-browser-arenas.test.js tests/design-system.test.js tests/home-systems.test.js tests/home-page-switcher.test.js tests/home-no-theme-search-bars.test.js tests/home-isometric-world-integration.test.js tests/home-galaxy-orbit-speed.test.js tests/home-parallax-jungle-app-card.test.js tests/home-removed-theme-regression.test.js tests/home-retro-integration.test.js tests/home-retro-complex-integration.test.js tests/home-process-monitor-refresh.test.js tests/renderer-memory-monitor-startup-live.test.js tests/home-v4-integration.test.js tests/home-theme-main-app-drag-drop.test.js tests/home-customizer-controller.test.js tests/home-layout-editor.test.js tests/home-widgets-controller.test.js tests/ipc-validation.test.js tests/main-settings.test.js tests/main-input-validation.test.js tests/main-config-schema.test.js tests/main-config-store.test.js tests/main-lock-security.test.js tests/main-app-lifecycle-runtime.test.js tests/main-account-session-security.test.js tests/main-main-window-runtime.test.js tests/main-app-bootstrap-runtime.test.js tests/main-lock-ipc.test.js tests/main-lock-controller.test.js tests/renderer-react-lists.test.js tests/renderer-react-ai-hub-management-forms.test.js tests/renderer-react-ai-hub-management-lists.test.js tests/renderer-react-ai-hub-account-navigation.test.js tests/renderer-react-context-menu.test.js tests/renderer-react-rename-account-modal.test.js tests/renderer-react-password-modal.test.js tests/renderer-react-lock-screen.test.js tests/renderer-react-image-hub.test.js tests/renderer-react-image-hub-discovery.test.js tests/renderer-react-video-hub.test.js tests/renderer-react-video-hub-provider-tiles.test.js tests/renderer-react-video-hub-account-list.test.js tests/renderer-react-video-hub-recent.test.js tests/renderer-react-notifications.test.js tests/renderer-react-downloads-list.test.js tests/main-settings-controller.test.js tests/renderer-aihub-sidebar-recovery.test.js tests/renderer-react-video-hub-providers.test.js tests/renderer-react-video-hub-workspace-chrome.test.js tests/renderer-react-video-hub-browser-state.test.js tests/appearance-controls.test.js tests/renderer-react-remaining-settings-panels.test.js tests/renderer-react-global-settings-panels.test.js tests/renderer-react-system-settings-panels.test.js tests/renderer-react-information-security-panels.test.js tests/main-downloads-controller.test.js tests/main-ipc-registration.test.js tests/main-video-hub-ipc.test.js tests/main-video-hub-controller.test.js tests/main-json-file-store.test.js tests/main-ai-hub-controller.test.js tests/main-ai-hub-ipc.test.js tests/main-ai-hub-read-model.test.js tests/main-diagnostics-controller.test.js tests/main-diagnostics-ipc.test.js tests/main-workspace-transfer-controller.test.js tests/main-workspace-transfer-files.test.js tests/main-workspace-transfer-ipc.test.js tests/main-background-files.test.js tests/main-background-ipc.test.js tests/main-ai-lab-credentials.test.js tests/main-browser-view-policy.test.js tests/main-browser-view-runtime.test.js tests/main-browser-lifecycle-contract.test.js tests/main-browser-data-cleanup-contract.test.js tests/main-arena-account-data-runtime.test.js tests/main-browser-view-pruning-runtime.test.js tests/main-browser-view-reclamation-runtime.test.js tests/main-workspace-browser-view-runtime.test.js tests/main-web-contents-view-attachment-runtime.test.js tests/main-browser-view-layout-runtime.test.js tests/main-session-lifecycle-runtime.test.js tests/renderer-react-video-hub-sidebar-controls.test.js tests/renderer-react-video-hub-settings.test.js tests/renderer-react-video-hub-setup-forms.test.js tests/renderer-react-image-hub-workspace-toolbar.test.js tests/renderer-react-image-hub-workspace-chrome.test.js tests/renderer-react-image-hub-settings.test.js tests/renderer-react-image-hub-browser-state.test.js tests/renderer-react-image-hub-sidebar-chrome.test.js tests/renderer-react-notes-workspace.test.js tests/renderer-react-utility-workspaces.test.js tests/main-ai-lab-runtime.test.js tests/main-workspace-browser-events.test.js tests/main-arena-store-runtime.test.js tests/main-account-prompt-runtime.test.js tests/main-theme-design-export.test.js tests/main-theme-pack-import.test.js tests/main-developer-options-auth.test.js tests/main-native-operations-runtime.test.js tests/main-arena-browser-runtime.test.js tests/main-arena-prompt-runtime.test.js tests/main-forge-browser-runtime.test.js tests/main-video-hub-browser-runtime.test.js tests/main-image-hub-browser-runtime.test.js tests/main-video-hub-network-runtime.test.js tests/main-account-browser-runtime.test.js tests/main-system-cpu-usage.test.js tests/main-memory-diagnostics-runtime.test.js tests/main-icon-runtime.test.js tests/main-icon-cache-security.test.js tests/developer-visual-debug.test.js tests/main-network-security.test.js tests/security-audit-contract.test.js tests/public-suffix-updater.test.js tests/main-public-suffix-list.test.js tests/renderer-react-memory-process-table.test.js tests/renderer-react-memory-monitor.test.js tests/renderer-react-arena-management.test.js tests/renderer-react-instruction-forge-accounts.test.js tests/renderer-react-instruction-forge-settings.test.js tests/renderer-react-instruction-forge-composer.test.js tests/sprintf-js-security-patch.test.js tests/home-galaxy-compact-monitor.test.js tests/home-glass-main-icon-clarity.test.js tests/home-retro-complex-interaction-states.test.js tests/home-seasonal-theme-variants.test.js tests/home-theme-control-contrast.test.js tests/home-topbar-system-indicators.test.js tests/home-topbar-theme.test.js tests/home-v3-integration.test.js tests/home-performance-optimizations.test.js",
+    "update:psl": "node scripts/update-public-suffix-list.mjs",
+    "env:check": "node scripts/check-dev-environment.mjs",
+    "prebuild": "npm run env:check",
+    "pretypecheck": "npm run env:check",
+    "docs:themes:check": "node scripts/check-theme-documentation.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.7.2",
+    "electron-builder": "26.17.0",
+    "@types/node": "22.18.6",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.0.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "esbuild": "0.25.12"
+  },
+  "build": {
+    "appId": "com.personal.madstation",
+    "productName": "Mad Station",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "build/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": "nsis",
+      "artifactName": "Mad-Station-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Mad Station"
+    },
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "docs/design/DESIGN_SYSTEM.md",
+        "to": "developer-docs/docs/design/DESIGN_SYSTEM.md"
+      },
+      {
+        "from": "docs/architecture/CORE_SYSTEM.md",
+        "to": "developer-docs/docs/architecture/CORE_SYSTEM.md"
+      },
+      {
+        "from": "AGENTS.md",
+        "to": "developer-docs/AGENTS.md"
+      },
+      {
+        "from": "CLAUDE.md",
+        "to": "developer-docs/CLAUDE.md"
+      },
+      {
+        "from": "README.md",
+        "to": "developer-docs/README.md"
+      },
+      {
+        "from": "src/THEME_INTEGRATION.md",
+        "to": "developer-docs/THEME_INTEGRATION.md"
+      },
+      {
+        "from": "docs/README.md",
+        "to": "developer-docs/docs/README.md"
+      },
+      {
+        "from": "docs/architecture/ARCHITECTURE.md",
+        "to": "developer-docs/docs/architecture/ARCHITECTURE.md"
+      },
+      {
+        "from": "docs/development/DEVELOPMENT_ENVIRONMENT.md",
+        "to": "developer-docs/docs/development/DEVELOPMENT_ENVIRONMENT.md"
+      },
+      {
+        "from": "scripts/check-dev-environment.mjs",
+        "to": "developer-docs/scripts/check-dev-environment.mjs"
+      },
+      {
+        "from": "docs/security/SECURITY_AUDIT.md",
+        "to": "developer-docs/docs/security/SECURITY_AUDIT.md"
+      },
+      {
+        "from": "docs/licenses/THIRD_PARTY_NOTICES.md",
+        "to": "developer-docs/docs/licenses/THIRD_PARTY_NOTICES.md"
+      },
+      {
+        "from": "docs/licenses/Public-Suffix-List-Notice.md",
+        "to": "developer-docs/docs/licenses/Public-Suffix-List-Notice.md"
+      },
+      {
+        "from": "docs/licenses/MPL-2.0.txt",
+        "to": "developer-docs/docs/licenses/MPL-2.0.txt"
+      },
+      {
+        "from": "docs/development/AI_DEVELOPMENT_GUIDE.md",
+        "to": "developer-docs/docs/development/AI_DEVELOPMENT_GUIDE.md"
+      },
+      {
+        "from": "developer-package.json",
+        "to": "developer-docs/package.json"
+      },
+      {
+        "from": "src",
+        "to": "developer-docs/src",
+        "filter": [
+          "design-tokens.css",
+          "design-kit.css",
+          "styles.css",
+          "home.css",
+          "home-v2.html",
+          "appearance.js",
+          "home-parallax-background.js",
+          "home-parallax-background.css",
+          "home-v5-bridge.js",
+          "home-v5.js",
+          "home-v5.css",
+          "home-v2.css",
+          "home-v2.js",
+          "home-v2-registry.js",
+          "home-page-switcher.js",
+          "home-galaxy.html",
+          "home-parallax-jungle.html",
+          "home-claymorphism.html",
+          "home-glass.html",
+          "pages.css",
+          "developer-visual-debug.css",
+          "developer-visual-debug.js",
+          "home-app-list.js",
+          "home-core-system.js",
+          "home-apps.js",
+          "home-mini-apps.js",
+          "home-mini-list.js",
+          "home-widgets.js",
+          "home-widget-list.js",
+          "home-customizer.js",
+          "home-layout-editor.js",
+          "renderer-react/home-companions.tsx",
+          "renderer-react/home-mini-apps.tsx",
+          "renderer-react/home-customizer.tsx",
+          "renderer-react/home-widgets.tsx",
+          "renderer-react/image-hub-sidebar.tsx",
+          "renderer-react/image-hub-discovery.tsx",
+          "renderer-react/video-hub-sites.tsx",
+          "renderer-react/video-hub-provider-tiles.tsx",
+          "renderer-react/video-hub-account-list.tsx",
+          "renderer-react/video-hub-recent.tsx",
+          "renderer-react/notifications.tsx",
+          "renderer-react/downloads-list.tsx",
+          "main/settings-controller.ts",
+          "renderer-react/video-hub-providers.tsx",
+          "renderer-react/video-hub-workspace-chrome.tsx",
+          "renderer-react/video-hub-browser-state.tsx",
+          "renderer-react/video-hub-sidebar-controls.tsx",
+          "renderer-react/appearance-controls.tsx",
+          "main/downloads-controller.ts",
+          "main/settings-ipc.ts",
+          "main/downloads-ipc.ts",
+          "main/video-hub-ipc.ts",
+          "main/video-hub-controller.ts",
+          "main/json-file-store.ts",
+          "main/ai-hub-controller.ts",
+          "main/ai-hub-ipc.ts",
+          "main/diagnostics-controller.ts",
+          "main/diagnostics-ipc.ts",
+          "main/workspace-transfer-controller.ts",
+          "main/workspace-transfer-ipc.ts",
+          "main/workspace-transfer-files.ts",
+          "main/background-files.ts",
+          "main/background-ipc.ts",
+          "main/ai-lab-credentials.ts",
+          "main/browser-view-policy.ts",
+          "main/browser-view-runtime.ts",
+          "main/browser-view-pruning-runtime.ts",
+          "main/browser-view-reclamation-runtime.ts",
+          "main/workspace-browser-view-runtime.ts",
+          "main/arena-account-data-runtime.ts",
+          "renderer-react/ai-hub-management-lists.tsx",
+          "renderer-react/ai-hub-account-navigation.tsx",
+          "renderer-react/context-menu.tsx",
+          "renderer-react/rename-account-modal.tsx",
+          "renderer-react/password-modal.tsx",
+          "renderer-react/lock-screen.tsx",
+          "renderer-react/memory-monitor.tsx",
+          "renderer-react/ai-hub-management-forms.tsx",
+          "renderer-react/global-settings-panels.tsx",
+          "renderer-react/system-settings-panels.tsx",
+          "renderer-react/information-security-panels.tsx",
+          "renderer-react/remaining-settings-panels.tsx",
+          "renderer-react/ai-playground-api-arena.tsx",
+          "renderer-react/ai-playground-api-model-settings.tsx",
+          "renderer-react/ai-playground-settings.tsx",
+          "renderer-react/ai-playground-arena-setup.tsx",
+          "renderer-react/ai-playground-browser-arenas.tsx",
+          "renderer-react/video-hub-settings.tsx",
+          "renderer-react/video-hub-setup-forms.tsx",
+          "renderer-react/image-hub-workspace-toolbar.tsx",
+          "renderer-react/image-hub-workspace-chrome.tsx",
+          "renderer-react/image-hub-browser-state.tsx",
+          "renderer-react/image-hub-settings.tsx",
+          "renderer-react/image-hub-sidebar-chrome.tsx",
+          "renderer-react/notes-workspace.tsx",
+          "renderer-react/utility-workspaces.tsx",
+          "renderer-react/instruction-forge-composer.tsx",
+          "main/lock-controller.ts",
+          "main/lock-ipc.ts",
+          "main/account-session-security.ts",
+          "main/main-window-runtime.ts",
+          "main/app-bootstrap-runtime.ts",
+          "main/app-lifecycle-runtime.ts",
+          "main/session-lifecycle-runtime.ts",
+          "main/browser-view-layout-runtime.ts",
+          "main/web-contents-view-attachment-runtime.ts",
+          "main/ai-lab-runtime.ts",
+          "main/workspace-browser-events.ts",
+          "main/arena-store-runtime.ts",
+          "main/account-prompt-runtime.ts",
+          "main/native-operations-runtime.ts",
+          "main/arena-browser-runtime.ts",
+          "main/arena-prompt-runtime.ts",
+          "main/video-hub-browser-runtime.ts",
+          "main/image-hub-browser-runtime.ts",
+          "main/video-hub-network-runtime.ts",
+          "main/account-browser-runtime.ts",
+          "main/forge-browser-runtime.ts",
+          "main/memory-diagnostics-runtime.ts",
+          "main/system-cpu-usage.js",
+          "main/icon-runtime.ts",
+          "main/network-security.ts",
+          "main/public-suffix-list.ts",
+          "renderer-react/memory-process-table.tsx",
+          "renderer-react/ai-playground-arena-management.tsx",
+          "renderer-react/instruction-forge-accounts.tsx",
+          "renderer-react/instruction-forge-settings.tsx",
+          "developer-debug-window.html",
+          "developer-debug-window.css",
+          "developer-debug-window.js",
+          "developer-debug-window-preload.js"
+        ]
+      },
+      {
+        "from": "docs/design-kit-preview.html",
+        "to": "developer-docs/docs/design-kit-preview.html"
+      }
+    ]
+  },
+  "engines": {
+    "node": "22.16.0"
+  },
+  "overrides": {
+    "sprintf-js": "file:../../vendor/sprintf-js-1.1.4+madstation.1.tgz"
+  }
+}

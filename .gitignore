@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+__pycache__/
+developer-package.json
+.env
+.env.*
+!.env.example

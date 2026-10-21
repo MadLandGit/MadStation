@@ -1,0 +1,21 @@
+#toolbar-root { height: 50px; min-width: 0; }
+#toolbar-root > .toolbar { width: 100%; }
+.tb-icon-img { display: block; width: 18px; height: 18px; object-fit: contain; }
+.tb-site-icon .tb-icon-default { display: block; width: 18px; height: 18px; }
+.toolbar-action-error {
+  position: absolute;
+  right: 136px;
+  top: 7px;
+  z-index: 5;
+  max-width: min(320px, calc(100vw - 200px));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 11px;
+  pointer-events: none;
+}
+.toolbar-action-error:empty { display: none; }

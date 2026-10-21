@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"/>
+<link href="developer-visual-debug.css" rel="stylesheet"/>
+<title>Mad Station — Simple</title>
+<link rel="stylesheet" href="design-tokens.css"/>
+<link rel="stylesheet" href="home-v5.css"/>
+<link rel="stylesheet" href="home-parallax-background.css"/>
+ <link href="home-style-chrome.css" rel="stylesheet"/>
+ <link href="home-topbar-theme.css" rel="stylesheet"/>
+ <link href="home-quick-access-theme.css" rel="stylesheet"/>
+</head>
+<body data-home-isolated="true" data-theme="dark" data-home-style="simple">
+<!-- Shared Parallax background: the same selectable Appearance preset used by the other home styles. -->
+<div class="home-parallax-bg" id="homeParallaxBackground" aria-hidden="true" hidden>
+  <canvas class="home-parallax-canvas" id="homeParallaxCanvas"></canvas>
+  <div class="home-parallax-layers">
+    <i class="hp-grid3d" data-depth="8"></i>
+    <i class="hp-orb hp-orb--one" data-depth="22"></i><i class="hp-orb hp-orb--two" data-depth="34"></i><i class="hp-orb hp-orb--three" data-depth="14"></i>
+    <i class="hp-ring hp-ring--one" data-depth="46"></i><i class="hp-ring hp-ring--two" data-depth="62"></i><i class="hp-ring hp-ring--three" data-depth="30"></i><i class="hp-hex" data-depth="78"></i>
+    <i class="hp-cube hp-cube--one" data-depth="58"><b><s></s><s></s><s></s><s></s><s></s><s></s></b></i>
+    <i class="hp-cube hp-cube--two" data-depth="92"><b><s></s><s></s><s></s><s></s><s></s><s></s></b></i>
+    <i class="hp-triangle" data-depth="70"></i><i class="hp-plus hp-plus--one" data-depth="40"></i><i class="hp-plus hp-plus--two" data-depth="84"></i><i class="hp-plus hp-plus--three" data-depth="52"></i>
+  </div>
+</div>
+<main class="home" id="launcherScreen" aria-label="Mad Station home">
+  <header class="bar">
+    <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5 27.5 10v12L16 28.5 4.5 22V10L16 3.5Z" opacity=".5"/><path d="M10.5 21V12l5.5 5.2L21.5 12v9"/></svg></span><span><b>Mad</b> Station</span></div>
+    <div class="search">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></svg>
+      <input id="homeSearch" type="text" autocomplete="off" spellcheck="false" placeholder="Find an app…" aria-label="Find an app"/>
+      <kbd>/</kbd>
+    </div>
+    <div class="actions">
+      <div class="menu-wrap">
+        <button class="btn" id="homeCustomizeBtn" type="button" aria-label="Customize" title="Customize" aria-haspopup="true" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+        <div class="menu" id="homeMenu" hidden></div>
+      </div>
+      <button class="icon" id="themeBtn" type="button" aria-label="Toggle theme" title="Day / night"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button>
+      <div class="madstation-theme-quick-access" data-theme-quick-access data-qa-skin="simple">
+        <button class="madstation-theme-quick-trigger" data-theme-quick-trigger type="button" aria-label="Quick Access: theme and appearance" title="Theme &amp; appearance" aria-haspopup="dialog" aria-expanded="false" aria-controls="themeQuickAccessMenu">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="madstation-theme-quick-glyph"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-.6-.3-1-.6-1.4-.4-.5-.6-.9-.6-1.5 0-1 .8-1.8 1.8-1.8H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.6 16.7 3.5 12 3.5Z"/><path d="M7.6 11h.01M10.2 7.6h.01M14.4 7.6h.01"/></svg><span class="madstation-theme-quick-sr">Quick Access</span>
+        </button>
+        <div class="madstation-theme-quick-menu" id="themeQuickAccessMenu" data-theme-quick-menu role="dialog" aria-label="Theme and appearance" hidden></div>
+      </div>
+      <button class="icon" id="launcherSettingsBtn" type="button" aria-label="Settings" title="Settings"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+  </header>
+  <section class="wrap">
+    <div class="head">
+      <div><h1 id="homeGreeting">Welcome back</h1><p id="homeDate"></p></div>
+      <p class="hint"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14"/></svg>Drag any app to rearrange · Alt + arrows with the keyboard</p>
+    </div>
+    <div class="grid" id="homeApps" aria-label="Your apps"></div>
+    <p class="none" id="noMatch" hidden>No app matches that.</p>
+  </section>
+</main>
+<div class="toast" id="homeToast" role="status" aria-live="polite"></div>
+<script src="appearance.js"></script>
+<script src="home-parallax-background.js"></script>
+<script src="home-v5.js"></script>
+<script src="home-v5-bridge.js"></script>
+
+<script src="developer-visual-debug.js"></script>
+<script src="home-style-settings-bridge.js"></script>
+<script src="home-quick-access-theme.js"></script>
+</body>
+</html>

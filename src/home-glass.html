@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"/>
+<link href="developer-visual-debug.css" rel="stylesheet"/>
+<title>Glass — Mad Station</title>
+<style>
+/* Mad Station — Home v10 "Glass". Frosted panes over a living light field. Same features and host hooks as v9. CSP-safe. */
+@property --mh{syntax:'<color>';inherits:true;initial-value:#6f8cff}
+body{
+  --a:var(--accent,#7c9cff);--c1:#7c9cff;--c2:#b18cff;--c3:#ff8fbd;--c4:#ffb869;--c5:#4fe0b0;--c6:#4fd0ee;
+  --text:#f5f7ff;--muted:#b3bbe4;--bg:linear-gradient(160deg,#0b0d2b,#1b1050 48%,#08284a);
+  --ga:rgb(255 255 255/.17);--gb:rgb(255 255 255/.04);--edge:rgb(255 255 255/.22);--hi:rgb(255 255 255/.38);--shadow:rgb(2 4 30/.55);--field:rgb(255 255 255/.08);
+  --blur:blur(26px) saturate(170%);--ease:cubic-bezier(.2,.85,.25,1);color-scheme:dark}
+body[data-theme=light]{
+  --text:#1b2152;--muted:#566096;--bg:linear-gradient(160deg,#dbe5ff,#efe0ff 50%,#d4f2ff);
+  --ga:rgb(255 255 255/.62);--gb:rgb(255 255 255/.22);--edge:rgb(255 255 255/.85);--hi:rgb(255 255 255/.95);--shadow:rgb(70 82 170/.28);--field:rgb(255 255 255/.5);color-scheme:light}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:400 14px/1.45 'Segoe UI Variable Display','SF Pro Display','Inter','Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--a) 80%,#fff);outline-offset:3px}
+h1,h2,p,ul{margin:0;padding:0}ul{list-style:none}
+body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
+[data-h="1"]{--h:var(--c1)}[data-h="2"]{--h:var(--c2)}[data-h="3"]{--h:var(--c3)}[data-h="4"]{--h:var(--c4)}[data-h="5"]{--h:var(--c5)}[data-h="6"]{--h:var(--c6)}
+
+/* ---- depth layers: light field → spot → glass gems → content ---- */
+.layers{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.8;translate:var(--tx,0) var(--ty,0);animation:drift 22s ease-in-out infinite alternate}
+.o1{width:46vmax;height:46vmax;left:-12vmax;top:-14vmax;background:var(--mh);transition:--mh .8s}
+.o2{width:36vmax;height:36vmax;right:-10vmax;top:6vmax;background:var(--c3);opacity:.55;animation-duration:28s}
+.o3{width:40vmax;height:40vmax;left:22vw;bottom:-22vmax;background:var(--c6);opacity:.5;animation-duration:25s}
+.o4{width:26vmax;height:26vmax;right:12vw;bottom:2vmax;background:var(--c2);opacity:.5;animation-duration:31s}
+@keyframes drift{to{transform:translate(4vmax,3vmax) scale(1.12)}}
+.gem{position:absolute;border-radius:50%;border:1px solid var(--edge);background:linear-gradient(135deg,var(--ga),var(--gb));backdrop-filter:blur(8px);box-shadow:inset 0 1px 0 var(--hi),0 30px 60px -30px var(--shadow);translate:var(--tx,0) var(--ty,0)}
+.g1{width:230px;height:230px;left:5vw;top:40vh}.g2{width:130px;height:130px;right:9vw;top:20vh}.g3{width:300px;height:300px;right:-90px;bottom:-60px}
+
+/* ---- the glass material ---- */
+.glass{position:relative;background:linear-gradient(135deg,var(--ga),var(--gb));backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--edge);border-radius:26px;box-shadow:0 24px 60px -24px var(--shadow),inset 0 1px 0 var(--hi),inset 0 -1px 0 rgb(255 255 255/.06)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(420px circle at var(--gx,25%) var(--gy,0%),rgb(255 255 255/.22),transparent 55%);opacity:0;transition:opacity .35s}
+.glass:hover::before,.glass:focus-visible::before{opacity:1}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.97);filter:blur(14px)}}
+.rise{animation:rise .9s var(--ease) backwards;animation-delay:calc(var(--i,0)*70ms)}
+
+/* ---- home layout ---- */
+.home{position:fixed;inset:0;z-index:1;overflow:auto;padding:18px clamp(14px,3vw,40px) 48px;scrollbar-width:thin}
+.top{max-width:1240px;margin:0 auto 26px;position:sticky;top:0;z-index:20}
+.dock{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:999px}
+.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:300;letter-spacing:.02em;white-space:nowrap}.brand b{font-weight:700}
+.mark{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--a),var(--c2));box-shadow:inset 0 1px 0 var(--hi),0 8px 20px -8px var(--a);color:#fff}
+.mark svg{width:20px;height:20px}
+kbd{font:600 11px/1 inherit;padding:4px 7px;border-radius:7px;background:var(--field);border:1px solid var(--edge);color:var(--muted)}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.chip,.chgm,.icon{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:999px;background:var(--field);border:1px solid var(--edge);color:var(--text);font-size:13px;transition:background .25s,transform .25s var(--ease)}
+.chgm:hover,.icon:hover{background:var(--ga);transform:translateY(-1px)}
+.chgm svg,.icon svg{width:17px;height:17px}.icon{width:36px;padding:0;justify-content:center}
+.chip em{font-style:normal;animation:blink 1.2s steps(2) infinite}@keyframes blink{50%{opacity:.25}}
+.chip b{font-weight:600;font-variant-numeric:tabular-nums}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--c5);box-shadow:0 0 10px var(--c5);display:inline-block}
+.bar{width:36px;height:5px;border-radius:9px;background:var(--field);overflow:hidden;display:block}.bar u{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--c6),var(--c2));transition:width .6s}
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 10px);width:250px;padding:14px;border-radius:22px;z-index:30;animation:rise .35s var(--ease);background:linear-gradient(135deg,var(--ga),var(--gb)),rgb(20 20 50/.35)}
+body[data-theme=light] .menu{background:linear-gradient(135deg,var(--ga),var(--gb)),rgb(255 255 255/.5)}
+.menu h2{font-size:12px;font-weight:600;color:var(--muted);margin:2px 4px 6px}.menu h2.gap{margin-top:12px}
+.menu label{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:12px;cursor:pointer;transition:background .2s}
+.menu label:hover{background:var(--field)}.menu input{accent-color:var(--a);width:16px;height:16px;margin:0}
+.reset{margin-top:10px;width:100%;padding:9px;border-radius:12px;background:var(--field);border:1px solid var(--edge);font-weight:600}.reset:hover{background:var(--ga)}
+
+.layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.9fr) minmax(300px,1fr);gap:22px;align-items:stretch}
+.hello{grid-column:1/-1;padding:4px 8px 2px}
+.hello h1{font-size:clamp(32px,5vw,56px);font-weight:200;letter-spacing:-.02em;line-height:1.1}
+.hello h1 span{display:inline-block;animation:rise .9s var(--ease) backwards;animation-delay:calc(var(--i)*35ms + 150ms)}
+.hello p{color:var(--muted);font-size:16px;margin-top:6px;font-weight:300}
+.stage{perspective:1200px;min-width:0}
+
+/* main app hero */
+.main{height:100%;min-height:340px;padding:26px 30px;display:flex;flex-direction:column;cursor:pointer;border-radius:34px;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .3s var(--ease);overflow:hidden}
+.main::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(90% 120% at 100% 100%,color-mix(in srgb,var(--h) 42%,transparent),transparent 62%)}
+.main.drop{outline:3px dashed var(--h);outline-offset:7px;box-shadow:0 0 0 6px color-mix(in srgb,var(--h) 14%,transparent),0 30px 72px -24px var(--h)}
+.main>*{position:relative;z-index:1}
+.m-bar{display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--field);border:1px solid var(--edge);font-size:12px;font-weight:600}.badge svg{width:14px;height:14px}
+.m-st{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:13px}.m-bar .key{margin-left:auto}
+.key{font-size:11px;font-weight:600;color:var(--muted);min-width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:var(--field);border:1px solid var(--edge)}
+.m-body{flex:1;display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:12px}
+.m-txt{min-width:0}
+.m-name{display:block;font-size:clamp(38px,6vw,76px);font-weight:200;letter-spacing:-.03em;line-height:1.02}
+.m-name span{display:inline-block;animation:rise .8s var(--ease) backwards;animation-delay:calc(var(--i)*28ms)}
+.fcs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px}
+.fc{padding:6px 13px;border-radius:999px;font-size:13px;background:var(--field);border:1px solid var(--edge);animation:bob 5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-5px)}}
+.open{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;font-weight:600;color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--h) 85%,#fff),color-mix(in srgb,var(--h) 70%,#3a2a9a));border:1px solid rgb(255 255 255/.45);box-shadow:inset 0 1px 0 rgb(255 255 255/.5),0 14px 30px -12px var(--h);transition:transform .3s var(--ease),box-shadow .3s}
+.open:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgb(255 255 255/.5),0 20px 36px -12px var(--h)}.open svg{width:18px;height:18px;transition:transform .3s var(--ease)}.open:hover svg{transform:translateX(4px)}
+.m-orb{flex:none;width:min(240px,32vw);aspect-ratio:1;display:grid;place-items:center;position:relative;translate:calc(var(--dx,0)*14px) calc(var(--dy,0)*14px)}
+.m-orb .ring{position:absolute;border-radius:50%;border:1px solid var(--edge);background:linear-gradient(135deg,var(--ga),var(--gb));backdrop-filter:blur(6px);box-shadow:inset 0 1px 0 var(--hi)}
+.r1{inset:0;animation:spin 26s linear infinite;border-style:dashed!important}.r2{inset:14%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.m-orb .ico{position:relative;width:46%;aspect-ratio:1;border-radius:32%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--h) 80%,#fff),var(--h));border:1px solid rgb(255 255 255/.55);box-shadow:inset 0 2px 0 rgb(255 255 255/.55),0 24px 50px -16px var(--h);translate:calc(var(--dx,0)*10px) calc(var(--dy,0)*10px)}
+.m-orb .ico svg{width:52%;height:52%;stroke-width:1.5}
+
+/* live system */
+.sys{padding:22px;display:flex;flex-direction:column;gap:14px;border-radius:30px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
+.sec-h h2{font-size:17px;font-weight:600;display:flex;align-items:center;gap:9px}.hint{color:var(--muted);font-size:12px}
+.pn{padding:16px;border-radius:20px;background:var(--field);border:1px solid var(--edge);display:flex;flex-direction:column;gap:10px;flex:1}
+.pn-top{display:flex;align-items:center;gap:14px}
+.gauge{position:relative;width:70px;height:70px;flex:none}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg);stroke-width:4.5}
+.gauge .trk{stroke:var(--edge)}.gauge .val{stroke:var(--h);stroke-dasharray:0 100;transition:stroke-dasharray .8s var(--ease);filter:drop-shadow(0 0 4px var(--h))}
+.gauge b{position:absolute;inset:0;display:grid;place-items:center;font-size:17px;font-weight:600}
+.pn-txt{display:flex;flex-direction:column;min-width:0}.pn-txt .lbl{font-size:12px;color:var(--muted)}.pn-txt>b{font-size:22px;font-weight:300}.pn-txt small{color:var(--muted);font-size:12px}
+.spark{width:100%;height:42px}.spark .line{stroke:var(--h);stroke-width:2}.spark .area{fill:color-mix(in srgb,var(--h) 22%,transparent);stroke:none}
+
+/* more apps */
+.rail{grid-column:1/-1;margin-top:8px}
+.rail .sec-h{padding:0 8px;margin-bottom:14px}.rail .sec-h h2{font-weight:300;font-size:24px}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px;perspective:1200px}
+.tile{padding:20px;min-height:168px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .3s var(--ease),border-color .3s;touch-action:manipulation}
+.tile::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(110% 90% at 0 0,color-mix(in srgb,var(--h) 34%,transparent),transparent 62%);opacity:.8;transition:opacity .3s}
+.tile:hover{border-color:var(--hi)}.tile:hover::after{opacity:1}.tile>*{position:relative;z-index:1}
+.tile .ico{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:#fff;margin-bottom:auto;background:linear-gradient(135deg,color-mix(in srgb,var(--h) 78%,#fff),var(--h));border:1px solid rgb(255 255 255/.5);box-shadow:inset 0 1px 0 rgb(255 255 255/.5),0 12px 24px -10px var(--h);transition:transform .4s var(--ease);translate:calc(var(--dx,0)*5px) calc(var(--dy,0)*5px)}
+.tile:hover .ico{transform:scale(1.1) rotate(-5deg)}.tile .ico svg{width:24px;height:24px}
+.tile strong{font-size:17px;font-weight:600}.tile .tag{color:var(--muted);font-size:12.5px}
+.tile .key{position:absolute;right:16px;bottom:16px}
+.star{position:absolute;right:12px;top:12px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted);background:var(--field);border:1px solid var(--edge);opacity:0;transform:scale(.8);transition:opacity .25s,transform .3s var(--ease),color .2s}
+.tile:hover .star,.star:focus-visible{opacity:1;transform:none}.star:hover{color:var(--c4)}.star svg{width:16px;height:16px}
+.tile.lifted{opacity:.2}.ghost{position:fixed;left:0;top:0;z-index:70;pointer-events:none;margin:0;box-shadow:0 40px 80px -20px var(--shadow),inset 0 1px 0 var(--hi)}
+.none{padding:30px;text-align:center;color:var(--muted)}
+
+/* palette + toast */@keyframes fade{from{opacity:0}}
+.toast{position:fixed;left:50%;bottom:28px;z-index:60;transform:translate(-50%,24px);opacity:0;pointer-events:none;padding:11px 20px;border-radius:999px;background:linear-gradient(135deg,var(--ga),var(--gb)),rgb(20 22 60/.45);backdrop-filter:var(--blur);border:1px solid var(--edge);box-shadow:0 20px 40px -16px var(--shadow),inset 0 1px 0 var(--hi);transition:opacity .3s,transform .4s var(--ease)}
+body[data-theme=light] .toast{background:linear-gradient(135deg,var(--ga),var(--gb)),rgb(255 255 255/.6)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){.layout{grid-template-columns:1fr}.hide-s,.chgm .lbl{display:none}.m-orb{display:none}}
+@media (max-width:560px){.brand span:last-child{display:none}.dock{padding:8px}.main{padding:20px}}
+@media (prefers-reduced-motion:reduce),(prefers-reduced-motion:no-preference){body.reduce-motion *{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+
+/* ---- v11: deeper glass, richer background, per-app 3D scenes ---- */
+.o5{width:30vmax;height:30vmax;left:40vw;top:-16vmax;background:var(--c4);opacity:.4;animation-duration:34s}
+.o6{width:34vmax;height:34vmax;left:-14vmax;bottom:-10vmax;background:var(--c5);opacity:.4;animation-duration:27s}
+@keyframes flt{to{transform:translateY(-28px) rotate(8deg)}}
+.gem{animation:flt 10s ease-in-out infinite alternate}
+.sph,.cap,.tor{position:absolute;width:var(--s);translate:var(--tx,0) var(--ty,0);backdrop-filter:blur(4px);animation:flt var(--t,9s) ease-in-out infinite alternate}
+.sph{height:var(--s);border-radius:50%;background:radial-gradient(circle at 30% 25%,rgb(255 255 255/.95),rgb(255 255 255/.3) 16%,color-mix(in srgb,var(--h) 55%,transparent) 55%,color-mix(in srgb,var(--h) 85%,#000) 100%);box-shadow:inset -10px -14px 26px rgb(0 0 0/.28),inset 8px 10px 16px rgb(255 255 255/.45),0 34px 44px -22px var(--shadow)}
+.cap{height:calc(var(--s)*.36);border-radius:999px;rotate:var(--a);background:linear-gradient(180deg,rgb(255 255 255/.3),rgb(255 255 255/.04) 55%),linear-gradient(135deg,var(--ga),var(--gb));border:1px solid var(--edge);box-shadow:inset 0 2px 2px var(--hi),inset 0 -10px 20px rgb(255 255 255/.1),0 30px 50px -26px var(--shadow)}
+.tor{height:var(--s);border-radius:50%;border:calc(var(--s)*.07) solid rgb(255 255 255/.14);rotate:1 .3 0 62deg;animation:tw 24s linear infinite;box-shadow:inset 0 3px 3px var(--hi),inset 0 -6px 12px rgb(0 0 0/.2),0 24px 34px -18px var(--shadow)}
+@keyframes tw{to{transform:rotate(360deg)}}
+.glass{backdrop-filter:blur(34px) saturate(200%) brightness(1.08);-webkit-backdrop-filter:blur(34px) saturate(200%) brightness(1.08);background:linear-gradient(180deg,rgb(255 255 255/.28),rgb(255 255 255/0) 38%),linear-gradient(135deg,var(--ga),var(--gb));border-top-color:var(--hi);border-left-color:var(--hi);box-shadow:0 44px 80px -32px var(--shadow),0 10px 20px -12px var(--shadow),inset 0 2px 1px var(--hi),inset 1px 0 1px rgb(255 255 255/.28),inset 0 -16px 30px -12px rgb(255 255 255/.16),inset 0 -2px 6px rgb(0 0 0/.14)}
+.glass.ghost{box-shadow:0 56px 90px -24px var(--shadow),inset 0 2px 1px var(--hi)}
+.tile:hover{transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(1.04)}
+.tile .ico,.m-orb .ico{box-shadow:inset 0 3px 2px rgb(255 255 255/.8),inset 0 -9px 16px rgb(0 0 0/.24),inset 0 0 0 1px rgb(255 255 255/.3),0 20px 32px -10px var(--h)}
+.tile .ico::after,.m-orb .ico::after{content:"";position:absolute;inset:5% 14% 55%;border-radius:50%/70%;background:linear-gradient(rgb(255 255 255/.8),transparent)}
+.m-orb .ico{z-index:3}
+.main>.sweep{position:absolute;top:-20%;bottom:-20%;left:-40%;width:30%;background:linear-gradient(100deg,transparent,rgb(255 255 255/.3),transparent);transform:skewX(-18deg);animation:swp 6.5s ease-in-out infinite;pointer-events:none}
+@keyframes swp{0%,55%{translate:0}100%{translate:560%}}
+.m-orb{transform-style:preserve-3d;perspective:800px;transform:rotateX(calc(var(--rx,0deg)*-1.6)) rotateY(calc(var(--ry,0deg)*1.6))}
+.s{--w:14%;position:absolute;left:50%;top:50%;width:var(--w);aspect-ratio:1;margin:calc(var(--w)/-2) 0 0 calc(var(--w)/-2);border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff,color-mix(in srgb,var(--h) 55%,#fff) 28%,var(--h) 62%,color-mix(in srgb,var(--h) 55%,#000));box-shadow:inset -4px -6px 10px rgb(0 0 0/.25),0 10px 18px -6px var(--h)}
+.m-name span{animation-fill-mode:backwards}
+/* AI Hub — neural orbit */
+[data-id=ai-hub] .s{--w:calc(8% + var(--k)*1.6%);animation:orb calc(6s + var(--k)*1.4s) linear infinite}
+@keyframes orb{from{transform:rotateZ(calc(var(--k)*60deg)) rotateX(68deg) translateX(300%) rotateX(-68deg)}to{transform:rotateZ(calc(var(--k)*60deg + 360deg)) rotateX(68deg) translateX(300%) rotateX(-68deg)}}
+[data-id=ai-hub] .ico{animation:ic1 4s ease-in-out infinite}@keyframes ic1{50%{transform:translateY(-8px) rotateY(18deg)}}
+[data-id=ai-hub] .m-name span,[data-id=clipboard] .m-name span{animation:rise .8s var(--ease) backwards,wv 3s ease-in-out infinite;animation-delay:calc(var(--i)*28ms),calc(var(--i)*120ms + 1s)}@keyframes wv{50%{transform:translateY(-7px)}}
+/* Prompt Studio — typing lines */
+[data-id=instruction-forge] .s{--w:calc(28% + var(--k)*5%);height:7%;aspect-ratio:auto;border-radius:99px;left:4%;top:calc(10% + var(--k)*12%);margin:0;translate:0 0 -50px;transform-origin:left;animation:typ 3.6s ease-in-out infinite;animation-delay:calc(var(--k)*.35s)}
+@keyframes typ{0%{transform:scaleX(0);opacity:1}35%,70%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+[data-id=instruction-forge] .ico{animation:ic2 3s ease-in-out infinite}@keyframes ic2{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+[data-id=instruction-forge] .r1{animation-direction:reverse;animation-duration:14s}
+/* AI Playground — rising bubbles */
+[data-id=ai-lab] .s{--w:calc(7% + var(--k)*1.5%);top:auto;bottom:4%;margin:0;left:calc(16% + var(--k)*11%);opacity:0;animation:bub calc(3.4s + var(--k)*.5s) ease-in infinite;animation-delay:calc(var(--k)*-.9s)}
+@keyframes bub{0%{opacity:0;transform:translateY(0) scale(.5)}15%{opacity:.95}50%{transform:translate(14px,-120px)}100%{opacity:0;transform:translate(-10px,-240px) scale(1.15)}}
+[data-id=ai-lab] .ico{animation:ic3 3.4s ease-in-out infinite}@keyframes ic3{40%{transform:rotate(-14deg) scale(1.05)}70%{transform:rotate(10deg)}}
+[data-id=ai-lab] .m-name span{animation:rise .8s var(--ease) backwards,wb 2.6s ease-in-out infinite;animation-delay:calc(var(--i)*28ms),calc(var(--i)*140ms + 1s)}@keyframes wb{50%{transform:rotate(-6deg) scale(1.08)}}
+/* Video Hub — spinning reel */
+[data-id=video-hub] .s{--w:9%;border-radius:28%;animation:reel 5s linear infinite}
+@keyframes reel{from{transform:rotate(calc(var(--k)*60deg)) translateX(430%)}to{transform:rotate(calc(var(--k)*60deg + 360deg)) translateX(430%)}}
+[data-id=video-hub] .r1{animation-duration:5s;animation-direction:reverse}[data-id=video-hub] .r2{animation:spin 3s linear infinite;border-top-color:var(--h);border-top-width:3px}
+[data-id=video-hub] .ico{animation:ic4 2s ease-in-out infinite}@keyframes ic4{15%{transform:scale(1.13)}30%{transform:scale(1)}}
+/* Image Hub — flipping glass tiles */
+[data-id=image-hub] .s{--w:22%;border-radius:22%;left:calc(8% + var(--c)*29%);top:calc(18% + var(--r)*34%);margin:0;translate:0 0 -40px;animation:flp 4.8s ease-in-out infinite;animation-delay:calc(var(--k)*.35s)}
+@keyframes flp{0%,60%,100%{rotate:0 1 0 0deg}30%{rotate:0 1 0 180deg}}
+[data-id=image-hub] .ico{animation:ic5 7s ease-in-out infinite}@keyframes ic5{to{transform:perspective(500px) rotateY(360deg)}}
+[data-id=image-hub] .m-name span,[data-id=video-hub] .m-name span{animation:rise .8s var(--ease) backwards,fz 3s ease-in-out infinite;animation-delay:calc(var(--i)*28ms),calc(var(--i)*110ms + 1s)}@keyframes fz{50%{filter:blur(2px);opacity:.7}}
+/* Notes & Tasks — fanning cards */
+[data-id=clipboard] .s{--w:56%;height:15%;aspect-ratio:auto;border-radius:16px;top:calc(6% + var(--k)*11%);margin:0 0 0 calc(var(--w)/-2);opacity:.9;translate:0 0 calc(var(--k)*-8px);animation:fan 4.2s ease-in-out infinite;animation-delay:calc(var(--k)*.12s)}
+@keyframes fan{50%{transform:translateX(calc((var(--k) - 3.5)*14px)) rotate(calc((var(--k) - 3.5)*3deg))}}
+[data-id=clipboard] .ico{animation:ic6 3.6s ease-in-out infinite}@keyframes ic6{50%{transform:translateY(-6px) rotate(3deg)}}
+
+/* ---- v12: see-through glass — light blur, thin fill, background visible behind every card ---- */
+body{--ga:rgb(255 255 255/.085);--gb:rgb(255 255 255/.015)}
+body[data-theme=light]{--ga:rgb(255 255 255/.34);--gb:rgb(255 255 255/.08)}
+.glass{backdrop-filter:blur(11px) saturate(185%);-webkit-backdrop-filter:blur(11px) saturate(185%);background:linear-gradient(180deg,rgb(255 255 255/.15),rgb(255 255 255/0) 34%),linear-gradient(135deg,var(--ga),var(--gb))}
+.menu.glass{backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%)}
+.tile::after{background:radial-gradient(110% 90% at 0 0,color-mix(in srgb,var(--h) 20%,transparent),transparent 60%)}
+.main::after{background:radial-gradient(90% 120% at 100% 100%,color-mix(in srgb,var(--h) 22%,transparent),transparent 62%)}
+.pn{background:color-mix(in srgb,var(--field) 45%,transparent)}
+.gem{background:linear-gradient(135deg,rgb(255 255 255/.2),rgb(255 255 255/.04))}
+
+
+
+/* ===== Glass hero icon clarity: keep the selected app glyph crisp and use its own accent ===== */
+/* The main card carries data-h (1–6), so the existing per-app --h mapping should flow through unchanged. */
+.main .m-orb { perspective: none; transform: none; transform-style: flat; }
+.main .m-orb > .ico {
+  animation: none !important;
+  transform: none !important;
+  rotate: 0deg !important;
+  translate: 0 0 !important;
+  filter: none !important;
+  will-change: auto;
+  backface-visibility: visible;
+}
+.main .m-orb > .ico svg {
+  animation: none !important;
+  transform: none !important;
+  rotate: 0deg !important;
+  filter: none !important;
+}
+
+/* ===== Desktop fit pass: preserve the glass aesthetic while fitting header, hero, gauges and all app tiles ===== */
+@media (min-width: 900px) and (min-height: 480px) {
+  html,body { height: 100%; overflow: hidden; }
+  .home {
+    display: flex; flex-direction: column; overflow: hidden;
+    padding: 10px clamp(12px, 2vw, 28px) 12px;
+  }
+  .top { position: relative; top: auto; flex: 0 0 auto; width: min(1240px, 100%); margin: 0 auto 10px; }
+  .dock { gap: 10px; padding: 7px 10px; border-radius: 28px; }
+  .mark { width: 30px; height: 30px; border-radius: 10px; }
+  .chip,.chgm,.icon { height: 32px; }
+  .layout {
+    width: min(1240px, 100%); flex: 1 1 auto; min-height: 0; height: auto;
+    display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, .88fr);
+    grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px 14px; align-content: stretch;
+  }
+  .hello { grid-column: 1 / -1; padding: 0 6px; }
+  .hello h1 { font-size: clamp(25px, 2.6vw, 34px); line-height: 1.05; }
+  .hello p { margin-top: 3px; font-size: 12px; }
+  .stage { grid-column: 1; grid-row: 2; min-height: 0; }
+  .main { height: 100%; min-height: 0; padding: 15px 17px; border-radius: 27px; }
+  .m-bar { gap: 8px; }
+  .badge { padding: 5px 10px; font-size: 10px; }
+  .m-st { font-size: 11px; }
+  .m-body { gap: 13px; padding-top: 7px; }
+  .m-name { font-size: clamp(27px, 2.8vw, 41px); }
+  .fcs { gap: 6px; margin: 10px 0 12px; }
+  .fc { padding: 5px 9px; font-size: 11px; }
+  .open { padding: 10px 15px; font-size: 13px; }
+  .m-orb { width: min(155px, 18vw); max-width: 155px; }
+  .m-orb .ico svg { width: 48%; height: 48%; }
+  .sys { grid-column: 2; grid-row: 2; height: 100%; min-height: 0; padding: 10px; gap: 8px; border-radius: 25px; overflow: hidden; }
+  .sys .sec-h { margin-bottom: 0; }
+  .sys .sec-h h2 { font-size: 13px; }
+  .sys .hint { font-size: 10px; }
+  .pn { display: grid; grid-template-columns: minmax(0, 1fr) minmax(78px, .65fr); grid-template-rows: 1fr; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 18px; min-height: 0; }
+  .pn-top { gap: 8px; min-width: 0; }
+  .gauge { width: 52px; height: 52px; }
+  .gauge b { font-size: 13px; }
+  .pn-txt .lbl { font-size: 10px; }
+  .pn-txt>b { font-size: 18px; }
+  .pn-txt small { font-size: 10px; line-height: 1.15; }
+  .spark { grid-column: 2; height: 27px; align-self: center; }
+  .rail { grid-column: 1 / -1; grid-row: 3; margin-top: 0; min-height: 0; }
+  .rail .sec-h { margin-bottom: 7px; padding-inline: 6px; }
+  .rail .sec-h h2 { font-size: 18px; }
+  .rail .hint { font-size: 10px; }
+  .apps { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .tile { min-height: 110px; padding: 12px; border-radius: 22px; gap: 6px; }
+  .tile .ico { width: 38px; height: 38px; border-radius: 13px; }
+  .tile .ico svg { width: 20px; height: 20px; }
+  .tile strong { font-size: 14px; line-height: 1.15; }
+  .tile .tag { font-size: 10.5px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .key { right: 10px; bottom: 9px; }
+  .tile .star { right: 8px; top: 7px; width: 27px; height: 27px; }
+}
+
+@media (min-width: 900px) and (min-height: 480px) and (max-height: 760px) {
+  .home { padding-top: 7px; padding-bottom: 8px; }
+  .top { margin-bottom: 7px; }
+  .layout { gap: 7px 12px; }
+  .main { padding: 12px 14px; }
+  .m-orb { width: min(132px, 16vw); }
+  .sys { padding: 8px; gap: 6px; }
+  .pn { padding: 6px 8px; }
+  .tile { min-height: 98px; padding: 9px 10px; }
+}
+
+
+/* ===== Audit consistency pass (Glass) =====
+   - header/content share one width that grows on large windows instead of freezing at 1240px
+   - greeting aligns with the dock's inner edge and the subtitle stays readable over the busy scene
+   - Live System panels are stacked: gauge + readout on top, sparkline fills the remaining panel height
+   - gauge, hero orb and type scale with window height so tall windows do not leave empty panels */
+@media (min-width: 900px) and (min-height: 480px) {
+  .top,.layout { width: min(clamp(1240px, 88vw, 1840px), 100%); max-width: none; }
+  .top { margin-bottom: 14px; }
+  .hello { padding: 0 12px; }
+  .hello p { color: color-mix(in srgb, var(--text) 82%, transparent); text-shadow: 0 1px 14px rgb(0 0 0/.45), 0 0 2px rgb(0 0 0/.25); font-weight: 400; }
+  body[data-theme=light] .hello p { text-shadow: 0 1px 10px rgb(255 255 255/.7); }
+  .main { --o: clamp(150px, 20vh, 230px); }
+  .m-orb { display: grid; width: var(--o); max-width: none; flex: none; }
+  .m-name { font-size: clamp(27px, min(2.8vw, 4.6vh), 54px); }
+  .sys { display: flex; flex-direction: column; }
+  .sys .sec-h { flex: none; }
+  .pn { flex: 1 1 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); align-items: stretch; align-content: stretch; gap: 8px; padding: clamp(8px, 1.4vh, 16px) 12px; }
+  .pn-top { align-self: start; }
+  .pn .spark { grid-column: 1; height: 100%; min-height: 26px; align-self: stretch; }
+  .spark .line { stroke-width: 2.5; }
+  .gauge { width: clamp(52px, 8.4vh, 84px); height: clamp(52px, 8.4vh, 84px); }
+  .gauge b { font-size: clamp(13px, 1.9vh, 18px); }
+  .pn-txt .lbl { font-size: clamp(10px, 1.45vh, 13px); }
+  .pn-txt>b { font-size: clamp(18px, 2.8vh, 28px); }
+  .pn-txt small { font-size: clamp(10px, 1.4vh, 12.5px); }
+}
+@media (min-width: 900px) and (min-height: 480px) and (max-height: 760px) {
+  .main { --o: 126px; }
+  .gauge { width: 52px; height: 52px; }
+}
+
+/* Minimum-size compact pass: 900 x 560 keeps hero, live system and every app tile in one view.
+   .home stays scrollable here as a safety net because the real content viewport is shorter than the window bounds. */
+@media (min-width: 900px) and (min-height: 480px) and (max-height: 639px) {
+  .home { overflow-y: auto; padding-top: 6px; padding-bottom: 8px; }
+  .top { margin-bottom: 6px; }
+  .dock { padding: 5px 9px; }
+  .hello p { display: none; }
+  .hello h1 { font-size: 22px; }
+  .layout { min-height: 400px; gap: 6px 12px; }
+  .main { --o: 96px; padding: 8px 12px 10px; }
+  .m-body { padding-top: 2px; gap: 10px; }
+  .m-name { font-size: 24px; }
+  .fcs { margin: 6px 0 8px; } .fc { padding: 3px 8px; font-size: 10px; } .open { padding: 7px 12px; font-size: 12px; }
+  .rail .sec-h { margin-bottom: 4px; } .rail .sec-h h2 { font-size: 15px; }
+  .tile { min-height: 84px; padding: 7px 9px; gap: 3px; }
+  .tile .ico { width: 30px; height: 30px; border-radius: 10px; }
+  .tile .ico svg { width: 16px; height: 16px; }
+  .tile .tag { padding-right: 24px; }
+  .tile .key { right: 8px; bottom: 7px; min-width: 20px; height: 20px; }
+  .sys { padding: 6px; gap: 4px; }
+  .pn { padding: 5px 8px; gap: 3px; }
+  .gauge { width: 40px; height: 40px; } .gauge b { font-size: 11px; }
+  .pn-txt>b { font-size: 15px; }
+}
+
+/* ===== Quick Access trigger: self-contained, same size and skin as the neighbouring icon buttons so the dock does not grow ===== */
+body[data-home-style="glass"] .madstation-theme-quick-access .madstation-theme-quick-trigger{appearance:none;-webkit-appearance:none;box-sizing:border-box;width:36px;height:36px;min-width:36px;min-height:36px;flex:0 0 36px;padding:0;border:1px solid var(--edge);border-radius:999px;background:var(--field);color:var(--text);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;transition:background .25s,transform .25s var(--ease)}
+body[data-home-style="glass"] .madstation-theme-quick-access .madstation-theme-quick-trigger:hover{background:var(--ga);border-color:var(--edge);transform:translateY(-1px)}
+body[data-home-style="glass"] .madstation-theme-quick-access .madstation-theme-quick-trigger .madstation-theme-quick-glyph{width:17px;height:17px;stroke-width:1.7}
+@media (min-width: 900px) and (min-height: 480px){body[data-home-style="glass"] .madstation-theme-quick-access .madstation-theme-quick-trigger{height:32px;min-height:32px}}
+
+/* Theme-matched process-monitor refresh control. */
+.sys-head-actions { display:inline-flex; align-items:center; justify-content:flex-end; gap:9px; min-width:0; }
+.sys-refresh-btn { flex:none; display:inline-grid; place-items:center; width:28px; height:28px; padding:0; border:1px solid color-mix(in srgb,var(--a) 32%,var(--edge)); border-radius:10px; background:color-mix(in srgb,var(--field) 75%,transparent); color:var(--a); box-shadow:inset 0 1px 0 var(--hi),0 5px 14px var(--shadow); backdrop-filter:blur(12px); transition:background .2s,border-color .2s,transform .2s; }
+.sys-refresh-btn svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .48s; }
+.sys-refresh-btn:hover { background:color-mix(in srgb,var(--a) 18%,var(--field)); border-color:var(--a); transform:translateY(-1px); }
+.sys-refresh-btn.is-refreshing svg { transform:rotate(360deg); }
+
+/* Glass refresh control: preserve the light-mode button styling and recolor only the arrow glyph. */
+body[data-home-style="glass"] .sys-refresh-btn svg { stroke: #fff; color: #fff; }
+body[data-home-style="glass"][data-theme="light"] .sys-refresh-btn svg { stroke: #111; color: #111; }
+
+
+/* Keyboard focus remains visible even though the input itself has a reset outline. */
+</style>
+ <link href="home-style-chrome.css" rel="stylesheet"/>
+ <link href="home-topbar-theme.css" rel="stylesheet"/>
+ <link href="home-quick-access-theme.css" rel="stylesheet"/>
+</head>
+<body data-theme="dark" data-home-style="glass">
+<div class="layers" aria-hidden="true">
+  <i class="orb o1" data-d="40"></i><i class="orb o2" data-d="70"></i><i class="orb o3" data-d="55"></i><i class="orb o4" data-d="90"></i><i class="orb o5" data-d="30"></i><i class="orb o6" data-d="65"></i>
+    <i class="tor" data-d="45" style="--s:260px;left:14vw;top:58vh"></i><i class="tor" data-d="75" style="--s:150px;left:80vw;top:4vh"></i>
+  <i class="cap" data-d="50" style="--s:220px;--a:-24deg;left:56vw;top:8vh;--t:11s"></i><i class="cap" data-d="85" style="--s:160px;--a:32deg;left:2vw;top:12vh;--t:8s"></i><i class="cap" data-d="30" style="--s:260px;--a:-12deg;left:70vw;top:78vh;--t:13s"></i>
+  <i class="sph" data-h="3" data-d="80" style="--s:110px;left:62vw;top:58vh;--t:9s"></i><i class="sph" data-h="6" data-d="110" style="--s:64px;left:44vw;top:12vh;--t:7s"></i><i class="sph" data-h="2" data-d="40" style="--s:150px;left:-30px;top:72vh;--t:12s"></i><i class="sph" data-h="4" data-d="95" style="--s:46px;left:88vw;top:48vh;--t:6s"></i><i class="sph" data-h="5" data-d="70" style="--s:84px;left:30vw;top:84vh;--t:10s"></i>
+  <i class="gem g1" data-d="26"></i><i class="gem g2" data-d="60"></i><i class="gem g3" data-d="14"></i>
+</div>
+
+<main class="home" id="launcherScreen" aria-label="Mad Station home">
+  <header class="top">
+    <div class="dock glass rise">
+      <div class="brand"><span class="mark"><svg viewBox="0 0 32 32"><path d="M16 3.5 27.5 10v12L16 28.5 4.5 22V10L16 3.5Z" opacity=".5"/><path d="M10.5 21V12l5.5 5.2L21.5 12v9"/></svg></span><span><b>Mad</b> Station</span></div>
+      <div class="top-r">
+        <span class="chip" aria-label="Current time" hidden><i class="dot"></i><b id="clock">--:--</b></span>
+        <span class="chip hide-s" hidden>RAM <b id="chipRam">–</b><i class="bar"><u id="ramBar"></u></i></span>
+        <span class="chip hide-s" hidden>CPU <b id="chipCpu">–</b><i class="bar"><u id="cpuBar"></u></i></span>
+        <div class="menu-wrap">
+          <button class="icon" id="homeCustomizeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Customize" title="Customize"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+          <div class="menu glass" id="homeMenu" hidden></div>
+        </div>
+        <button class="icon" id="themeBtn" type="button" aria-label="Toggle theme" title="Day / night"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button>
+        <div class="madstation-theme-quick-access" data-theme-quick-access data-qa-skin="glass">
+        <button class="madstation-theme-quick-trigger" data-theme-quick-trigger type="button" aria-label="Quick Access: theme and appearance" title="Theme &amp; appearance" aria-haspopup="dialog" aria-expanded="false" aria-controls="themeQuickAccessMenu">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="madstation-theme-quick-glyph"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.4 0 2-.9 2-1.8 0-.6-.3-1-.6-1.4-.4-.5-.6-.9-.6-1.5 0-1 .8-1.8 1.8-1.8H17a3.5 3.5 0 0 0 3.5-3.5C20.5 6.6 16.7 3.5 12 3.5Z"/><path d="M7.6 11h.01M10.2 7.6h.01M14.4 7.6h.01"/></svg><span class="madstation-theme-quick-sr">Quick Access</span>
+        </button>
+        <div class="madstation-theme-quick-menu" id="themeQuickAccessMenu" data-theme-quick-menu role="dialog" aria-label="Theme and appearance" hidden></div>
+      </div>
+      <button class="icon" id="launcherSettingsBtn" type="button" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l-.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="hello" aria-label="Welcome"><h1 id="hello">Welcome back</h1><p>Your main app is warmed up and ready.</p></section>
+    <section class="stage rise" style="--i:4" aria-label="Main app"><article class="main glass" id="mainCard" tabindex="0" role="button"></article></section>
+    <section class="glass sys rise" style="--i:5" aria-label="Live system">
+      <div class="sec-h"><h2><i class="dot"></i>Live system</h2><div class="sys-head-actions"><span class="hint" id="procs">–</span><button class="sys-refresh-btn" type="button" data-memory-refresh title="Refresh process monitor" aria-label="Refresh process monitor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"></path><path d="M20 4v5h-5"></path></svg></button></div></div>
+      <div class="pn" data-h="6">
+        <div class="pn-top"><div class="gauge"><svg viewBox="0 0 44 44"><circle class="trk" cx="22" cy="22" r="18"/><circle class="val" id="ramRing" cx="22" cy="22" r="18" pathLength="100"/></svg><b id="ramBig">–</b></div>
+          <div class="pn-txt"><span class="lbl">App memory</span><b id="ramState">–</b><small id="ramSub">Measuring…</small></div></div>
+        <svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none"><path class="area" id="ramArea"/><path class="line" id="ramLine"/></svg>
+      </div>
+      <div class="pn" data-h="5">
+        <div class="pn-top"><div class="gauge"><svg viewBox="0 0 44 44"><circle class="trk" cx="22" cy="22" r="18"/><circle class="val" id="cpuRing" cx="22" cy="22" r="18" pathLength="100"/></svg><b id="cpuBig">–</b></div>
+          <div class="pn-txt"><span class="lbl">Processor</span><b id="cpuState">–</b><small>System load</small></div></div>
+        <svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none"><path class="area" id="cpuArea"/><path class="line" id="cpuLine"/></svg>
+      </div>
+    </section>
+    <section class="rail" aria-label="More apps">
+      <div class="sec-h"><h2>More apps</h2><span class="hint">Drag a tile onto the main panel to replace it · drag to reorder</span></div>
+      <div class="apps" id="homeApps"></div>
+      <p class="none" id="noMatch" hidden>No app matches that.</p>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="homeToast" role="status" aria-live="polite"></div>
+
+<script>
+// Mad Station — Home v10 "Glass". Self-contained; keeps the app's hooks, storage keys and shortcuts.
+(function () {
+  'use strict';
+  const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
+  const svg = (p) => `<svg viewBox="0 0 24 24">${p}</svg>`;
+  const ARROW = svg('<path d="M5 12h14M13 6l6 6-6 6"/>');
+  const APPS = [
+    { id: 'ai-hub', name: 'AI Hub', h: 1, tag: 'Accounts · Providers · Sessions', icon: '<circle cx="12" cy="12" r="2.6"/><circle cx="6" cy="7" r="1.4"/><circle cx="18" cy="6" r="1.4"/><circle cx="18" cy="18" r="1.4"/><path d="M9.8 10.3 7.2 8.1M14.4 9.9l2.4-2.4M14.2 14.3l2.7 2.2"/>' },
+    { id: 'instruction-forge', name: 'Prompt Studio', h: 2, tag: 'Refine · Clarify · Structure', icon: '<path d="M5 6.5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H10l-4 3v-5.2a2 2 0 0 1-1-1.8v-5z"/><path d="M8 8.5h7M8 11.5h5"/>' },
+    { id: 'ai-lab', name: 'AI Playground', h: 4, tag: 'Arena · API · Local AI', icon: '<path d="M9 3h6M10 3v5l-4.6 9.1A2 2 0 0 0 7.2 20h9.6a2 2 0 0 0 1.8-2.9L14 8V3"/><path d="M8 14h8"/>' },
+    { id: 'video-hub', name: 'Video Hub', h: 3, tag: 'AI Video · Daily Credits', icon: '<rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="m10 9 5 3-5 3z"/>' },
+    { id: 'image-hub', name: 'Image Hub', h: 5, tag: 'AI Images · Edit · Upscale', icon: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>' },
+    { id: 'clipboard', name: 'Notes & Tasks', h: 6, tag: 'Notes · Checklists', icon: '<rect x="4" y="5" width="13" height="15" rx="2"/><path d="M8 9h6M8 12h5M8 15h4"/><circle cx="18" cy="16" r="4"/><path d="m16.4 16 1.1 1.1 2.2-2.3"/>' },
+  ];
+  const K_ORDER = 'mad-home-v8-order', K_HIDDEN = 'mad-home-v8-hidden', K_MAIN = 'mad-home-v8-main', K_THEME = 'mad-home-glass-theme';
+  const load = (k) => { try { return JSON.parse(localStorage.getItem(k)) || []; } catch (e) { return []; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const byId = (id) => APPS.find((a) => a.id === id);
+  const home = $('#launcherScreen'), grid = $('#homeApps'), mcard = $('#mainCard'), tiles = {};
+  const reduce = () => document.body.classList.contains('reduce-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const letters = (t) => [...t].map((c, i) => `<span style="--i:${i}">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+  const SATS = [1, 2, 3, 4, 5, 6].map((k) => `<i class="s" style="--k:${k};--c:${(k - 1) % 3};--r:${k > 3 ? 1 : 0}"></i>`).join('');
+  let launcher = null, suppressClick = false, d = null;
+
+  /* ---------- host hooks (same names the old Home used) ---------- */
+  window.MadHomeApps = { setLauncher(fn) { if (typeof fn === 'function') launcher = fn; } };
+  window.MadHome = { inApp: window.parent !== window || !!window.MadStationMemoryMonitor, setStats() {} };
+  function toast(t) { const n = $('#homeToast'); n.textContent = t; n.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => n.classList.remove('show'), 1800); }
+  function launch(id) {
+    const a = byId(id); if (!a) return;
+    const el = id === main ? mcard : tiles[id];
+    if (!reduce()) el.animate([{ scale: 1 }, { scale: .965 }, { scale: 1 }], { duration: 320, easing: 'ease-out' });
+    if (launcher) launcher(id); else toast(`Opening ${a.name}…`);
+  }
+
+  /* ---------- greeting ---------- */
+  (function () { const h = new Date().getHours(); $('#hello').innerHTML = letters(h < 5 ? 'Burning the midnight oil' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'); })();
+
+  /* ---------- main app + tiles ---------- */
+  let main = 'ai-hub'; try { const m = localStorage.getItem(K_MAIN); if (byId(m)) main = m; } catch (e) {}
+  const STAR_P = '<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>';
+  const isShown = (id) => id === main || !tiles[id].hidden;
+  APPS.forEach((a) => {
+    const el = document.createElement('div');
+    el.className = 'tile glass rise'; el.dataset.id = a.id; el.dataset.h = a.h;
+    el.tabIndex = 0; el.setAttribute('role', 'button'); el.setAttribute('aria-label', `${a.name}. Enter to open, Alt plus arrow keys to move.`);
+    el.innerHTML = `<button class="star" type="button" aria-label="Make ${a.name} the main app" title="Make main app">${svg(STAR_P)}</button><span class="ico">${svg(a.icon)}</span><strong>${a.name}</strong><span class="tag">${a.tag}</span><span class="key"></span>`;
+    tiles[a.id] = el;
+  });
+  function renderMain(pop) {
+    const a = byId(main); mcard.dataset.h = a.h; mcard.dataset.id = a.id;
+    mcard.setAttribute('aria-label', `Main app: ${a.name}. Enter to open.`);
+    document.body.style.setProperty('--mh', `var(--c${a.h})`);
+    const fc = a.tag.split(' · ').map((t, i) => `<span class="fc" style="animation-delay:${-i * 1.2}s">${t}</span>`).join('');
+    mcard.innerHTML = `<i class="sweep"></i><div class="m-bar"><span class="badge">${svg(STAR_P)}Main app</span><span class="m-st"><i class="dot"></i>Ready</span><span class="key">1</span></div>
+      <div class="m-body"><div class="m-txt"><strong class="m-name" aria-label="${a.name}">${letters(a.name)}</strong><div class="fcs">${fc}</div><button class="open" type="button">Open ${a.name}${ARROW}</button></div>
+      <div class="m-orb"><i class="ring r1"></i><i class="ring r2"></i><span class="ico">${svg(a.icon)}</span>${SATS}</div></div>`;
+    if (pop && !reduce()) mcard.animate([{ opacity: .4, filter: 'blur(12px)', scale: .96 }, { opacity: 1, filter: 'blur(0)', scale: 1 }], { duration: 560, easing: 'cubic-bezier(.2,.85,.25,1)' });
+  }
+  const numbers = () => [...grid.children].filter((c) => !c.hidden).forEach((c, i) => { c.querySelector('.key').textContent = i + 2; });
+  function applyOrder() {
+    const saved = load(K_ORDER), hidden = new Set(load(K_HIDDEN));
+    [...saved.filter((i) => tiles[i]), ...APPS.map((a) => a.id).filter((i) => !saved.includes(i))].forEach((id, n) => { tiles[id].hidden = id === main || hidden.has(id); tiles[id].style.setProperty('--i', n + 6); grid.appendChild(tiles[id]); });
+    numbers(); $('#noMatch').hidden = [...grid.children].some((c) => !c.hidden);
+  }
+  const order = () => [...grid.children].map((c) => c.dataset.id);
+  function flip(change) {
+    const kids = [...grid.children].filter((c) => !c.hidden), first = new Map(kids.map((c) => [c, c.getBoundingClientRect()]));
+    change(); if (reduce()) return;
+    kids.forEach((c) => { const a = first.get(c), b = c.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top; if ((dx || dy) && b.width) c.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], { duration: 460, easing: 'cubic-bezier(.2,.9,.3,1)' }); });
+  }
+  function setMain(id) {
+    if (id === main || !byId(id)) return;
+    const ord = order(), i = ord.indexOf(id), j = ord.indexOf(main);
+    main = id; try { localStorage.setItem(K_MAIN, id); } catch (e) {}
+    [ord[i], ord[j]] = [ord[j], ord[i]]; save(K_ORDER, ord);
+    flip(applyOrder); renderMain(true); toast(`${byId(id).name} is now your main app`);
+  }
+  mcard.addEventListener('click', () => launch(main));
+  mcard.addEventListener('keydown', (e) => { if (e.target === mcard && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); launch(main); } });
+
+  /* ---------- tilt + specular light that follows the pointer ---------- */
+  function tilt(el, e, deg) {
+    const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    el.style.setProperty('--gx', x * 100 + '%'); el.style.setProperty('--gy', y * 100 + '%'); if (reduce()) return;
+    el.style.setProperty('--ry', (x - .5) * deg + 'deg'); el.style.setProperty('--rx', (.5 - y) * deg + 'deg'); el.style.setProperty('--dx', (x - .5) * 2); el.style.setProperty('--dy', (y - .5) * 2);
+  }
+  const untilt = (el) => { ['--rx', '--ry'].forEach((p) => el.style.setProperty(p, '0deg')); ['--dx', '--dy'].forEach((p) => el.style.setProperty(p, 0)); };
+  grid.addEventListener('pointermove', (e) => { if (document.body.classList.contains('dragging')) return; const t = e.target.closest('.tile'); if (t) tilt(t, e, 15); }, { passive: true });
+  grid.addEventListener('pointerout', (e) => { const t = e.target.closest('.tile'); if (t && !t.contains(e.relatedTarget)) untilt(t); });
+  mcard.addEventListener('pointermove', (e) => tilt(mcard, e, 10), { passive: true });
+  mcard.addEventListener('pointerleave', () => untilt(mcard));
+  $$('.dock,.sys').forEach((el) => el.addEventListener('pointermove', (e) => { const r = el.getBoundingClientRect(); el.style.setProperty('--gx', e.clientX - r.left + 'px'); el.style.setProperty('--gy', e.clientY - r.top + 'px'); }, { passive: true }));
+
+  /* ---------- drag to rearrange or drop onto the main app ---------- */
+  const overMain = () => { if (!d) return false; const r = mcard.getBoundingClientRect(); return d.x >= r.left && d.x <= r.right && d.y >= r.top && d.y <= r.bottom; };
+  const place = () => { d.ghost.style.transform = `translate(${d.x - d.ox}px,${d.y - d.oy}px) scale(1.05) rotate(${Math.max(-8, Math.min(8, d.vx * .5))}deg)`; };
+  function startDrag() {
+    if (!d || d.on) return; d.on = true;
+    const r = d.t.getBoundingClientRect(); d.ox = d.x - r.left; d.oy = d.y - r.top;
+    d.ghost = d.t.cloneNode(true); d.ghost.classList.add('ghost'); d.ghost.classList.remove('rise'); d.ghost.style.width = r.width + 'px'; d.ghost.style.height = r.height + 'px'; document.body.appendChild(d.ghost);
+    d.t.classList.add('lifted'); document.body.classList.add('dragging'); if (navigator.vibrate) navigator.vibrate(10); place();
+  }
+  grid.addEventListener('pointerdown', (e) => {
+    const t = e.target.closest('.tile'); if (!t || e.target.closest('.star') || (e.button && e.button !== 0)) return;
+    d = { t, vx: 0, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, type: e.pointerType, on: false };
+    if (e.pointerType === 'touch') d.timer = setTimeout(startDrag, 300);
+  });
+  document.addEventListener('pointermove', (e) => {
+    if (!d) return; d.vx = (e.clientX - d.x) * .5 + d.vx * .5; d.x = e.clientX; d.y = e.clientY;
+    if (!d.on) { const far = Math.hypot(d.x - d.sx, d.y - d.sy); if (d.type === 'touch') { if (far > 9) { clearTimeout(d.timer); d = null; } } else if (far > 6) startDrag(); return; }
+    place();
+    mcard.classList.toggle('drop', overMain());
+    const hr = home.getBoundingClientRect(); if (d.y < hr.top + 100) home.scrollTop -= 14; else if (d.y > hr.bottom - 60) home.scrollTop += 14;
+    const over = document.elementFromPoint(d.x, d.y), target = over && over.closest && over.closest('.tile');
+    if (target && target !== d.t && target.parentNode === grid) {
+      const r = target.getBoundingClientRect(), after = d.x > r.left + r.width / 2, ref = after ? target.nextElementSibling : target;
+      if (ref !== d.t && ref !== d.t.nextElementSibling) flip(() => grid.insertBefore(d.t, ref));
+    }
+  }, { passive: true });
+  document.addEventListener('touchmove', (e) => { if (d && d.on) e.preventDefault(); }, { passive: false });
+  function endDrag() {
+    if (!d) return; clearTimeout(d.timer); const cur = d, toMain = cur.on && overMain(); d = null; mcard.classList.remove('drop'); if (!cur.on) return;
+    suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
+    const cleanup = () => { cur.ghost.remove(); cur.t.classList.remove('lifted'); document.body.classList.remove('dragging'); };
+    if (toMain) { cleanup(); setMain(cur.t.dataset.id); return; }
+    const r = cur.t.getBoundingClientRect(); cur.ghost.style.transition = reduce() ? 'none' : 'transform .35s cubic-bezier(.2,.9,.3,1),opacity .35s'; cur.ghost.style.transform = `translate(${r.left}px,${r.top}px)`;
+    setTimeout(() => { cleanup(); numbers(); save(K_ORDER, order()); }, reduce() ? 0 : 320);
+  }
+  document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
+  grid.addEventListener('click', (e) => { const t = e.target.closest('.tile'); if (!t || suppressClick) return; if (e.target.closest('.star')) { e.stopPropagation(); setMain(t.dataset.id); } else launch(t.dataset.id); });
+  grid.addEventListener('keydown', (e) => {
+    const t = e.target.closest('.tile'); if (!t || e.target.closest('.star')) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); launch(t.dataset.id); return; }
+    if (!/^Arrow(Left|Right|Up|Down)$/.test(e.key)) return; e.preventDefault();
+    const vis = [...grid.children].filter((c) => !c.hidden), i = vis.indexOf(t), j = i + (/Left|Up/.test(e.key) ? -1 : 1);
+    if (j < 0 || j >= vis.length) return;
+    if (!e.altKey) { vis[j].focus(); return; }
+    flip(() => grid.insertBefore(t, j < i ? vis[j] : vis[j].nextElementSibling)); t.focus(); numbers(); save(K_ORDER, order()); toast(`${byId(t.dataset.id).name} → position ${j + 1}`);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { const wasMenu = !menu.hidden; toggleMenu(false); if (wasMenu) cbtn.focus(); return; }
+    if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if (/^[1-9]$/.test(e.key)) { const ids = [main, ...[...grid.children].filter((c) => !c.hidden).map((c) => c.dataset.id)]; if (ids[+e.key - 1]) launch(ids[+e.key - 1]); }
+  });
+
+  /* ---------- customize menu + theme ---------- */
+  const menu = $('#homeMenu'), cbtn = $('#homeCustomizeBtn');
+  const resetLayout = () => { save(K_ORDER, []); save(K_HIDDEN, []); main = 'ai-hub'; try { localStorage.removeItem(K_MAIN); } catch (e) {} renderMain(true); flip(applyOrder); toast('Layout reset'); };
+  const buildMenu = () => { const h = new Set(load(K_HIDDEN)); menu.innerHTML = '<h2>Show in list</h2>' + APPS.map((a) => `<label><input type="checkbox" data-id="${a.id}" ${a.id !== main && h.has(a.id) ? '' : 'checked'} ${a.id === main ? 'disabled' : ''}/> ${a.name}</label>`).join('') + '<button class="reset" type="button" id="resetLayout">Reset layout</button>'; };
+  function toggleMenu(open) { menu.hidden = !open; cbtn.setAttribute('aria-expanded', String(open)); if (open) buildMenu(); }
+  cbtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(menu.hidden); });
+  menu.addEventListener('click', (e) => { e.stopPropagation(); if (e.target.id === 'resetLayout') { resetLayout(); buildMenu(); } });
+  menu.addEventListener('change', (e) => { const id = e.target.dataset.id; if (!id) return; const h = new Set(load(K_HIDDEN)); e.target.checked ? h.delete(id) : h.add(id); save(K_HIDDEN, [...h]); tiles[id].hidden = !e.target.checked; numbers(); $('#noMatch').hidden = [...grid.children].some((c) => !c.hidden); });
+  document.addEventListener('click', () => toggleMenu(false));
+  try { const th = localStorage.getItem(K_THEME); if (th === 'light' || th === 'dark') document.body.dataset.theme = th; } catch (e) {}
+  $('#themeBtn').addEventListener('click', () => { const b = document.body; b.dataset.theme = b.dataset.theme === 'light' ? 'dark' : 'light'; try { localStorage.setItem(K_THEME, b.dataset.theme); } catch (e) {} });
+
+  /* ---------- clock ---------- */
+  const p2 = (n) => String(n).padStart(2, '0');
+  function tick() { const n = new Date(); $('#clock').innerHTML = p2(n.getHours()) + '<em>:</em>' + p2(n.getMinutes()); }
+  tick(); setInterval(tick, 15000);
+
+  /* ---------- live system: gauges + sparklines ---------- */
+  const hist = { ram: [], cpu: [] };
+  function spark(key, v) {
+    const a = hist[key]; a.push(Math.max(0, Math.min(100, v))); if (a.length > 40) a.shift();
+    const max = Math.max(20, ...a), pts = a.map((y, i) => [(i / 39) * 120 + (120 - ((a.length - 1) / 39) * 120), 35 - (y / max) * 29]);
+    const line = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+    $(`#${key}Line`).setAttribute('d', line); $(`#${key}Area`).setAttribute('d', `${line} L120 40 L${pts[0][0].toFixed(1)} 40 Z`);
+  }
+  function setSys(m) {
+    const ram = +m.appPercent || 0, cpu = +m.systemCpuPercent || 0, rv = Math.min(100, ram * 2.2), cv = Math.min(100, cpu);
+    $('#ramBig').textContent = Math.round(ram) + '%'; $('#cpuBig').textContent = Math.round(cpu) + '%';
+    $('#chipRam').textContent = Math.round(ram) + '%'; $('#chipCpu').textContent = Math.round(cpu) + '%'; $('#ramBar').style.width = rv + '%'; $('#cpuBar').style.width = cv + '%';
+    $('#ramSub').textContent = (m.totalLabel || '—') + ' used by Mad Station'; if (m.processCountLabel) $('#procs').textContent = m.processCountLabel + ' processes';
+    $('#ramState').textContent = ram < 25 ? 'Light' : ram < 60 ? 'Moderate' : 'Heavy';
+    $('#ramRing').setAttribute('stroke-dasharray', `${Math.max(3, rv).toFixed(1)} 100`); $('#cpuRing').setAttribute('stroke-dasharray', `${Math.max(3, cv).toFixed(1)} 100`);
+    $('#cpuState').textContent = cpu < 25 ? 'Cruising' : cpu < 60 ? 'Working' : 'Busy';
+    spark('ram', rv); spark('cpu', cpu);
+  }
+  document.addEventListener('mad:memory-model', (e) => setSys(e.detail || {}));
+  if (!window.MadHome.inApp) {
+    let ram = 9; const step = () => { ram = Math.max(5, Math.min(40, ram + (Math.random() - .5) * 3)); setSys({ appPercent: ram, systemCpuPercent: 14 + Math.random() * 30, totalLabel: (ram * 0.16).toFixed(2) + ' GB', processCountLabel: '6' }); };
+    for (let i = 0; i < 30; i++) step(); setInterval(step, 2000);
+  }
+
+  /* ---------- parallax: pointer + scroll move the glass depth layers ---------- */
+  const layers = $$('.layers>i');
+  let mx = 0, my = 0, cx = 0, cy = 0;
+  window.addEventListener('pointermove', (e) => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
+    function frame() {
+    requestAnimationFrame(frame); if (document.hidden) return;
+    cx += (mx - cx) * .06; cy += (my - cy) * .06; const sy = home.scrollTop;
+    if (!mcard.matches(':hover')) { mcard.style.setProperty('--dx', (cx * 2).toFixed(3)); mcard.style.setProperty('--dy', (cy * 2).toFixed(3)); mcard.style.setProperty('--ry', (cx * 4).toFixed(2) + 'deg'); mcard.style.setProperty('--rx', (-cy * 4).toFixed(2) + 'deg'); }
+    layers.forEach((l) => { const k = +l.dataset.d; l.style.setProperty('--tx', (-cx * k).toFixed(1) + 'px'); l.style.setProperty('--ty', (-cy * k - sy * k / 90).toFixed(1) + 'px'); });
+  }
+  if (!reduce()) frame();
+
+  renderMain(false); applyOrder();
+  $$('.dock>.brand,.top-r>*').forEach((el, i) => { el.style.animation = 'rise .8s cubic-bezier(.2,.85,.25,1) backwards'; el.style.animationDelay = 200 + i * 60 + 'ms'; });
+  window.MadHome.setMain = setMain; window.MadHome.getMain = () => main;
+})();
+</script>
+<script>
+/* Mad Station host bridge for the Glass homepage. */
+(function () {
+  'use strict';
+  const CHANNEL = 'madstation-home-glass';
+  const isFramed = window.parent !== window;
+  const allowedMemoryActions = new Set(['refresh', 'cleanup', 'details']);
+  let ready = false;
+
+  function sendHost(type, detail = {}) {
+    if (!isFramed) return false;
+    try { window.parent.postMessage({ channel: CHANNEL, type, ...detail }, '*'); return true; }
+    catch { return false; }
+  }
+
+  window.MadHomeApps?.setLauncher?.((target) => {
+    if (typeof target === 'string' && target.length <= 80) sendHost('launch', { target });
+  });
+  if (window.MadHome) {
+    window.MadHome.inApp = isFramed || Boolean(window.MadStationMemoryMonitor);
+    window.MadHome.toggleTheme = () => sendHost('toggle-theme');
+    window.MadHome.memoryAction = (action) => { if (allowedMemoryActions.has(action)) sendHost('memory-action', { action }); };
+  }
+  document.getElementById('launcherSettingsBtn')?.addEventListener('click', () => sendHost('open-settings'));
+  // Mad Station owns the theme preference while Glass is embedded; keep standalone preview toggling intact.
+  document.getElementById('themeBtn')?.addEventListener('click', (event) => {
+    if (!isFramed) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    sendHost('toggle-theme');
+  }, true);
+
+  function applySettings(settings) {
+    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return;
+    const requestedTheme = ['dark', 'light', 'system'].includes(settings.theme) ? settings.theme : document.body.dataset.theme;
+    const systemLight = Boolean(window.matchMedia?.('(prefers-color-scheme: light)').matches);
+    document.body.dataset.theme = requestedTheme === 'system' ? (systemLight ? 'light' : 'dark') : requestedTheme;
+    document.body.classList.toggle('reduce-motion', Boolean(settings.reduceMotion));
+    document.body.classList.toggle('no-hover-animation', settings.animateHover === false);
+    window.MadHome?.setStats?.({ accounts: Number(settings.accounts) || 0, providers: Number(settings.providers) || 0 });
+  }
+
+  window.addEventListener('message', (event) => {
+    if (!isFramed || event.source !== window.parent || event.data?.channel !== CHANNEL) return;
+    const message = event.data;
+    if (!message || typeof message.type !== 'string') return;
+    if (message.type === 'host-ping') {
+      if (ready) sendHost('home-ready');
+    } else if (message.type === 'appearance-settings') {
+      applySettings(message.settings);
+    } else if (message.type === 'memory-model' && message.model && typeof message.model === 'object' && !Array.isArray(message.model)) {
+      document.dispatchEvent(new CustomEvent('mad:memory-model', { detail: message.model }));
+    } else if (message.type === 'stats') {
+      window.MadHome?.setStats?.({ accounts: message.accounts, providers: message.providers });
+    }
+  });
+  window.addEventListener('error', () => { if (!ready) sendHost('home-error'); });
+  window.addEventListener('unhandledrejection', () => { if (!ready) sendHost('home-error'); });
+  function markReady() { ready = true; sendHost('home-ready'); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', markReady, { once: true });
+  else queueMicrotask(markReady);
+})();
+</script>
+
+
+<script src="developer-visual-debug.js"></script>
+<script src="home-style-settings-bridge.js"></script>
+<script src="home-quick-access-theme.js"></script>
+</body>
+</html>
