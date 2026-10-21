@@ -194,7 +194,7 @@ public final class MainActivity extends Activity {
 
     private void enqueueDownload(String rawUrl, String userAgent, String contentDisposition, String mimeType) {
         Uri uri = Uri.parse(rawUrl == null ? "" : rawUrl);
-        if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null) {
+        if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null || uri.getUserInfo() != null) {
             Toast.makeText(this, "Only secure HTTPS downloads are allowed.", Toast.LENGTH_LONG).show();
             return;
         }
@@ -236,8 +236,9 @@ public final class MainActivity extends Activity {
     private void openCurrentInExternalBrowser() {
         if (browserWebView == null) return;
         String url = browserWebView.getUrl();
-        if (url != null && url.startsWith("https://")) {
-            launchExternal(Uri.parse(url));
+        Uri uri = Uri.parse(url == null ? "" : url);
+        if ("https".equalsIgnoreCase(uri.getScheme()) && uri.getHost() != null && uri.getUserInfo() == null) {
+            launchExternal(uri);
         } else {
             Toast.makeText(this, "No secure website is open.", Toast.LENGTH_SHORT).show();
         }
