@@ -62,6 +62,11 @@ The installer is generated under `dist/` as `Mad-Station-Setup-1.6.3.exe`. See t
 - [Third-party licenses and notices](docs/licenses/THIRD_PARTY_NOTICES.md)
 - [Report a bug or suggest an improvement](https://github.com/MadLandYT/Mad-Station/issues)
 
+## Contributors & acknowledgements
+
+- **Project creator and maintainer:** MadLandYT
+- **AI-assisted development:** Cloud AI and ChatGPT, which assisted with development, code review, testing, documentation, and release preparation.
+
 ## License
 
 Mad Station is released under the [MIT License](LICENSE). Included third-party components may have their own licenses; see [Third-party notices](docs/licenses/THIRD_PARTY_NOTICES.md).
