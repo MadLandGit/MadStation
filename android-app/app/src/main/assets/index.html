@@ -348,7 +348,7 @@ var tasks=readArray(KEY.tasks).filter(function(t){return t&&typeof t.id==="strin
 var prompts=readArray(KEY.prompts).filter(function(p){return p&&typeof p.id==="string"&&typeof p.body==="string";});
 var clipboardItems=readArray(KEY.clipboard).filter(function(c){return c&&typeof c.id==="string"&&typeof c.text==="string";}).slice(0,100);
 var page="home",category="All",query="",taskFilter="all",editingNote=null,editingPrompt=null,editingTool=null,toastTimer=null;
-function isHttps(value){try{var url=new URL(String(value));return url.protocol==="https:"&&!!url.hostname;}catch(e){return false;}}
+function isHttps(value){try{var url=new URL(String(value));return url.protocol==="https:"&&!!url.hostname&&!url.username&&!url.password;}catch(e){return false;}}
 function notify(message){var el=document.getElementById("liveMessage");el.textContent=message;el.style.display="block";if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.style.display="none";},2600);}
 function openSite(url){
  if(!isHttps(url)){notify("Only secure HTTPS websites can be opened.");return;}
