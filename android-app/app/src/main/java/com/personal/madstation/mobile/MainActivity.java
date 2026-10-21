@@ -1,6 +1,7 @@
 package com.personal.madstation.mobile;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.ClipData;
@@ -9,9 +10,11 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.CookieManager;
+import android.webkit.URLUtil;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -101,6 +104,8 @@ public final class MainActivity extends Activity {
 
         browserWebView = new WebView(this);
         configureWebView(browserWebView, true);
+        browserWebView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) ->
+                enqueueDownload(url, userAgent, contentDisposition, mimeType));
         browserScreen.addView(browserWebView, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
     }
@@ -185,6 +190,47 @@ public final class MainActivity extends Activity {
     private void showHome() {
         if (browserScreen != null) browserScreen.setVisibility(View.GONE);
         if (homeWebView != null) homeWebView.setVisibility(View.VISIBLE);
+    }
+
+    private void enqueueDownload(String rawUrl, String userAgent, String contentDisposition, String mimeType) {
+        Uri uri = Uri.parse(rawUrl == null ? "" : rawUrl);
+        if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null) {
+            Toast.makeText(this, "Only secure HTTPS downloads are allowed.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+            if (manager == null) {
+                Toast.makeText(this, "Android Download Manager is unavailable.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            String fileName = URLUtil.guessFileName(rawUrl, contentDisposition, mimeType);
+            fileName = fileName.replaceAll("[^A-Za-z0-9._ -]", "_");
+            if (fileName.trim().isEmpty() || ".".equals(fileName) || "..".equals(fileName)) {
+                fileName = "mad-station-download";
+            }
+
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle(fileName);
+            request.setDescription("Download from Mad Station");
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setAllowedOverMetered(true);
+            request.setAllowedOverRoaming(false);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+            if (mimeType != null && !mimeType.trim().isEmpty()) request.setMimeType(mimeType);
+            if (userAgent != null && !userAgent.trim().isEmpty()) request.addRequestHeader("User-Agent", userAgent);
+
+            String cookieHeader = CookieManager.getInstance().getCookie(rawUrl);
+            if (cookieHeader != null && !cookieHeader.trim().isEmpty()) {
+                request.addRequestHeader("Cookie", cookieHeader);
+            }
+
+            long downloadId = manager.enqueue(request);
+            Toast.makeText(this, "Download started. Check Android notifications.", Toast.LENGTH_LONG).show();
+        } catch (IllegalArgumentException | SecurityException exception) {
+            Toast.makeText(this, "Could not start this download.", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void openCurrentInExternalBrowser() {
