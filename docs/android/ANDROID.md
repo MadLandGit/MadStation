@@ -10,6 +10,7 @@ while retaining the existing Windows application unchanged.
 
 - Touch-friendly AI-service discovery with categories, search, and favorites.
 - Built-in HTTPS browser with Back, Home, and Open in browser controls.
+- Basic native downloads through Android Download Manager, with system notifications and files saved to Downloads.
 - Custom HTTPS shortcuts with add, edit, and delete.
 - **Prompt Studio:** prompt templates for coding, research, writing, image prompts,
   and learning; a local prompt formatter; and a saved prompt library.
@@ -47,7 +48,7 @@ The APK is written to `android-app/app/build/outputs/apk/debug/app-debug.apk`.
 
 - This is a companion MVP, not a full port of every Windows feature.
 - Electron workspaces, isolated per-account browser sessions, Windows process/RAM
-  monitoring, the desktop downloads controller, and desktop homepage themes are
+  monitoring, the full desktop downloads controller, and desktop homepage themes are
   not implemented in the mobile app.
 - Websites run inside Android WebView. Some providers block embedded sign-in or
   require device-specific browser behavior; use **Open in browser** when needed.
