@@ -146,7 +146,7 @@ public final class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
-                if ("https".equals(scheme)) {
+                if ("https".equals(scheme) && uri.getHost() != null && uri.getUserInfo() == null) {
                     return false;
                 }
                 if (isBrowser && ("mailto".equals(scheme) || "tel".equals(scheme))) {
@@ -178,7 +178,7 @@ public final class MainActivity extends Activity {
 
     private void openBrowser(String url) {
         Uri uri = Uri.parse(url == null ? "" : url.trim());
-        if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null) {
+        if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null || uri.getUserInfo() != null) {
             Toast.makeText(this, "Only secure HTTPS websites can be opened in-app.", Toast.LENGTH_LONG).show();
             return;
         }
