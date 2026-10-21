@@ -54,10 +54,15 @@ test('release version is single-source and consistent', () => {
   assert.match(read('src/main.js'), /const APP_VERSION = app\.getVersion\(\);/);
 });
 
-test('README release history is ordered and the packaging note is non-release metadata', () => {
-  const headings = [...read('README.md').matchAll(/^## (v\d+\.\d+\.\d+[^\n]*)$/gm)].map((m) => m[1]);
-  assert.deepEqual(headings, ['v1.6.3 — Isometric World homepage integration', 'v1.6.0 — Migration stabilization and monitor fixes', 'v1.5.4 — Google OAuth handoff fix', 'v1.5.3 — release candidate', 'v1.5.3 release preparation']);
-  assert.match(read('README.md'), /## Release packaging note/);
+test('README is a clear GitHub landing page with current download and source links', () => {
+  const readme = read('README.md');
+  assert.ok(readme.includes('<h1 align="center">Mad Station</h1>'));
+  assert.ok(readme.includes('**Current release:** v1.6.3'));
+  assert.ok(readme.includes('Mad-Station-Setup-1.6.3.exe'));
+  assert.ok(readme.includes('Build from source'));
+  assert.ok(readme.includes('docs/development/DEVELOPMENT_ENVIRONMENT.md'));
+  assert.ok(!readme.includes('MS-CURRENT-STATUS-AND-HANDOFF'));
+  assert.ok(!readme.includes('docs/migration/'));
 });
 
 
@@ -290,8 +295,6 @@ test('general appearance settings expose and normalize the expanded visual syste
 test('release metadata consistently identifies Mad Station 1.6.3 while retaining historical release notes', () => {
   assert.equal(fs.readFileSync(path.join(root, 'VERSION'), 'utf8').trim(), '1.6.3');
   assert.equal(JSON.parse(read('package-lock.json')).version, '1.6.3');
-  assert.match(read('README.md'), /## v1\.6\.0 — Migration stabilization and monitor fixes/);
-  assert.match(read('README.md'), /application version is \*\*1\.6\.3\*\*/);
   assert.match(read('docs/security/RELEASE_AUDIT.md'), /Release validation for Mad Station v1\.6\.3/);
   assert.match(read('src/renderer-react/information-security-panels.tsx'), /version-pill ms-chip/);
   assert.match(read('src/renderer-react/information-security-panels.tsx'), /snapshot\.version \|\| '1\.6\.3'/);
@@ -665,7 +668,6 @@ test('untouched legacy 3x6 starter configs are upgraded to the curated one-per-p
   assert.match(schema, /next\.accounts = accounts;/);
   assert.match(schema, /account\.name === `\$\{service\.name\} 1`/);
   assert.match(schema, /migrateLegacyStarterAccounts\(next\);/);
-  assert.match(read('README.md'), /untouched legacy starter configuration/);
 });
 
 test('fresh defaults create exactly one account per provider', () => {
@@ -674,7 +676,7 @@ test('fresh defaults create exactly one account per provider', () => {
   assert.match(main, /const DEFAULT_SERVICES = require\('\.\/default-providers'\);/);
   assert.match(schema, /const accounts: AccountRecord\[\] = services\.map\(\(service, index\) =>/);
   assert.doesNotMatch(schema, /for \(let i = 1; i <= 3; i \+= 1\)/);
-  assert.match(read('README.md'), /one account per curated provider/);
+  assert.ok(read('README.md').includes('one account for each supported provider'));
 });
 
 test('provider settings expose free-tier state without making free access a hard security dependency', () => {
@@ -714,7 +716,6 @@ test('provider and account order is persistent, shared by both sidebar styles, a
   assert.match(managementLists, /data-order-action="up"/);
   assert.match(managementLists, /data-order-action="down"/);
   assert.match(managementLists, /data-order-action/);
-  assert.match(read('README.md'), /same order is used by both the List and Icon grid sidebar styles/);
 });
 test('icon rendering always has a bundled default and rebinds after filter-only renders', () => {
   const renderer = read('src/renderer.js');
@@ -2682,7 +2683,6 @@ test('single Diagnose Startup launcher runs the full v2 diagnostics workflow and
   assert.match(read('AGENTS.md'), /\+ Diagnose Startup\.cmd/);
   assert.doesNotMatch(read('AGENTS.md'), /\+ Diagnose Startup 2\.cmd/, 'instructions should name only the canonical launcher');
   assert.match(read('AGENTS.md'), /Do not routinely make them paste a series of separate PowerShell commands/);
-  assert.match(read('README.md'), /AI coding agents should tell you to run this launcher first/);
   assert.equal(fs.existsSync(path.join(root, 'diagnose-startup.cmd')), false, 'old launcher name should be removed from the current project root');
 });
 

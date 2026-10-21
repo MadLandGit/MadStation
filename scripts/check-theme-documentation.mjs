@@ -33,7 +33,7 @@ for (const { id, label } of themes) {
 const markdownFiles = [];
 function walk(dir) { for (const ent of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) { const rel = path.posix.join(dir, ent.name); if (ent.isDirectory()) walk(rel); else if (ent.isFile() && ent.name.toLowerCase().endsWith('.md')) markdownFiles.push(rel); } }
 walk('docs');
-markdownFiles.push('README.md', 'AGENTS.md', 'CLAUDE.md', 'MS-CURRENT-STATUS-AND-HANDOFF.md');
+markdownFiles.push('README.md', 'AGENTS.md', 'CLAUDE.md');
 const checked = new Set();
 for (const rel of markdownFiles) {
   if (!exists(rel)) continue;
