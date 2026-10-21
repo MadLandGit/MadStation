@@ -7,6 +7,7 @@ Use this page to navigate Mad Station's user, architecture, design, development,
 - [`DOCUMENTATION-UPDATE-CHANGELOG.md`](DOCUMENTATION-UPDATE-CHANGELOG.md) — this documentation repair and its validation boundaries.
 
 - [`../README.md`](../README.md) — product overview and current user-facing feature descriptions.
+- [`android/ANDROID.md`](android/ANDROID.md) — Android companion features, APK build instructions, and known limitations.
 - [`../AGENTS.md`](../AGENTS.md) — canonical repository instructions for AI coding agents and maintainers.
 - [`../CLAUDE.md`](../CLAUDE.md) — concise entry point delegating to the repository instructions.
 - [`architecture/CORE_SYSTEM.md`](architecture/CORE_SYSTEM.md) — fastest route to the correct subsystem and source files.

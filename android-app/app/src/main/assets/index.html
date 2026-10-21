@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mad Station Mobile</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #10141b;
+  --fg: #edf1f8;
+  --muted: #a1aaba;
+  --panel: #181e28;
+  --panel-strong: #202837;
+  --line: #303a49;
+  --accent: #9bb8ff;
+  --accent-soft: #293650;
+  --danger: #ff9292;
+  --good: #9ae3c0;
+  --shadow: 0 10px 28px #0004;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f5f9;
+  --fg: #182131;
+  --muted: #5d687a;
+  --panel: #fff;
+  --panel-strong: #eef1f6;
+  --line: #dce2ec;
+  --accent: #365fc5;
+  --accent-soft: #e1e9ff;
+  --danger: #b52d3d;
+  --good: #15734b;
+  --shadow: 0 10px 28px #21304b12;
+}
+:root[data-accent="violet"] { --accent:#bca7ff; --accent-soft:#342b4f; }
+:root[data-accent="green"] { --accent:#8fe0b6; --accent-soft:#203e35; }
+:root[data-accent="orange"] { --accent:#ffbd86; --accent-soft:#4a3427; }
+:root[data-theme="light"][data-accent="violet"] { --accent:#6543b7; --accent-soft:#eee7ff; }
+:root[data-theme="light"][data-accent="green"] { --accent:#18754a; --accent-soft:#e0f6e9; }
+:root[data-theme="light"][data-accent="orange"] { --accent:#a34c12; --accent-soft:#fff0e3; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif; min-height:100vh; }
+button,input,textarea,select { font:inherit; }
+button { cursor:pointer; touch-action:manipulation; }
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.app { width:min(100%,860px); margin:0 auto; padding:17px 15px calc(34px + env(safe-area-inset-bottom)); }
+header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:2px 0 20px; }
+.brand { display:flex; align-items:center; gap:11px; min-width:0; }
+.logo { width:43px;height:43px;display:grid;place-items:center;flex:0 0 auto;border-radius:14px;font-weight:900;font-size:17px;background:var(--accent-soft);border:1px solid var(--line);color:var(--fg); }
+.brand h1 { font-size:18px;margin:0;letter-spacing:-.35px; }
+.brand p { color:var(--muted);font-size:12px;margin:2px 0 0; }
+.header-actions { display:flex;gap:7px; }
+.icon-button,.tab,.category,.secondary,.primary,.small-button,.filter-button {
+  border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:13px;min-height:42px;padding:9px 12px;
+}
+.icon-button { min-width:43px;font-size:18px;padding:8px; }
+.primary { background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--line));font-weight:750; }
+.secondary { font-weight:600; }
+.danger-button { color:var(--danger); }
+.hero { padding:20px;border:1px solid var(--line);background:linear-gradient(135deg,var(--panel),var(--panel-strong));border-radius:22px;box-shadow:var(--shadow); }
+.eyebrow { color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-size:10px;font-weight:850; }
+.hero h2 { font-size:clamp(25px,6vw,34px);line-height:1.1;letter-spacing:-.9px;margin:9px 0 9px; }
+.hero p { color:var(--muted);margin:0 0 17px;font-size:13px;max-width:570px; }
+.search { display:flex;gap:8px; }
+input,textarea,select { min-width:0;width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:12px 13px;outline:none; }
+textarea { resize:vertical;min-height:94px;line-height:1.5; }
+input:focus,textarea:focus,select:focus { border-color:var(--accent); }
+nav { display:flex;gap:7px;margin:18px 0 18px;overflow-x:auto;padding-bottom:5px;scrollbar-width:thin; }
+.tab { white-space:nowrap;min-height:39px;padding:7px 12px;font-size:13px; }
+.tab[aria-selected="true"],.category[aria-pressed="true"],.filter-button[aria-pressed="true"] { background:var(--accent-soft);border-color:var(--accent); }
+.section-heading { display:flex;justify-content:space-between;align-items:center;gap:10px;margin:20px 0 12px; }
+.section-heading h3 { font-size:16px;margin:0; }
+.section-heading p { font-size:12px;color:var(--muted);margin:4px 0 0; }
+.small { color:var(--muted);font-size:12px; }
+.categories,.filters { display:flex;gap:7px;overflow-x:auto;margin:0 0 13px;padding-bottom:3px; }
+.category,.filter-button { min-height:34px;padding:6px 10px;font-size:12px;white-space:nowrap; }
+.grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px; }
+.tile { min-width:0;display:flex;flex-direction:column;gap:10px;text-align:left;padding:13px;border:1px solid var(--line);border-radius:17px;background:var(--panel);color:var(--fg);min-height:145px;box-shadow:0 4px 16px #0000000b; }
+.tile-top { display:flex;align-items:center;justify-content:space-between;gap:6px; }
+.tile-icon { width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);border-radius:13px;background:var(--accent-soft);font-size:19px;font-weight:850;flex:0 0 auto; }
+.star { background:transparent;color:var(--muted);border:0;font-size:24px;padding:0 3px;line-height:1;min-width:34px;min-height:34px; }
+.star.active { color:var(--accent); }
+.open-tool { color:var(--fg);background:transparent;border:0;padding:0;text-align:left; }
+.open-tool strong { display:block;font-size:14px;line-height:1.2; }
+.open-tool small { display:block;color:var(--muted);font-size:11px;margin-top:5px;line-height:1.35; }
+.badge { display:inline-flex;align-self:flex-start;border:1px solid var(--line);border-radius:20px;padding:3px 7px;font-size:10px;color:var(--muted); }
+.empty { border:1px dashed var(--line);border-radius:16px;padding:23px 16px;text-align:center;color:var(--muted);grid-column:1/-1;font-size:13px; }
+.notice { color:var(--muted);font-size:11px;margin:18px 2px 0; }
+.panel { border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:15px;margin-top:12px;min-width:0; }
+.panel h3 { font-size:15px;margin:0 0 5px; }
+.panel p { color:var(--muted);font-size:12px;margin:0 0 12px; }
+.form-grid { display:grid;grid-template-columns:1fr;gap:10px; }
+.field-label { display:grid;gap:6px;color:var(--muted);font-size:12px; }
+.field-label input,.field-label textarea,.field-label select { color:var(--fg);font-size:14px; }
+.row { display:flex;gap:8px;align-items:center;margin-top:9px; }
+.row > * { flex:1; }
+.row .auto { flex:0 0 auto; }
+.row button { white-space:nowrap; }
+.card-list { display:grid;gap:8px;margin-top:12px; }
+.list-card { display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:11px;overflow-wrap:anywhere;min-width:0; }
+.list-card-main { flex:1;min-width:0; }
+.list-card-main strong { display:block;font-size:13px; }
+.list-card-main p { color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0 0;font-size:12px; }
+.list-card-actions { display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end; }
+.small-button { min-height:34px;padding:6px 9px;border-radius:10px;font-size:11px; }
+.done .task-title { text-decoration:line-through;color:var(--muted); }
+.task-line { display:flex;gap:9px;align-items:flex-start; }
+.task-line input[type=checkbox] { width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;accent-color:var(--accent); }
+.priority { display:inline-block;padding:3px 6px;border-radius:7px;background:var(--panel-strong);color:var(--muted);font-size:10px;margin-top:6px; }
+.priority.high { color:var(--danger); }
+.priority.low { color:var(--good); }
+.meta { color:var(--muted);font-size:10px;margin-top:6px; }
+.prompt-output { min-height:175px; }
+.template-row { display:flex;gap:7px;overflow-x:auto;padding:3px 0 7px; }
+.template-button { flex:0 0 auto; }
+.color-row { display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:10px; }
+.color-button { border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:8px 11px;border-radius:12px;font-size:12px; }
+.color-button[aria-pressed="true"] { border-color:var(--accent);background:var(--accent-soft); }
+.status-note { color:var(--muted);font-size:11px;margin-top:9px; }
+.hidden { display:none!important; }
+footer { color:var(--muted);font-size:11px;margin:24px 2px 0; }
+@media(min-width:560px) {
+ .app { padding:25px 22px 48px; }
+ .grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .hero { padding:26px; }
+ .form-grid.two-col { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">MS</div><div><h1>Mad Station</h1><p>Your AI workspace, on the go</p></div></div>
+  <div class="header-actions"><button class="icon-button" id="themeButton" aria-label="Toggle theme" title="Toggle theme">☼</button><button class="icon-button" id="quickAddButton" aria-label="Add custom shortcut" title="Add shortcut">＋</button></div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Your mobile workspace</div>
+  <h2>All your AI tools.<br>One station.</h2>
+  <p>Find your favourite services, prepare stronger prompts, and keep notes and tasks together. Your personal data stays on this device.</p>
+  <div class="search"><input id="searchInput" type="search" placeholder="Search tools, or paste an HTTPS URL…" autocomplete="off" aria-label="Search AI tools"><button id="clearSearch" class="primary" type="button">Clear</button></div>
+</section>
+
+<nav aria-label="Main navigation">
+  <button class="tab" data-page="home" aria-selected="true">Discover</button>
+  <button class="tab" data-page="favorites" aria-selected="false">★ Favorites</button>
+  <button class="tab" data-page="prompts" aria-selected="false">Prompt Studio</button>
+  <button class="tab" data-page="notes" aria-selected="false">Notes & Tasks</button>
+  <button class="tab" data-page="clipboard" aria-selected="false">Clipboard</button>
+  <button class="tab" data-page="manage" aria-selected="false">Manage</button>
+</nav>
+
+<section id="homePage">
+  <div class="section-heading"><h3 id="listTitle">Quick access</h3><span class="small" id="toolCount"></span></div>
+  <div class="categories" id="categories">
+    <button class="category" data-category="All" aria-pressed="true">All tools</button>
+    <button class="category" data-category="Chat" aria-pressed="false">Chat</button>
+    <button class="category" data-category="Images" aria-pressed="false">Images</button>
+    <button class="category" data-category="Video" aria-pressed="false">Video</button>
+    <button class="category" data-category="Research" aria-pressed="false">Research</button>
+    <button class="category" data-category="Coding" aria-pressed="false">Coding</button>
+    <button class="category" data-category="Writing" aria-pressed="false">Writing</button>
+  </div>
+  <div class="grid" id="toolGrid"></div>
+  <p class="notice">AI services are third-party sites and may require their own sign-in or subscription. If in-app sign-in is blocked, use ↗ to open the site in your regular browser.</p>
+</section>
+
+<section id="favoritesPage" class="hidden">
+  <div class="section-heading"><div><h3>Your favorites</h3><p>Shortcuts you have starred</p></div><span class="small" id="favoriteCount"></span></div>
+  <div class="grid" id="favoriteGrid"></div>
+</section>
+
+<section id="promptsPage" class="hidden">
+  <div class="section-heading"><div><h3>Prompt Studio</h3><p>Turn a rough idea into a structured, reusable prompt.</p></div></div>
+  <div class="panel">
+    <div class="eyebrow">01 · Define your prompt</div>
+    <div class="template-row">
+      <button class="secondary template-button" data-template="coding">⌘ Coding</button>
+      <button class="secondary template-button" data-template="research">⌕ Research</button>
+      <button class="secondary template-button" data-template="writing">✎ Writing</button>
+      <button class="secondary template-button" data-template="image">▧ Image prompt</button>
+      <button class="secondary template-button" data-template="learning">✦ Learning</button>
+    </div>
+    <div class="form-grid two-col">
+      <label class="field-label">Role / expertise<input id="promptRole" maxlength="180" placeholder="e.g. Senior Android engineer"></label>
+      <label class="field-label">Desired output<select id="promptFormat"><option value="A clear, structured answer with headings and actionable steps.">Structured answer</option><option value="A concise answer with the key result first.">Concise answer</option><option value="A numbered step-by-step guide with examples.">Step-by-step guide</option><option value="A table comparing options, trade-offs and recommendations.">Comparison table</option><option value="Valid code with helpful comments and a short explanation.">Code with explanation</option><option value="A polished, ready-to-use final artifact with no filler.">Ready-to-use artifact</option><option value="A detailed visual prompt covering subject, composition, lighting, style and exclusions.">Visual prompt</option></select></label>
+    </div>
+    <label class="field-label" style="margin-top:10px">What do you want to achieve?<textarea id="promptObjective" rows="3" maxlength="5000" placeholder="Describe the result you need, in your own words."></textarea></label>
+    <label class="field-label" style="margin-top:10px">Context / source material<textarea id="promptContext" rows="3" maxlength="10000" placeholder="Paste relevant background, code, audience, existing work, or constraints."></textarea></label>
+    <label class="field-label" style="margin-top:10px">Requirements and things to avoid<textarea id="promptConstraints" rows="3" maxlength="4000" placeholder="Must-haves, limits, tone, platform, budget, edge cases…"></textarea></label>
+    <div class="row"><button class="secondary" id="clearPrompt">Clear fields</button><button class="primary" id="generatePrompt">Build prompt ↗</button></div>
+    <p class="status-note">This formatter runs on your device. It structures your instructions; it does not call an AI model or send your content anywhere.</p>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">02 · Your result</div>
+    <label class="field-label" style="margin-top:10px">Prompt title<input id="promptTitle" maxlength="140" placeholder="e.g. Review my Android architecture"></label>
+    <label class="field-label" style="margin-top:10px">Generated prompt<textarea class="prompt-output" id="promptOutput" maxlength="30000" placeholder="Your structured prompt will appear here. You can edit it before copying or saving."></textarea></label>
+    <div class="row"><button class="secondary" id="copyPrompt">Copy prompt</button><button class="primary" id="savePrompt">Save to library</button></div>
+    <div class="section-heading"><h3>Prompt library</h3><span class="small" id="promptCount"></span></div>
+    <div class="card-list" id="promptLibrary"></div>
+  </div>
+</section>
+
+<section id="notesPage" class="hidden">
+  <div class="section-heading"><div><h3>Notes & Tasks</h3><p>Personal notes, ideas, reminders and checklists.</p></div></div>
+  <div class="panel">
+    <div class="eyebrow" id="noteFormEyebrow">01 · New note</div>
+    <label class="field-label" style="margin-top:9px">Title<input id="noteTitle" maxlength="120" placeholder="A short title"></label>
+    <label class="field-label" style="margin-top:9px">Note<textarea id="noteBody" rows="4" maxlength="30000" placeholder="Write an idea, a useful prompt, meeting notes, or anything to remember…"></textarea></label>
+    <div class="row"><button class="secondary" id="cancelNoteEdit">Cancel</button><button class="primary" id="saveNote">Save note</button></div>
+    <div class="section-heading"><h3>Your notes</h3><span class="small" id="noteCount"></span></div>
+    <input id="noteSearch" type="search" placeholder="Search notes…" aria-label="Search notes">
+    <div class="card-list" id="notesList"></div>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">02 · Task list</div>
+    <div class="form-grid two-col" style="margin-top:10px">
+      <label class="field-label">Task<input id="taskInput" maxlength="240" placeholder="What needs to get done?"></label>
+      <label class="field-label">Priority<select id="taskPriority"><option value="normal">Normal priority</option><option value="high">High priority</option><option value="low">Low priority</option></select></label>
+      <label class="field-label">Due date<input id="taskDue" type="date"></label>
+    </div>
+    <div class="row"><button class="secondary" id="clearCompleted">Clear completed</button><button class="primary" id="addTask">＋ Add task</button></div>
+    <div class="filters" style="margin-top:13px;margin-bottom:0">
+      <button class="filter-button" data-task-filter="all" aria-pressed="true">All</button>
+      <button class="filter-button" data-task-filter="open" aria-pressed="false">Open</button>
+      <button class="filter-button" data-task-filter="done" aria-pressed="false">Completed</button>
+    </div>
+    <div class="card-list" id="tasksList"></div>
+  </div>
+</section>
+
+<section id="clipboardPage" class="hidden">
+  <div class="section-heading"><div><h3>Clipboard History</h3><p>Keep snippets you copy within Mad Station close at hand.</p></div></div>
+  <div class="panel">
+    <div class="eyebrow">01 · Save a snippet</div>
+    <label class="field-label" style="margin-top:10px">Text or prompt<textarea id="clipboardDraft" rows="4" maxlength="12000" placeholder="Type or paste a useful snippet to save it here…"></textarea></label>
+    <div class="row"><button class="secondary" id="clearClipboardDraft">Clear</button><button class="primary" id="saveClipboardSnippet">Save snippet</button></div>
+    <div class="section-heading"><h3>Recent copies and snippets</h3><span id="clipboardCount" class="small"></span></div>
+    <div class="card-list" id="clipboardList"></div>
+    <p class="status-note">For privacy, this history only records text copied from inside Mad Station Mobile or snippets you save here. It does not monitor or read the Android system clipboard in the background.</p>
+  </div>
+</section>
+
+<section id="managePage" class="hidden">
+  <div class="section-heading"><div><h3>Manage your station</h3><p>Personalize shortcuts and keep a portable backup.</p></div></div>
+  <div class="panel" id="customToolPanel">
+    <div class="eyebrow" id="customFormEyebrow">01 · Custom shortcut</div>
+    <div class="form-grid two-col" style="margin-top:10px">
+      <label class="field-label">Name<input id="customName" maxlength="90" placeholder="e.g. My local AI"></label>
+      <label class="field-label">Category<select id="customCategory"><option value="Chat">Chat</option><option value="Images">Images</option><option value="Video">Video</option><option value="Research">Research</option><option value="Coding">Coding</option><option value="Writing">Writing</option></select></label>
+      <label class="field-label" style="grid-column:1/-1">HTTPS website URL<input id="customUrl" type="url" inputmode="url" maxlength="1000" placeholder="https://example.com"></label>
+      <label class="field-label">Icon / emoji<input id="customIcon" maxlength="8" placeholder="✦"></label>
+      <label class="field-label">Description<input id="customDescription" maxlength="180" placeholder="What do you use it for?"></label>
+    </div>
+    <div class="row"><button class="secondary" id="cancelCustomEdit">Cancel</button><button class="primary" id="saveCustom">Save shortcut</button></div>
+    <p class="status-note">Only HTTPS addresses are accepted for custom shortcuts.</p>
+    <div class="section-heading"><h3>Custom shortcuts</h3><span id="customCount" class="small"></span></div>
+    <div class="card-list" id="customList"></div>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">02 · Appearance</div>
+    <h3 style="margin-top:7px">Make it yours</h3>
+    <p>Changes are saved locally on this device.</p>
+    <div class="row"><button class="secondary" id="lightTheme">☼ Light</button><button class="secondary" id="darkTheme">☾ Dark</button></div>
+    <div class="color-row"><button class="color-button" data-accent="blue" aria-pressed="true">Blue</button><button class="color-button" data-accent="violet" aria-pressed="false">Violet</button><button class="color-button" data-accent="green" aria-pressed="false">Green</button><button class="color-button" data-accent="orange" aria-pressed="false">Orange</button></div>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">03 · Backup & restore</div>
+    <h3 style="margin-top:7px">Keep your data portable</h3>
+    <p>Export notes, tasks, prompts, favorites, custom shortcuts and appearance as JSON. You can share it to a notes app or save it somewhere safe. The backup may contain private content you have written.</p>
+    <div class="row"><button class="primary" id="exportBackup">Export / share backup</button><button class="secondary" id="copyBackup">Copy backup JSON</button></div>
+    <label class="field-label" style="margin-top:12px">Restore from backup JSON<textarea id="backupInput" rows="4" placeholder="Paste a Mad Station Mobile backup JSON here…"></textarea></label>
+    <div class="row"><button class="secondary danger-button" id="resetLocal">Reset local data</button><button class="primary" id="importBackup">Validate & restore</button></div>
+    <p class="status-note">Backup and restore stay on this device unless you choose to share or copy the file yourself. Imported data replaces the current mobile data.</p>
+  </div>
+  <div class="panel">
+    <div class="eyebrow">04 · What's supported</div>
+    <h3 style="margin-top:7px">Mobile companion status</h3>
+    <p>Included: quick access, in-app browser, saved prompt library, local notes/tasks, custom HTTPS shortcuts, favorites and backup/restore.</p>
+    <p>Not yet ported: isolated per-account browser sessions, Windows process/RAM monitoring, Electron downloads controller, desktop theme scenes and API-backed multi-model arena execution.</p>
+  </div>
+</section>
+
+<footer>Mad Station Mobile · Android companion · v1.2.0 · Personal data stays on this device and does not sync with the Windows app.</footer>
+</div>
+<div id="liveMessage" role="status" aria-live="polite" style="position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));background:var(--panel-strong);border:1px solid var(--line);border-radius:13px;padding:11px 14px;box-shadow:var(--shadow);display:none;z-index:99;font-size:13px"></div>
+
+<script>
+(function () {
+"use strict";
+var BASE_TOOLS = [
+{id:"chatgpt",name:"ChatGPT",description:"Chat, write, learn and build",category:"Chat",icon:"✦",url:"https://chatgpt.com/"},
+{id:"claude",name:"Claude",description:"Writing, analysis and coding",category:"Chat",icon:"✳",url:"https://claude.ai/"},
+{id:"gemini",name:"Gemini",description:"Google’s AI assistant",category:"Chat",icon:"✧",url:"https://gemini.google.com/"},
+{id:"copilot",name:"Copilot",description:"Microsoft AI assistant",category:"Chat",icon:"◈",url:"https://copilot.cloud.microsoft/"},
+{id:"deepseek",name:"DeepSeek",description:"Reasoning and general chat",category:"Chat",icon:"⌘",url:"https://chat.deepseek.com/"},
+{id:"mistral",name:"Le Chat",description:"Mistral’s AI assistant",category:"Chat",icon:"M",url:"https://chat.mistral.ai/"},
+{id:"grok",name:"Grok",description:"Assistant from xAI",category:"Chat",icon:"𝕏",url:"https://grok.com/"},
+{id:"meta-ai",name:"Meta AI",description:"Meta’s AI assistant",category:"Chat",icon:"∞",url:"https://meta.ai/"},
+{id:"qwen",name:"Qwen",description:"Qwen chat and reasoning",category:"Chat",icon:"Q",url:"https://chat.qwen.ai/"},
+{id:"kimi",name:"Kimi",description:"Kimi AI assistant",category:"Chat",icon:"K",url:"https://kimi.com/"},
+{id:"poe",name:"Poe",description:"Explore multiple AI bots",category:"Chat",icon:"P",url:"https://poe.com/"},
+{id:"duck-ai",name:"Duck.ai",description:"Private AI chats from DuckDuckGo",category:"Chat",icon:"🦆",url:"https://duck.ai/"},
+{id:"character-ai",name:"Character.AI",description:"Chat with AI characters",category:"Chat",icon:"✧",url:"https://character.ai/"},
+{id:"perplexity",name:"Perplexity",description:"Answers with web sources",category:"Research",icon:"⌕",url:"https://www.perplexity.ai/"},
+{id:"phind",name:"Phind",description:"Search and reasoning for developers",category:"Coding",icon:"⌘",url:"https://www.phind.com/"},
+{id:"you",name:"You.com",description:"AI search and assistants",category:"Research",icon:"Y",url:"https://you.com/"},
+{id:"notebooklm",name:"NotebookLM",description:"Research from your source material",category:"Research",icon:"▤",url:"https://notebooklm.google.com/"},
+{id:"chatgpt-search",name:"ChatGPT Search",description:"Search the web with ChatGPT",category:"Research",icon:"⌕",url:"https://chatgpt.com/"},
+{id:"ideogram",name:"Ideogram",description:"Image generation and design",category:"Images",icon:"▧",url:"https://ideogram.ai/"},
+{id:"leonardo",name:"Leonardo.Ai",description:"Create images and assets",category:"Images",icon:"◉",url:"https://leonardo.ai/"},
+{id:"firefly",name:"Adobe Firefly",description:"Generate and edit visuals",category:"Images",icon:"✺",url:"https://firefly.adobe.com/"},
+{id:"canva",name:"Canva AI",description:"Design tools and AI features",category:"Images",icon:"C",url:"https://www.canva.com/"},
+{id:"runway",name:"Runway",description:"AI video and creative tools",category:"Video",icon:"▶",url:"https://runwayml.com/"},
+{id:"pika",name:"Pika",description:"AI video creation",category:"Video",icon:"▸",url:"https://pika.art/"},
+{id:"kling",name:"Kling AI",description:"AI video generation",category:"Video",icon:"K",url:"https://kling.ai/"},
+{id:"higgsfield",name:"Higgsfield",description:"AI video and cinematic content",category:"Video",icon:"H",url:"https://higgsfield.ai/"},
+{id:"pixverse",name:"PixVerse",description:"AI video creation",category:"Video",icon:"P",url:"https://app.pixverse.ai/"},
+{id:"hailuo",name:"Hailuo AI",description:"AI video generator",category:"Video",icon:"H",url:"https://hailuoai.video/"},
+{id:"vidu",name:"Vidu AI",description:"AI video generation",category:"Video",icon:"V",url:"https://www.vidu.com/"},
+{id:"suno",name:"Suno",description:"Create music from ideas",category:"Writing",icon:"♫",url:"https://suno.com/"},
+{id:"udio",name:"Udio",description:"AI music studio",category:"Writing",icon:"♫",url:"https://www.udio.com/"},
+{id:"github",name:"GitHub",description:"Repositories, issues and code",category:"Coding",icon:"⌘",url:"https://github.com/"},
+{id:"replit",name:"Replit",description:"Code and build in the browser",category:"Coding",icon:"R",url:"https://replit.com/"},
+{id:"codepen",name:"CodePen",description:"Experiment with web code",category:"Coding",icon:"⌁",url:"https://codepen.io/"},
+{id:"writefull",name:"Writefull",description:"Writing assistance for text",category:"Writing",icon:"W",url:"https://www.writefull.com/"}
+];
+var KEY = {
+favorites:"madstation-mobile-favorites-v2", custom:"madstation-mobile-custom-tools-v2",
+notes:"madstation-mobile-notes-v2", tasks:"madstation-mobile-tasks-v2",
+prompts:"madstation-mobile-prompts-v2", clipboard:"madstation-mobile-clipboard-v1", theme:"madstation-mobile-theme-v2", accent:"madstation-mobile-accent-v2"
+};
+function readArray(key) {
+ try { var val=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(val)?val:[]; }
+ catch(e){return [];}
+}
+function save(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(e){notify("Storage is full; export a backup or delete older items.");}}
+function readText(key,fallback){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
+function uid(prefix){return prefix+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);}
+function esc(value){return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function allTools(){return BASE_TOOLS.concat(customTools);}
+var favorites=readArray(KEY.favorites).filter(function(v){return typeof v==="string";});
+var customTools=readArray(KEY.custom).filter(function(t){return t&&typeof t.id==="string"&&typeof t.name==="string"&&isHttps(t.url);});
+var notes=readArray(KEY.notes).filter(function(n){return n&&typeof n.id==="string"&&typeof n.body==="string";});
+var tasks=readArray(KEY.tasks).filter(function(t){return t&&typeof t.id==="string"&&typeof t.text==="string";});
+var prompts=readArray(KEY.prompts).filter(function(p){return p&&typeof p.id==="string"&&typeof p.body==="string";});
+var clipboardItems=readArray(KEY.clipboard).filter(function(c){return c&&typeof c.id==="string"&&typeof c.text==="string";}).slice(0,100);
+var page="home",category="All",query="",taskFilter="all",editingNote=null,editingPrompt=null,editingTool=null,toastTimer=null;
+function isHttps(value){try{var url=new URL(String(value));return url.protocol==="https:"&&!!url.hostname&&!url.username&&!url.password;}catch(e){return false;}}
+function notify(message){var el=document.getElementById("liveMessage");el.textContent=message;el.style.display="block";if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.style.display="none";},2600);}
+function openSite(url){
+ if(!isHttps(url)){notify("Only secure HTTPS websites can be opened.");return;}
+ if(window.MadStation&&typeof window.MadStation.openSite==="function"){window.MadStation.openSite(url);}
+ else {window.open(url,"_blank","noopener");}
+}
+function copyText(text){
+ var value=String(text);
+ recordClipboard(value);
+ if(window.MadStation&&typeof window.MadStation.copyText==="function"){window.MadStation.copyText(value);return;}
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){notify("Copied to clipboard.");}).catch(function(){notify("Copy was blocked by this browser.");});}
+ else {var ta=document.createElement("textarea");ta.value=value;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");notify("Copied to clipboard.");}catch(e){notify("Could not copy automatically.");}ta.remove();}
+}
+function shareText(text){
+ if(window.MadStation&&typeof window.MadStation.shareText==="function"){window.MadStation.shareText(String(text));return;}
+ copyText(text);notify("Backup copied. Paste it into a safe place.");
+}
+function toolById(id){return allTools().find(function(t){return t.id===id;});}
+function isFavorite(id){return favorites.indexOf(id)!==-1;}
+function toolMarkup(tool){
+ var active=isFavorite(tool.id);
+ return '<article class="tile"><div class="tile-top"><div class="tile-icon">'+esc(tool.icon||"✦")+'</div><button class="star '+(active?"active":"")+'" data-favorite="'+esc(tool.id)+'" aria-label="'+(active?"Remove from":"Add to")+' favorites">'+(active?"★":"☆")+'</button></div><button class="open-tool" data-open="'+esc(tool.id)+'"><strong>'+esc(tool.name)+'</strong><small>'+esc(tool.description||tool.url)+'</small></button><span class="badge">'+esc(tool.category||"Custom")+'</span></article>';
+}
+function renderToolLists(){
+ var matched=allTools().filter(function(tool){
+  var cat=category==="All"||tool.category===category;
+  var text=(tool.name+" "+tool.description+" "+tool.category+" "+tool.url).toLowerCase();
+  return cat&&text.indexOf(query.toLowerCase())!==-1;
+ });
+ document.getElementById("toolGrid").innerHTML=matched.length?matched.map(toolMarkup).join(""):'<div class="empty">No tools match this search. Try another keyword or add a custom shortcut.</div>';
+ document.getElementById("toolCount").textContent=matched.length+" tools";
+ var fav=allTools().filter(function(t){return isFavorite(t.id);});
+ document.getElementById("favoriteGrid").innerHTML=fav.length?fav.map(toolMarkup).join(""):'<div class="empty">No favorites yet. Tap ☆ on any tool to save it here.</div>';
+ document.getElementById("favoriteCount").textContent=fav.length+" saved";
+ attachToolEvents("toolGrid");attachToolEvents("favoriteGrid");
+}
+function attachToolEvents(rootId){
+ var root=document.getElementById(rootId);
+ root.querySelectorAll("[data-open]").forEach(function(el){el.addEventListener("click",function(){var tool=toolById(el.getAttribute("data-open"));if(tool)openSite(tool.url);});});
+ root.querySelectorAll("[data-favorite]").forEach(function(el){el.addEventListener("click",function(event){
+  event.stopPropagation();var id=el.getAttribute("data-favorite");
+  favorites=isFavorite(id)?favorites.filter(function(v){return v!==id;}):favorites.concat([id]);save(KEY.favorites,favorites);renderToolLists();
+ });});
+}
+function setPage(next){
+ page=next;
+ ["home","favorites","prompts","notes","clipboard","manage"].forEach(function(p){document.getElementById(p+"Page").classList.toggle("hidden",p!==next);});
+ document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-page")===next?"true":"false");});
+ if(next==="home")renderToolLists();
+ if(next==="favorites")renderToolLists();
+ if(next==="prompts"){renderPrompts();}
+ if(next==="notes"){renderNotes();renderTasks();}
+ if(next==="clipboard")renderClipboard();
+ if(next==="manage")renderCustomTools();
+}
+document.querySelectorAll(".tab").forEach(function(b){b.addEventListener("click",function(){setPage(b.getAttribute("data-page"));});});
+document.querySelectorAll(".category").forEach(function(b){b.addEventListener("click",function(){
+ category=b.getAttribute("data-category");document.querySelectorAll(".category").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});renderToolLists();
+});});
+document.getElementById("searchInput").addEventListener("input",function(e){query=e.target.value.trim();renderToolLists();});
+document.getElementById("searchInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&isHttps(query))openSite(query);});
+document.getElementById("clearSearch").addEventListener("click",function(){document.getElementById("searchInput").value="";query="";category="All";document.querySelectorAll(".category").forEach(function(x){x.setAttribute("aria-pressed",x.getAttribute("data-category")==="All"?"true":"false");});renderToolLists();});
+document.getElementById("quickAddButton").addEventListener("click",function(){setPage("manage");document.getElementById("customName").focus();});
+document.getElementById("themeButton").addEventListener("click",function(){setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light");});
+function setTheme(theme){document.documentElement.setAttribute("data-theme",theme);save(KEY.theme,theme);}
+function setAccent(accent){if(["blue","violet","green","orange"].indexOf(accent)<0)accent="blue";document.documentElement.setAttribute("data-accent",accent);save(KEY.accent,accent);document.querySelectorAll("[data-accent]").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-accent")===accent?"true":"false");});}
+document.getElementById("lightTheme").addEventListener("click",function(){setTheme("light");});
+document.getElementById("darkTheme").addEventListener("click",function(){setTheme("dark");});
+document.querySelectorAll("[data-accent]").forEach(function(b){b.addEventListener("click",function(){setAccent(b.getAttribute("data-accent"));});});
+
+/* Prompt Studio: local prompt structuring and reusable prompt library. */
+var TEMPLATES={
+ coding:{role:"Senior software engineer and careful code reviewer",objective:"Help me solve the programming problem described below. Explain the approach, implement the solution, and verify edge cases.",constraints:"State assumptions. Prefer secure, maintainable code. Include meaningful error handling and tests. Do not invent APIs or claim unrun tests passed.",format:"Valid code with helpful comments and a short explanation."},
+ research:{role:"Thorough research analyst",objective:"Investigate this question and give me a balanced, evidence-based answer.",constraints:"Separate confirmed facts from uncertainty. Cite reliable, primary sources when possible. Include publication dates for time-sensitive claims and explain material disagreements.",format:"A table comparing options, trade-offs and recommendations."},
+ writing:{role:"Experienced editor and clear communicator",objective:"Help me create a polished piece of writing for the intended audience.",constraints:"Keep the intended meaning. Avoid filler, unsupported claims, clichés and repetition. Match the requested tone and language.",format:"A polished, ready-to-use final artifact with no filler."},
+ image:{role:"Professional visual artist and art director",objective:"Create a detailed visual prompt based on my idea. Specify the subject, composition, lighting, palette, materials, camera or viewpoint, and mood.",constraints:"Be concrete and visually coherent. Describe what should be included and excluded. Do not add text or logos unless requested.",format:"A detailed visual prompt covering subject, composition, lighting, style and exclusions."},
+ learning:{role:"Patient teacher who adapts to my current level",objective:"Teach me the topic step by step, starting from what I already know and building toward practical understanding.",constraints:"Define unfamiliar terms. Use short examples and check common misconceptions. Do not skip important reasoning steps.",format:"A numbered step-by-step guide with examples."}
+};
+document.querySelectorAll("[data-template]").forEach(function(b){b.addEventListener("click",function(){
+ var t=TEMPLATES[b.getAttribute("data-template")];if(!t)return;
+ document.getElementById("promptRole").value=t.role;document.getElementById("promptObjective").value=t.objective;
+ document.getElementById("promptConstraints").value=t.constraints;document.getElementById("promptFormat").value=t.format;
+ document.getElementById("promptTitle").value=b.textContent.trim().replace(/^[⌘⌕✎▧✦]\s*/,"")+" prompt";
+ notify("Template loaded. Add your own details, then build the prompt.");
+});});
+function buildPrompt(){
+ var role=document.getElementById("promptRole").value.trim();
+ var objective=document.getElementById("promptObjective").value.trim();
+ var context=document.getElementById("promptContext").value.trim();
+ var constraints=document.getElementById("promptConstraints").value.trim();
+ var format=document.getElementById("promptFormat").value.trim();
+ if(!objective){notify("Describe what you want to achieve first.");document.getElementById("promptObjective").focus();return;}
+ var pieces=[];
+ pieces.push("Act as "+(role||"a knowledgeable, careful assistant")+".");
+ pieces.push("\n## Objective\n"+objective);
+ if(context)pieces.push("\n## Context and source material\n"+context);
+ if(constraints)pieces.push("\n## Requirements and constraints\n"+constraints);
+ pieces.push("\n## Response format\n"+format);
+ pieces.push("\n## Quality bar\nAddress the objective directly. Preserve important details, state assumptions, and flag uncertainty rather than inventing facts. Organize the answer so it is easy to review and use.");
+ var output=pieces.join("\n").trim();
+ document.getElementById("promptOutput").value=output;
+ if(!document.getElementById("promptTitle").value.trim())document.getElementById("promptTitle").value=objective.length>58?objective.slice(0,55).trim()+"…":objective;
+ notify("Prompt built locally. Review it, then copy or save it.");
+}
+document.getElementById("generatePrompt").addEventListener("click",buildPrompt);
+document.getElementById("clearPrompt").addEventListener("click",function(){
+ ["promptRole","promptObjective","promptContext","promptConstraints","promptTitle","promptOutput"].forEach(function(id){document.getElementById(id).value="";});
+ document.getElementById("promptFormat").selectedIndex=0;editingPrompt=null;
+});
+document.getElementById("copyPrompt").addEventListener("click",function(){var val=document.getElementById("promptOutput").value.trim();if(!val){notify("Build or enter a prompt first.");return;}copyText(val);});
+document.getElementById("savePrompt").addEventListener("click",function(){
+ var body=document.getElementById("promptOutput").value.trim();if(!body){notify("Build or enter a prompt first.");return;}
+ var title=document.getElementById("promptTitle").value.trim()||"Untitled prompt";
+ if(editingPrompt){var item=prompts.find(function(p){return p.id===editingPrompt;});if(item){item.title=title;item.body=body;item.updatedAt=Date.now();}else editingPrompt=null;}
+ if(!editingPrompt)prompts.unshift({id:uid("prompt"),title:title,body:body,createdAt:Date.now(),updatedAt:Date.now()});
+ save(KEY.prompts,prompts);editingPrompt=null;renderPrompts();notify("Prompt saved to your local library.");
+});
+function renderPrompts(){
+ var list=document.getElementById("promptLibrary");
+ document.getElementById("promptCount").textContent=prompts.length+" saved";
+ list.innerHTML=prompts.length?prompts.map(function(p){return '<article class="list-card"><div class="list-card-main"><strong>'+esc(p.title)+'</strong><p>'+esc(p.body.slice(0,220))+(p.body.length>220?"…":"")+'</p><div class="meta">Updated '+esc(new Date(p.updatedAt||p.createdAt||Date.now()).toLocaleDateString())+'</div></div><div class="list-card-actions"><button class="small-button" data-prompt-load="'+esc(p.id)+'">Use</button><button class="small-button" data-prompt-copy="'+esc(p.id)+'">Copy</button><button class="small-button danger-button" data-prompt-delete="'+esc(p.id)+'">×</button></div></article>';}).join(""):'<div class="empty">Your saved prompts will appear here. Use a template, build a prompt and save it.</div>';
+ list.querySelectorAll("[data-prompt-load]").forEach(function(b){b.addEventListener("click",function(){
+  var p=prompts.find(function(x){return x.id===b.getAttribute("data-prompt-load");});if(!p)return;
+  editingPrompt=p.id;document.getElementById("promptTitle").value=p.title;document.getElementById("promptOutput").value=p.body;document.getElementById("promptOutput").focus();notify("Prompt loaded. Save to update the saved copy.");
+ });});
+ list.querySelectorAll("[data-prompt-copy]").forEach(function(b){b.addEventListener("click",function(){var p=prompts.find(function(x){return x.id===b.getAttribute("data-prompt-copy");});if(p)copyText(p.body);});});
+ list.querySelectorAll("[data-prompt-delete]").forEach(function(b){b.addEventListener("click",function(){prompts=prompts.filter(function(x){return x.id!==b.getAttribute("data-prompt-delete");});save(KEY.prompts,prompts);renderPrompts();});});
+}
+
+/* Notes: create, edit, search, pin and delete. */
+function resetNoteForm(){editingNote=null;document.getElementById("noteTitle").value="";document.getElementById("noteBody").value="";document.getElementById("noteFormEyebrow").textContent="01 · New note";document.getElementById("saveNote").textContent="Save note";}
+document.getElementById("cancelNoteEdit").addEventListener("click",resetNoteForm);
+document.getElementById("saveNote").addEventListener("click",function(){
+ var title=document.getElementById("noteTitle").value.trim(),body=document.getElementById("noteBody").value.trim();
+ if(!title&&!body){notify("Write a title or some note content first.");return;}
+ if(editingNote){
+  var old=notes.find(function(n){return n.id===editingNote;});
+  if(old){old.title=title||"Untitled note";old.body=body;old.updatedAt=Date.now();}
+ }else notes.unshift({id:uid("note"),title:title||"Untitled note",body:body,createdAt:Date.now(),updatedAt:Date.now(),pinned:false});
+ save(KEY.notes,notes);resetNoteForm();renderNotes();notify("Note saved on this device.");
+});
+document.getElementById("noteSearch").addEventListener("input",renderNotes);
+function renderNotes(){
+ var term=document.getElementById("noteSearch").value.trim().toLowerCase();
+ var list=notes.filter(function(n){return (n.title+" "+n.body).toLowerCase().indexOf(term)!==-1;}).sort(function(a,b){return Number(!!b.pinned)-Number(!!a.pinned)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0);});
+ document.getElementById("noteCount").textContent=notes.length+" saved";
+ var host=document.getElementById("notesList");
+ host.innerHTML=list.length?list.map(function(n){return '<article class="list-card"><div class="list-card-main"><strong>'+(n.pinned?"📌 ":"")+esc(n.title)+'</strong><p>'+esc(n.body.slice(0,420))+(n.body.length>420?"…":"")+'</p><div class="meta">Updated '+esc(new Date(n.updatedAt||n.createdAt||Date.now()).toLocaleString())+'</div></div><div class="list-card-actions"><button class="small-button" data-note-edit="'+esc(n.id)+'">Edit</button><button class="small-button" data-note-pin="'+esc(n.id)+'">'+(n.pinned?"Unpin":"Pin")+'</button><button class="small-button" data-note-copy="'+esc(n.id)+'">Copy</button><button class="small-button danger-button" data-note-delete="'+esc(n.id)+'">×</button></div></article>';}).join(""):'<div class="empty">'+(term?"No notes match your search.":"No notes yet. Use the editor above to save an idea.")+'</div>';
+ host.querySelectorAll("[data-note-edit]").forEach(function(b){b.addEventListener("click",function(){var n=notes.find(function(x){return x.id===b.getAttribute("data-note-edit");});if(!n)return;editingNote=n.id;document.getElementById("noteTitle").value=n.title;document.getElementById("noteBody").value=n.body;document.getElementById("noteFormEyebrow").textContent="01 · Edit note";document.getElementById("saveNote").textContent="Update note";document.getElementById("noteTitle").focus();});});
+ host.querySelectorAll("[data-note-pin]").forEach(function(b){b.addEventListener("click",function(){var n=notes.find(function(x){return x.id===b.getAttribute("data-note-pin");});if(!n)return;n.pinned=!n.pinned;save(KEY.notes,notes);renderNotes();});});
+ host.querySelectorAll("[data-note-copy]").forEach(function(b){b.addEventListener("click",function(){var n=notes.find(function(x){return x.id===b.getAttribute("data-note-copy");});if(n)copyText((n.title?n.title+"\n\n":"")+n.body);});});
+ host.querySelectorAll("[data-note-delete]").forEach(function(b){b.addEventListener("click",function(){notes=notes.filter(function(x){return x.id!==b.getAttribute("data-note-delete");});if(editingNote===b.getAttribute("data-note-delete"))resetNoteForm();save(KEY.notes,notes);renderNotes();});});
+}
+
+/* Clipboard history: deliberately limited to copies made inside this app. */
+function recordClipboard(text){
+ if(!text||text.length>12000)return;
+ var existing=clipboardItems.findIndex(function(item){return item.text===text;});
+ if(existing===0)return;
+ if(existing>0)clipboardItems.splice(existing,1);
+ clipboardItems.unshift({id:uid("clip"),text:text,createdAt:Date.now()});
+ clipboardItems=clipboardItems.slice(0,50);
+ save(KEY.clipboard,clipboardItems);
+ if(page==="clipboard")renderClipboard();
+}
+document.getElementById("clearClipboardDraft").addEventListener("click",function(){document.getElementById("clipboardDraft").value="";});
+document.getElementById("saveClipboardSnippet").addEventListener("click",function(){
+ var text=document.getElementById("clipboardDraft").value.trim();
+ if(!text){notify("Enter or paste a snippet first.");return;}
+ if(text.length>12000){notify("That snippet is too long to save in clipboard history.");return;}
+ recordClipboard(text);document.getElementById("clipboardDraft").value="";renderClipboard();notify("Snippet saved locally.");
+});
+function renderClipboard(){
+ var list=document.getElementById("clipboardList");
+ document.getElementById("clipboardCount").textContent=clipboardItems.length+" items";
+ list.innerHTML=clipboardItems.length?clipboardItems.map(function(item){return '<article class="list-card"><div class="list-card-main"><p>'+esc(item.text.slice(0,360))+(item.text.length>360?"…":"")+'</p><div class="meta">'+esc(new Date(item.createdAt||Date.now()).toLocaleString())+(item.text.length>12000?" · truncated":"")+'</div></div><div class="list-card-actions"><button class="small-button" data-clip-copy="'+esc(item.id)+'">Copy</button><button class="small-button" data-clip-note="'+esc(item.id)+'">To note</button><button class="small-button danger-button" data-clip-delete="'+esc(item.id)+'">×</button></div></article>';}).join(""):'<div class="empty">No clipboard items yet. Copy text in Prompt Studio or Notes, or save a snippet above.</div>';
+ list.querySelectorAll("[data-clip-copy]").forEach(function(b){b.addEventListener("click",function(){var item=clipboardItems.find(function(x){return x.id===b.getAttribute("data-clip-copy");});if(item)copyText(item.text);});});
+ list.querySelectorAll("[data-clip-note]").forEach(function(b){b.addEventListener("click",function(){var item=clipboardItems.find(function(x){return x.id===b.getAttribute("data-clip-note");});if(!item)return;notes.unshift({id:uid("note"),title:"Clipboard snippet",body:item.text,createdAt:Date.now(),updatedAt:Date.now(),pinned:false});save(KEY.notes,notes);setPage("notes");notify("Snippet saved as a note.");});});
+ list.querySelectorAll("[data-clip-delete]").forEach(function(b){b.addEventListener("click",function(){clipboardItems=clipboardItems.filter(function(x){return x.id!==b.getAttribute("data-clip-delete");});save(KEY.clipboard,clipboardItems);renderClipboard();});});
+}
+
+/* Tasks: priorities, due dates, filters and completion. */
+document.getElementById("addTask").addEventListener("click",addTask);
+document.getElementById("taskInput").addEventListener("keydown",function(e){if(e.key==="Enter")addTask();});
+function addTask(){
+ var text=document.getElementById("taskInput").value.trim();if(!text){notify("Type a task first.");document.getElementById("taskInput").focus();return;}
+ tasks.unshift({id:uid("task"),text:text,done:false,priority:document.getElementById("taskPriority").value,due:document.getElementById("taskDue").value,createdAt:Date.now()});
+ document.getElementById("taskInput").value="";save(KEY.tasks,tasks);renderTasks();notify("Task added.");
+}
+document.querySelectorAll("[data-task-filter]").forEach(function(b){b.addEventListener("click",function(){taskFilter=b.getAttribute("data-task-filter");document.querySelectorAll("[data-task-filter]").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});renderTasks();});});
+document.getElementById("clearCompleted").addEventListener("click",function(){var before=tasks.length;tasks=tasks.filter(function(t){return !t.done;});save(KEY.tasks,tasks);renderTasks();notify((before-tasks.length)+" completed tasks cleared.");});
+function renderTasks(){
+ var list=tasks.filter(function(t){return taskFilter==="all"||(taskFilter==="open"&&!t.done)||(taskFilter==="done"&&t.done);}).sort(function(a,b){if(a.done!==b.done)return Number(a.done)-Number(b.done);if(a.due&&b.due&&a.due!==b.due)return a.due.localeCompare(b.due);if(a.due)return -1;if(b.due)return 1;return (b.createdAt||0)-(a.createdAt||0);});
+ var host=document.getElementById("tasksList");
+ host.innerHTML=list.length?list.map(function(t){var due=t.due?"Due "+esc(t.due):"No due date";return '<article class="list-card '+(t.done?"done":"")+'"><div class="task-line" style="flex:1;min-width:0"><input type="checkbox" data-task-check="'+esc(t.id)+'" '+(t.done?"checked":"")+' aria-label="Mark task complete"><div class="list-card-main"><strong class="task-title">'+esc(t.text)+'</strong><span class="priority '+(t.priority==="high"?"high":t.priority==="low"?"low":"")+'">'+esc((t.priority||"normal")+" priority")+'</span><div class="meta">'+due+'</div></div></div><div class="list-card-actions"><button class="small-button danger-button" data-task-delete="'+esc(t.id)+'">×</button></div></article>';}).join(""):'<div class="empty">'+(taskFilter==="done"?"No completed tasks yet.":taskFilter==="open"?"No open tasks.":"No tasks yet. Add one above.")+'</div>';
+ host.querySelectorAll("[data-task-check]").forEach(function(b){b.addEventListener("change",function(){var t=tasks.find(function(x){return x.id===b.getAttribute("data-task-check");});if(t){t.done=b.checked;save(KEY.tasks,tasks);renderTasks();}});});
+ host.querySelectorAll("[data-task-delete]").forEach(function(b){b.addEventListener("click",function(){tasks=tasks.filter(function(x){return x.id!==b.getAttribute("data-task-delete");});save(KEY.tasks,tasks);renderTasks();});});
+}
+
+/* Custom shortcuts. User-supplied URLs are validated as HTTPS and all text is escaped. */
+function resetCustomForm(){editingTool=null;["customName","customUrl","customIcon","customDescription"].forEach(function(id){document.getElementById(id).value="";});document.getElementById("customCategory").value="Chat";document.getElementById("customFormEyebrow").textContent="01 · Custom shortcut";document.getElementById("saveCustom").textContent="Save shortcut";}
+document.getElementById("cancelCustomEdit").addEventListener("click",resetCustomForm);
+document.getElementById("saveCustom").addEventListener("click",function(){
+ var name=document.getElementById("customName").value.trim(),url=document.getElementById("customUrl").value.trim();
+ if(!name){notify("Give the shortcut a name.");return;}if(!isHttps(url)){notify("Enter a valid HTTPS website address.");return;}
+ var data={name:name,url:new URL(url).href,category:document.getElementById("customCategory").value,icon:document.getElementById("customIcon").value.trim()||"✦",description:document.getElementById("customDescription").value.trim()||url};
+ if(editingTool){var old=customTools.find(function(t){return t.id===editingTool;});if(old)Object.assign(old,data);else editingTool=null;}
+ if(!editingTool)customTools.unshift(Object.assign({id:uid("custom"),custom:true},data));
+ save(KEY.custom,customTools);resetCustomForm();renderCustomTools();renderToolLists();notify("Custom shortcut saved.");
+});
+function renderCustomTools(){
+ document.getElementById("customCount").textContent=customTools.length+" custom";
+ var host=document.getElementById("customList");
+ host.innerHTML=customTools.length?customTools.map(function(t){return '<article class="list-card"><div class="tile-icon">'+esc(t.icon||"✦")+'</div><div class="list-card-main"><strong>'+esc(t.name)+'</strong><p>'+esc(t.url)+'</p><div class="meta">'+esc(t.category)+'</div></div><div class="list-card-actions"><button class="small-button" data-custom-open="'+esc(t.id)+'">Open</button><button class="small-button" data-custom-edit="'+esc(t.id)+'">Edit</button><button class="small-button danger-button" data-custom-delete="'+esc(t.id)+'">×</button></div></article>';}).join(""):'<div class="empty">No custom shortcuts yet. Add a website above.</div>';
+ host.querySelectorAll("[data-custom-open]").forEach(function(b){b.addEventListener("click",function(){var t=customTools.find(function(x){return x.id===b.getAttribute("data-custom-open");});if(t)openSite(t.url);});});
+ host.querySelectorAll("[data-custom-edit]").forEach(function(b){b.addEventListener("click",function(){var t=customTools.find(function(x){return x.id===b.getAttribute("data-custom-edit");});if(!t)return;editingTool=t.id;document.getElementById("customName").value=t.name;document.getElementById("customUrl").value=t.url;document.getElementById("customCategory").value=t.category;document.getElementById("customIcon").value=t.icon||"";document.getElementById("customDescription").value=t.description||"";document.getElementById("customFormEyebrow").textContent="01 · Edit shortcut";document.getElementById("saveCustom").textContent="Update shortcut";document.getElementById("customName").focus();});});
+ host.querySelectorAll("[data-custom-delete]").forEach(function(b){b.addEventListener("click",function(){var id=b.getAttribute("data-custom-delete");customTools=customTools.filter(function(t){return t.id!==id;});favorites=favorites.filter(function(v){return v!==id;});if(editingTool===id)resetCustomForm();save(KEY.custom,customTools);save(KEY.favorites,favorites);renderCustomTools();renderToolLists();});});
+}
+document.getElementById("customUrl").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("saveCustom").click();});
+
+/* Portable backup format, with structural checks before replacing local data. */
+function backupObject(){return {format:"mad-station-mobile-backup",version:3,exportedAt:new Date().toISOString(),favorites:favorites,customTools:customTools,notes:notes,tasks:tasks,prompts:prompts,clipboard:clipboardItems,theme:readText(KEY.theme,"dark"),accent:readText(KEY.accent,"blue")};}
+function backupJson(){return JSON.stringify(backupObject(),null,2);}
+document.getElementById("exportBackup").addEventListener("click",function(){shareText(backupJson());});
+document.getElementById("copyBackup").addEventListener("click",function(){copyText(backupJson());notify("Backup JSON copied. Keep it somewhere safe.");});
+document.getElementById("importBackup").addEventListener("click",function(){
+ var parsed;try{parsed=JSON.parse(document.getElementById("backupInput").value);}catch(e){notify("That is not valid JSON.");return;}
+ if(!parsed||parsed.format!=="mad-station-mobile-backup"||![2,3].includes(parsed.version)||!Array.isArray(parsed.favorites)||!Array.isArray(parsed.customTools)||!Array.isArray(parsed.notes)||!Array.isArray(parsed.tasks)||!Array.isArray(parsed.prompts)||(parsed.clipboard!==undefined&&!Array.isArray(parsed.clipboard))){notify("This does not look like a Mad Station Mobile backup.");return;}
+ var importedTools=parsed.customTools.filter(function(t){return t&&typeof t.id==="string"&&typeof t.name==="string"&&isHttps(t.url)&&typeof t.category==="string";});
+ var importedNotes=parsed.notes.filter(function(n){return n&&typeof n.id==="string"&&typeof n.body==="string"&&typeof n.title==="string";});
+ var importedTasks=parsed.tasks.filter(function(t){return t&&typeof t.id==="string"&&typeof t.text==="string";});
+ var importedPrompts=parsed.prompts.filter(function(p){return p&&typeof p.id==="string"&&typeof p.body==="string"&&typeof p.title==="string";});
+ var importedClipboard=(Array.isArray(parsed.clipboard)?parsed.clipboard:[]).filter(function(c){return c&&typeof c.id==="string"&&typeof c.text==="string"&&c.text.length<=12000;}).slice(0,50);
+ if(importedTools.length>300||importedNotes.length>5000||importedTasks.length>5000||importedPrompts.length>5000){notify("Backup exceeds supported item limits.");return;}
+ customTools=importedTools;notes=importedNotes;tasks=importedTasks;prompts=importedPrompts;clipboardItems=importedClipboard;
+ favorites=parsed.favorites.filter(function(id){return typeof id==="string"&&(BASE_TOOLS.some(function(t){return t.id===id;})||customTools.some(function(t){return t.id===id;}));});
+ save(KEY.custom,customTools);save(KEY.notes,notes);save(KEY.tasks,tasks);save(KEY.prompts,prompts);save(KEY.clipboard,clipboardItems);save(KEY.favorites,favorites);
+ setTheme(parsed.theme==="light"?"light":"dark");setAccent(parsed.accent);
+ document.getElementById("backupInput").value="";renderCustomTools();renderToolLists();renderNotes();renderTasks();renderPrompts();renderClipboard();notify("Backup restored.");
+});
+document.getElementById("resetLocal").addEventListener("click",function(){
+ if(!window.confirm("Delete this app's saved notes, tasks, prompts, custom shortcuts and favorites? This cannot be undone unless you have a backup."))return;
+ favorites=[];customTools=[];notes=[];tasks=[];prompts=[];
+ [KEY.favorites,KEY.custom,KEY.notes,KEY.tasks,KEY.prompts,KEY.clipboard].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+ clipboardItems=[];resetCustomForm();resetNoteForm();renderToolLists();renderCustomTools();renderNotes();renderTasks();renderPrompts();renderClipboard();notify("Local lists cleared.");
+});
+
+var theme=readText(KEY.theme,"dark");setTheme(theme==="light"?"light":"dark");setAccent(readText(KEY.accent,"blue"));
+renderToolLists();renderCustomTools();renderNotes();renderTasks();renderPrompts();
+}());
+</script>
+</body>
+</html>
