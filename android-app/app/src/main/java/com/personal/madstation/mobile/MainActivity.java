@@ -133,7 +133,7 @@ public final class MainActivity extends Activity {
 
         CookieManager cookies = CookieManager.getInstance();
         cookies.setAcceptCookie(true);
-        cookies.setAcceptThirdPartyCookies(webView, true);
+        cookies.setAcceptThirdPartyCookies(webView, false);
 
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
@@ -142,9 +142,6 @@ public final class MainActivity extends Activity {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
                 if ("https".equals(scheme)) {
-                    return false;
-                }
-                if ("http".equals(scheme) && isBrowser) {
                     return false;
                 }
                 if (isBrowser && ("mailto".equals(scheme) || "tel".equals(scheme))) {
