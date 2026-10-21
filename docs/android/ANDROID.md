@@ -12,12 +12,13 @@ while retaining the existing Windows application unchanged.
 - Built-in HTTPS browser with Back, Home, and Open in browser controls.
 - Basic native downloads through Android Download Manager, with system notifications and files saved to Downloads.
 - Custom HTTPS shortcuts with add, edit, and delete.
+- Clipboard snippet history and reusable saved snippets; for Android privacy, the app records only copies initiated inside Mad Station rather than monitoring the system clipboard.
 - **Prompt Studio:** prompt templates for coding, research, writing, image prompts,
   and learning; a local prompt formatter; and a saved prompt library.
 - **Notes:** create, edit, search, pin, copy, and delete notes.
 - **Tasks:** priorities, due dates, completion filters, and deletion.
 - Dark/light mode and accent color selection.
-- Local JSON backup and restore for favorites, shortcuts, prompts, notes, tasks,
+- Local JSON backup and restore for favorites, shortcuts, prompts, notes, tasks, clipboard snippets,
   and appearance settings, with native Android share/copy support.
 
 Prompt Studio formats user-supplied text locally; it does not call a model. AI
