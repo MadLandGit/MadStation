@@ -148,6 +148,7 @@ footer { color:var(--muted);font-size:11px;margin:24px 2px 0; }
   <button class="tab" data-page="favorites" aria-selected="false">★ Favorites</button>
   <button class="tab" data-page="prompts" aria-selected="false">Prompt Studio</button>
   <button class="tab" data-page="notes" aria-selected="false">Notes & Tasks</button>
+  <button class="tab" data-page="clipboard" aria-selected="false">Clipboard</button>
   <button class="tab" data-page="manage" aria-selected="false">Manage</button>
 </nav>
 
@@ -230,6 +231,18 @@ footer { color:var(--muted);font-size:11px;margin:24px 2px 0; }
   </div>
 </section>
 
+<section id="clipboardPage" class="hidden">
+  <div class="section-heading"><div><h3>Clipboard History</h3><p>Keep snippets you copy within Mad Station close at hand.</p></div></div>
+  <div class="panel">
+    <div class="eyebrow">01 · Save a snippet</div>
+    <label class="field-label" style="margin-top:10px">Text or prompt<textarea id="clipboardDraft" rows="4" maxlength="12000" placeholder="Type or paste a useful snippet to save it here…"></textarea></label>
+    <div class="row"><button class="secondary" id="clearClipboardDraft">Clear</button><button class="primary" id="saveClipboardSnippet">Save snippet</button></div>
+    <div class="section-heading"><h3>Recent copies and snippets</h3><span id="clipboardCount" class="small"></span></div>
+    <div class="card-list" id="clipboardList"></div>
+    <p class="status-note">For privacy, this history only records text copied from inside Mad Station Mobile or snippets you save here. It does not monitor or read the Android system clipboard in the background.</p>
+  </div>
+</section>
+
 <section id="managePage" class="hidden">
   <div class="section-heading"><div><h3>Manage your station</h3><p>Personalize shortcuts and keep a portable backup.</p></div></div>
   <div class="panel" id="customToolPanel">
@@ -270,7 +283,7 @@ footer { color:var(--muted);font-size:11px;margin:24px 2px 0; }
   </div>
 </section>
 
-<footer>Mad Station Mobile · Android companion · v1.1.0 · Favorites, notes, prompts and tasks are stored on this device and do not sync with the Windows app.</footer>
+<footer>Mad Station Mobile · Android companion · v1.2.0 · Personal data stays on this device and does not sync with the Windows app.</footer>
 </div>
 <div id="liveMessage" role="status" aria-live="polite" style="position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));background:var(--panel-strong);border:1px solid var(--line);border-radius:13px;padding:11px 14px;box-shadow:var(--shadow);display:none;z-index:99;font-size:13px"></div>
 
@@ -317,7 +330,7 @@ var BASE_TOOLS = [
 var KEY = {
 favorites:"madstation-mobile-favorites-v2", custom:"madstation-mobile-custom-tools-v2",
 notes:"madstation-mobile-notes-v2", tasks:"madstation-mobile-tasks-v2",
-prompts:"madstation-mobile-prompts-v2", theme:"madstation-mobile-theme-v2", accent:"madstation-mobile-accent-v2"
+prompts:"madstation-mobile-prompts-v2", clipboard:"madstation-mobile-clipboard-v1", theme:"madstation-mobile-theme-v2", accent:"madstation-mobile-accent-v2"
 };
 function readArray(key) {
  try { var val=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(val)?val:[]; }
@@ -333,6 +346,7 @@ var customTools=readArray(KEY.custom).filter(function(t){return t&&typeof t.id==
 var notes=readArray(KEY.notes).filter(function(n){return n&&typeof n.id==="string"&&typeof n.body==="string";});
 var tasks=readArray(KEY.tasks).filter(function(t){return t&&typeof t.id==="string"&&typeof t.text==="string";});
 var prompts=readArray(KEY.prompts).filter(function(p){return p&&typeof p.id==="string"&&typeof p.body==="string";});
+var clipboardItems=readArray(KEY.clipboard).filter(function(c){return c&&typeof c.id==="string"&&typeof c.text==="string";}).slice(0,100);
 var page="home",category="All",query="",taskFilter="all",editingNote=null,editingPrompt=null,editingTool=null,toastTimer=null;
 function isHttps(value){try{var url=new URL(String(value));return url.protocol==="https:"&&!!url.hostname;}catch(e){return false;}}
 function notify(message){var el=document.getElementById("liveMessage");el.textContent=message;el.style.display="block";if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.style.display="none";},2600);}
@@ -342,9 +356,11 @@ function openSite(url){
  else {window.open(url,"_blank","noopener");}
 }
 function copyText(text){
- if(window.MadStation&&typeof window.MadStation.copyText==="function"){window.MadStation.copyText(String(text));return;}
- if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(String(text)).then(function(){notify("Copied to clipboard.");}).catch(function(){notify("Copy was blocked by this browser.");});}
- else {var ta=document.createElement("textarea");ta.value=String(text);document.body.appendChild(ta);ta.select();try{document.execCommand("copy");notify("Copied to clipboard.");}catch(e){notify("Could not copy automatically.");}ta.remove();}
+ var value=String(text);
+ recordClipboard(value);
+ if(window.MadStation&&typeof window.MadStation.copyText==="function"){window.MadStation.copyText(value);return;}
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){notify("Copied to clipboard.");}).catch(function(){notify("Copy was blocked by this browser.");});}
+ else {var ta=document.createElement("textarea");ta.value=value;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");notify("Copied to clipboard.");}catch(e){notify("Could not copy automatically.");}ta.remove();}
 }
 function shareText(text){
  if(window.MadStation&&typeof window.MadStation.shareText==="function"){window.MadStation.shareText(String(text));return;}
@@ -379,12 +395,13 @@ function attachToolEvents(rootId){
 }
 function setPage(next){
  page=next;
- ["home","favorites","prompts","notes","manage"].forEach(function(p){document.getElementById(p+"Page").classList.toggle("hidden",p!==next);});
+ ["home","favorites","prompts","notes","clipboard","manage"].forEach(function(p){document.getElementById(p+"Page").classList.toggle("hidden",p!==next);});
  document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-page")===next?"true":"false");});
  if(next==="home")renderToolLists();
  if(next==="favorites")renderToolLists();
  if(next==="prompts"){renderPrompts();}
  if(next==="notes"){renderNotes();renderTasks();}
+ if(next==="clipboard")renderClipboard();
  if(next==="manage")renderCustomTools();
 }
 document.querySelectorAll(".tab").forEach(function(b){b.addEventListener("click",function(){setPage(b.getAttribute("data-page"));});});
@@ -486,6 +503,33 @@ function renderNotes(){
  host.querySelectorAll("[data-note-delete]").forEach(function(b){b.addEventListener("click",function(){notes=notes.filter(function(x){return x.id!==b.getAttribute("data-note-delete");});if(editingNote===b.getAttribute("data-note-delete"))resetNoteForm();save(KEY.notes,notes);renderNotes();});});
 }
 
+/* Clipboard history: deliberately limited to copies made inside this app. */
+function recordClipboard(text){
+ if(!text||text.length>12000)return;
+ var existing=clipboardItems.findIndex(function(item){return item.text===text;});
+ if(existing===0)return;
+ if(existing>0)clipboardItems.splice(existing,1);
+ clipboardItems.unshift({id:uid("clip"),text:text,createdAt:Date.now()});
+ clipboardItems=clipboardItems.slice(0,50);
+ save(KEY.clipboard,clipboardItems);
+ if(page==="clipboard")renderClipboard();
+}
+document.getElementById("clearClipboardDraft").addEventListener("click",function(){document.getElementById("clipboardDraft").value="";});
+document.getElementById("saveClipboardSnippet").addEventListener("click",function(){
+ var text=document.getElementById("clipboardDraft").value.trim();
+ if(!text){notify("Enter or paste a snippet first.");return;}
+ if(text.length>12000){notify("That snippet is too long to save in clipboard history.");return;}
+ recordClipboard(text);document.getElementById("clipboardDraft").value="";renderClipboard();notify("Snippet saved locally.");
+});
+function renderClipboard(){
+ var list=document.getElementById("clipboardList");
+ document.getElementById("clipboardCount").textContent=clipboardItems.length+" items";
+ list.innerHTML=clipboardItems.length?clipboardItems.map(function(item){return '<article class="list-card"><div class="list-card-main"><p>'+esc(item.text.slice(0,360))+(item.text.length>360?"…":"")+'</p><div class="meta">'+esc(new Date(item.createdAt||Date.now()).toLocaleString())+(item.text.length>12000?" · truncated":"")+'</div></div><div class="list-card-actions"><button class="small-button" data-clip-copy="'+esc(item.id)+'">Copy</button><button class="small-button" data-clip-note="'+esc(item.id)+'">To note</button><button class="small-button danger-button" data-clip-delete="'+esc(item.id)+'">×</button></div></article>';}).join(""):'<div class="empty">No clipboard items yet. Copy text in Prompt Studio or Notes, or save a snippet above.</div>';
+ list.querySelectorAll("[data-clip-copy]").forEach(function(b){b.addEventListener("click",function(){var item=clipboardItems.find(function(x){return x.id===b.getAttribute("data-clip-copy");});if(item)copyText(item.text);});});
+ list.querySelectorAll("[data-clip-note]").forEach(function(b){b.addEventListener("click",function(){var item=clipboardItems.find(function(x){return x.id===b.getAttribute("data-clip-note");});if(!item)return;notes.unshift({id:uid("note"),title:"Clipboard snippet",body:item.text,createdAt:Date.now(),updatedAt:Date.now(),pinned:false});save(KEY.notes,notes);setPage("notes");notify("Snippet saved as a note.");});});
+ list.querySelectorAll("[data-clip-delete]").forEach(function(b){b.addEventListener("click",function(){clipboardItems=clipboardItems.filter(function(x){return x.id!==b.getAttribute("data-clip-delete");});save(KEY.clipboard,clipboardItems);renderClipboard();});});
+}
+
 /* Tasks: priorities, due dates, filters and completion. */
 document.getElementById("addTask").addEventListener("click",addTask);
 document.getElementById("taskInput").addEventListener("keydown",function(e){if(e.key==="Enter")addTask();});
@@ -526,29 +570,30 @@ function renderCustomTools(){
 document.getElementById("customUrl").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("saveCustom").click();});
 
 /* Portable backup format, with structural checks before replacing local data. */
-function backupObject(){return {format:"mad-station-mobile-backup",version:2,exportedAt:new Date().toISOString(),favorites:favorites,customTools:customTools,notes:notes,tasks:tasks,prompts:prompts,theme:readText(KEY.theme,"dark"),accent:readText(KEY.accent,"blue")};}
+function backupObject(){return {format:"mad-station-mobile-backup",version:3,exportedAt:new Date().toISOString(),favorites:favorites,customTools:customTools,notes:notes,tasks:tasks,prompts:prompts,clipboard:clipboardItems,theme:readText(KEY.theme,"dark"),accent:readText(KEY.accent,"blue")};}
 function backupJson(){return JSON.stringify(backupObject(),null,2);}
 document.getElementById("exportBackup").addEventListener("click",function(){shareText(backupJson());});
 document.getElementById("copyBackup").addEventListener("click",function(){copyText(backupJson());notify("Backup JSON copied. Keep it somewhere safe.");});
 document.getElementById("importBackup").addEventListener("click",function(){
  var parsed;try{parsed=JSON.parse(document.getElementById("backupInput").value);}catch(e){notify("That is not valid JSON.");return;}
- if(!parsed||parsed.format!=="mad-station-mobile-backup"||!Array.isArray(parsed.favorites)||!Array.isArray(parsed.customTools)||!Array.isArray(parsed.notes)||!Array.isArray(parsed.tasks)||!Array.isArray(parsed.prompts)){notify("This does not look like a Mad Station Mobile backup.");return;}
+ if(!parsed||parsed.format!=="mad-station-mobile-backup"||![2,3].includes(parsed.version)||!Array.isArray(parsed.favorites)||!Array.isArray(parsed.customTools)||!Array.isArray(parsed.notes)||!Array.isArray(parsed.tasks)||!Array.isArray(parsed.prompts)||(parsed.clipboard!==undefined&&!Array.isArray(parsed.clipboard))){notify("This does not look like a Mad Station Mobile backup.");return;}
  var importedTools=parsed.customTools.filter(function(t){return t&&typeof t.id==="string"&&typeof t.name==="string"&&isHttps(t.url)&&typeof t.category==="string";});
  var importedNotes=parsed.notes.filter(function(n){return n&&typeof n.id==="string"&&typeof n.body==="string"&&typeof n.title==="string";});
  var importedTasks=parsed.tasks.filter(function(t){return t&&typeof t.id==="string"&&typeof t.text==="string";});
  var importedPrompts=parsed.prompts.filter(function(p){return p&&typeof p.id==="string"&&typeof p.body==="string"&&typeof p.title==="string";});
+ var importedClipboard=(Array.isArray(parsed.clipboard)?parsed.clipboard:[]).filter(function(c){return c&&typeof c.id==="string"&&typeof c.text==="string"&&c.text.length<=12000;}).slice(0,50);
  if(importedTools.length>300||importedNotes.length>5000||importedTasks.length>5000||importedPrompts.length>5000){notify("Backup exceeds supported item limits.");return;}
- customTools=importedTools;notes=importedNotes;tasks=importedTasks;prompts=importedPrompts;
+ customTools=importedTools;notes=importedNotes;tasks=importedTasks;prompts=importedPrompts;clipboardItems=importedClipboard;
  favorites=parsed.favorites.filter(function(id){return typeof id==="string"&&(BASE_TOOLS.some(function(t){return t.id===id;})||customTools.some(function(t){return t.id===id;}));});
- save(KEY.custom,customTools);save(KEY.notes,notes);save(KEY.tasks,tasks);save(KEY.prompts,prompts);save(KEY.favorites,favorites);
+ save(KEY.custom,customTools);save(KEY.notes,notes);save(KEY.tasks,tasks);save(KEY.prompts,prompts);save(KEY.clipboard,clipboardItems);save(KEY.favorites,favorites);
  setTheme(parsed.theme==="light"?"light":"dark");setAccent(parsed.accent);
- document.getElementById("backupInput").value="";renderCustomTools();renderToolLists();renderNotes();renderTasks();renderPrompts();notify("Backup restored.");
+ document.getElementById("backupInput").value="";renderCustomTools();renderToolLists();renderNotes();renderTasks();renderPrompts();renderClipboard();notify("Backup restored.");
 });
 document.getElementById("resetLocal").addEventListener("click",function(){
  if(!window.confirm("Delete this app's saved notes, tasks, prompts, custom shortcuts and favorites? This cannot be undone unless you have a backup."))return;
  favorites=[];customTools=[];notes=[];tasks=[];prompts=[];
- [KEY.favorites,KEY.custom,KEY.notes,KEY.tasks,KEY.prompts].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
- resetCustomForm();resetNoteForm();renderToolLists();renderCustomTools();renderNotes();renderTasks();renderPrompts();notify("Local lists cleared.");
+ [KEY.favorites,KEY.custom,KEY.notes,KEY.tasks,KEY.prompts,KEY.clipboard].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+ clipboardItems=[];resetCustomForm();resetNoteForm();renderToolLists();renderCustomTools();renderNotes();renderTasks();renderPrompts();renderClipboard();notify("Local lists cleared.");
 });
 
 var theme=readText(KEY.theme,"dark");setTheme(theme==="light"?"light":"dark");setAccent(readText(KEY.accent,"blue"));
