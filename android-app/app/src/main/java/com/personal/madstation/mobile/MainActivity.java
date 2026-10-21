@@ -3,6 +3,9 @@ package com.personal.madstation.mobile;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,7 +13,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
-import android.webkit.SafeBrowsingResponse;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -210,6 +212,32 @@ public final class MainActivity extends Activity {
         @JavascriptInterface
         public void openSite(String url) {
             runOnUiThread(() -> openBrowser(url));
+        }
+
+        @JavascriptInterface
+        public void copyText(String text) {
+            runOnUiThread(() -> {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard != null) {
+                    String safeText = text == null ? "" : text;
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Mad Station", safeText));
+                    Toast.makeText(MainActivity.this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void shareText(String text) {
+            runOnUiThread(() -> {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, text == null ? "" : text);
+                try {
+                    startActivity(Intent.createChooser(intent, "Share Mad Station backup"));
+                } catch (ActivityNotFoundException exception) {
+                    Toast.makeText(MainActivity.this, "No app can share this text.", Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
