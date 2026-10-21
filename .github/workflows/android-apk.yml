@@ -31,6 +31,10 @@ jobs:
         with:
           gradle-version: "8.9"
 
+      - name: Validate mobile HTML and JavaScript
+        working-directory: android-app
+        run: node test-mobile-html.mjs
+
       - name: Assemble debug APK
         working-directory: android-app
         run: gradle --no-daemon --stacktrace assembleDebug
