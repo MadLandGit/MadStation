@@ -15,7 +15,7 @@ const references = [...scripts[0][1].matchAll(/getElementById\(["']([^"']+)["']\
 const missing = [...new Set(references.filter((id) => !idSet.has(id)))];
 if (missing.length) throw new Error("Missing static element IDs: " + missing.join(", "));
 
-for (const feature of ["Prompt Studio", "Notes & Tasks", "Backup & restore", "Custom shortcut"]) {
+for (const feature of ["Prompt Studio", "Notes & Tasks", "Backup & restore", "Custom shortcut", "Clipboard History"]) {
   if (!html.includes(feature)) throw new Error("Missing expected feature label: " + feature);
 }
 console.log("Android mobile HTML smoke test passed: script syntax, static IDs and feature sections.");
