@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10141b">
+<title>Mad Station Mobile</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: Canvas;
+  --fg: CanvasText;
+  --muted: color-mix(in srgb, CanvasText 64%, Canvas);
+  --panel: color-mix(in srgb, Canvas 94%, CanvasText);
+  --panel-strong: color-mix(in srgb, Canvas 88%, CanvasText);
+  --line: color-mix(in srgb, CanvasText 17%, Canvas);
+  --accent: LinkText;
+  --accent-soft: color-mix(in srgb, LinkText 18%, Canvas);
+  --shadow: 0 10px 28px color-mix(in srgb, CanvasText 12%, transparent);
+}
+:root[data-theme="light"] { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  min-height: 100vh;
+}
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+.app { width: min(100%, 760px); margin: 0 auto; padding: 18px 16px 36px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 24px; }
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.logo {
+  width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto;
+  border-radius: 14px; font-weight: 900; font-size: 17px;
+  background: var(--accent-soft); border: 1px solid var(--line); color: var(--fg);
+}
+.brand h1 { font-size: 18px; margin: 0; letter-spacing: -.35px; }
+.brand p { color: var(--muted); font-size: 12px; margin: 2px 0 0; }
+.icon-button, .tab, .category, .secondary, .primary {
+  border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+  border-radius: 13px; min-height: 42px; padding: 9px 12px;
+}
+.icon-button { min-width: 44px; font-size: 18px; }
+.hero { padding: 20px; border: 1px solid var(--line); background: var(--panel); border-radius: 22px; box-shadow: var(--shadow); }
+.eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: 1.4px; font-size: 10px; font-weight: 800; }
+.hero h2 { font-size: clamp(23px, 6vw, 31px); line-height: 1.12; letter-spacing: -.8px; margin: 9px 0 8px; }
+.hero p { color: var(--muted); margin: 0 0 17px; font-size: 13px; }
+.search { display: flex; gap: 8px; }
+.search input, .field, textarea {
+  min-width: 0; width: 100%; background: var(--bg); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 13px; padding: 12px 13px; outline: none;
+}
+.search input:focus, .field:focus, textarea:focus { border-color: var(--accent); }
+.primary { background: var(--accent-soft); font-weight: 750; white-space: nowrap; }
+nav { display: flex; gap: 8px; margin: 20px 0 16px; overflow-x: auto; padding-bottom: 3px; }
+.tab { white-space: nowrap; min-height: 38px; padding: 7px 13px; font-size: 13px; }
+.tab[aria-selected="true"], .category[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.section-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; margin: 22px 0 12px; }
+.section-heading h3 { font-size: 16px; margin: 0; }
+.small { color: var(--muted); font-size: 12px; }
+.categories { display:flex; gap:7px; overflow-x:auto; margin: 0 0 13px; padding-bottom: 2px; }
+.category { min-height: 34px; padding: 6px 11px; font-size: 12px; white-space: nowrap; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.tile {
+  min-width: 0; position: relative; display: flex; flex-direction: column; gap: 11px;
+  text-align: left; padding: 14px; border: 1px solid var(--line); border-radius: 18px;
+  background: var(--panel); color: var(--fg); min-height: 130px; box-shadow: 0 4px 16px color-mix(in srgb, CanvasText 5%, transparent);
+}
+.tile:active { transform: scale(.985); }
+.tile-top { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.tile-icon { width: 38px; height: 38px; display:grid; place-items:center; border:1px solid var(--line); border-radius:13px; background:var(--accent-soft); font-size:19px; font-weight:800; }
+.star { background:transparent; color:var(--muted); border:0; font-size:21px; padding:0 2px; line-height:1; }
+.star.active { color: var(--accent); }
+.tile strong { display:block; font-size:14px; line-height:1.2; }
+.tile small { display:block; color:var(--muted); font-size:11px; margin-top:5px; line-height:1.35; }
+.badge { display:inline-flex; align-self:flex-start; border:1px solid var(--line); border-radius:20px; padding:3px 7px; font-size:10px; color:var(--muted); }
+.empty { border:1px dashed var(--line); border-radius:16px; padding:22px 16px; text-align:center; color:var(--muted); grid-column:1/-1; }
+.notice { color:var(--muted); font-size:11px; margin:18px 2px 0; }
+.panel { border:1px solid var(--line); background:var(--panel); border-radius:19px; padding:15px; margin-top:13px; }
+.panel h3 { font-size:15px; margin:0 0 5px; }
+.panel p { color:var(--muted); font-size:12px; margin:0 0 12px; }
+textarea { resize:vertical; min-height:90px; }
+.row { display:flex; gap:8px; margin-top:9px; }
+.row .field { flex:1; }
+.primary, .secondary { font-size:13px; }
+.items { display:grid; gap:8px; margin-top:12px; }
+.item { display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:13px; padding:11px; overflow-wrap:anywhere; }
+.item span { flex:1; white-space:pre-wrap; }
+.item .delete { background:transparent; color:var(--muted); border:0; font-size:18px; }
+.item input { margin-top:4px; accent-color: var(--accent); }
+.item.done span { text-decoration:line-through; color:var(--muted); }
+.hidden { display:none !important; }
+@media (min-width: 560px) {
+  .app { padding: 28px 22px 46px; }
+  .grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .hero { padding: 26px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">MS</div>
+      <div><h1>Mad Station</h1><p>Your AI workspace, on the go</p></div>
+    </div>
+    <button class="icon-button" id="themeButton" aria-label="Toggle theme" title="Toggle theme">☼</button>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Mobile workspace</div>
+    <h2>All your AI tools.<br>One station.</h2>
+    <p>Jump into your favourite AI services, save shortcuts, and keep lightweight notes and tasks on this device.</p>
+    <div class="search">
+      <input id="searchInput" type="search" placeholder="Find a tool…" autocomplete="off" aria-label="Find an AI tool">
+      <button id="clearSearch" class="primary" type="button">Clear</button>
+    </div>
+  </section>
+
+  <nav aria-label="Main navigation">
+    <button class="tab" data-page="home" aria-selected="true">Discover</button>
+    <button class="tab" data-page="favorites" aria-selected="false">★ Favorites</button>
+    <button class="tab" data-page="notes" aria-selected="false">Notes & Tasks</button>
+  </nav>
+
+  <section id="homePage">
+    <div class="section-heading"><h3 id="listTitle">Quick access</h3><span class="small" id="toolCount"></span></div>
+    <div class="categories" id="categories">
+      <button class="category" data-category="All" aria-pressed="true">All tools</button>
+      <button class="category" data-category="Chat" aria-pressed="false">Chat</button>
+      <button class="category" data-category="Images" aria-pressed="false">Images</button>
+      <button class="category" data-category="Video" aria-pressed="false">Video</button>
+      <button class="category" data-category="Research" aria-pressed="false">Research</button>
+    </div>
+    <div class="grid" id="toolGrid"></div>
+    <p class="notice">Websites are third-party services and may require their own sign-in or subscription. If a site blocks in-app sign-in, use ↗ in the browser bar to open it in your regular browser.</p>
+  </section>
+
+  <section id="favoritesPage" class="hidden">
+    <div class="section-heading"><h3>Your favorites</h3><span class="small">Saved on this device</span></div>
+    <div class="grid" id="favoriteGrid"></div>
+  </section>
+
+  <section id="notesPage" class="hidden">
+    <div class="section-heading"><h3>Notes & Tasks</h3><span class="small">Stored locally</span></div>
+    <div class="panel">
+      <h3>Quick note</h3><p>Notes stay on this device and are not synced with the Windows app.</p>
+      <textarea id="noteInput" placeholder="Write an idea, a prompt, or something to remember…"></textarea>
+      <div class="row"><button id="saveNote" class="primary">Save note</button></div>
+      <div id="notesList" class="items"></div>
+    </div>
+    <div class="panel">
+      <h3>Tasks</h3><p>A simple personal checklist.</p>
+      <div class="row"><input id="taskInput" class="field" placeholder="Add a task…" maxlength="180"><button id="addTask" class="primary">Add</button></div>
+      <div id="tasksList" class="items"></div>
+    </div>
+  </section>
+
+  <p class="notice">Mad Station Mobile · Android companion preview · v1.0.0</p>
+</div>
+<script>
+(function () {
+  "use strict";
+  var tools = [
+    { id:"chatgpt", name:"ChatGPT", description:"Chat, write, learn and build", category:"Chat", icon:"✦", url:"https://chatgpt.com/" },
+    { id:"claude", name:"Claude", description:"Writing, analysis and coding", category:"Chat", icon:"✳", url:"https://claude.ai/" },
+    { id:"gemini", name:"Gemini", description:"Google’s AI assistant", category:"Chat", icon:"✧", url:"https://gemini.google.com/" },
+    { id:"copilot", name:"Copilot", description:"Microsoft AI assistant", category:"Chat", icon:"◈", url:"https://copilot.microsoft.com/" },
+    { id:"deepseek", name:"DeepSeek", description:"Reasoning and general chat", category:"Chat", icon:"⌘", url:"https://chat.deepseek.com/" },
+    { id:"mistral", name:"Le Chat", description:"Mistral’s AI assistant", category:"Chat", icon:"M", url:"https://chat.mistral.ai/" },
+    { id:"perplexity", name:"Perplexity", description:"Answers with web sources", category:"Research", icon:"⌕", url:"https://www.perplexity.ai/" },
+    { id:"grok", name:"Grok", description:"Assistant from xAI", category:"Chat", icon:"𝕏", url:"https://grok.com/" },
+    { id:"ideogram", name:"Ideogram", description:"Image generation and design", category:"Images", icon:"▧", url:"https://ideogram.ai/" },
+    { id:" leonardo", name:"Leonardo.Ai", description:"Create AI images and assets", category:"Images", icon:"◉", url:"https://leonardo.ai/" },
+    { id:"adobe-firefly", name:"Adobe Firefly", description:"Generate and edit visuals", category:"Images", icon:"✺", url:"https://firefly.adobe.com/" },
+    { id:"runway", name:"Runway", description:"AI video and creative tools", category:"Video", icon:"▶", url:"https://runwayml.com/" },
+    { id:"pika", name:"Pika", description:"AI video creation", category:"Video", icon:"▸", url:"https://pika.art/" },
+    { id:"kling", name:"Kling AI", description:"AI video generation", category:"Video", icon:"K", url:"https://klingai.com/" }
+  ];
+  var favorites = readArray("madstation-mobile-favorites");
+  var notes = readArray("madstation-mobile-notes");
+  var tasks = readArray("madstation-mobile-tasks");
+  var category = "All";
+  var page = "home";
+  var query = "";
+
+  function readArray(key) {
+    try { var value = JSON.parse(localStorage.getItem(key) || "[]"); return Array.isArray(value) ? value : []; }
+    catch (e) { return []; }
+  }
+  function save(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+  function escapeHtml(value) {
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function openSite(url) {
+    if (window.MadStation && typeof window.MadStation.openSite === "function") {
+      window.MadStation.openSite(url);
+    } else {
+      window.open(url, "_blank", "noopener");
+    }
+  }
+  function visibleTools() {
+    return tools.filter(function (tool) {
+      var categoryMatches = category === "All" || tool.category === category;
+      var text = (tool.name + " " + tool.description + " " + tool.category).toLowerCase();
+      return categoryMatches && text.indexOf(query.toLowerCase()) !== -1;
+    });
+  }
+  function toolMarkup(tool) {
+    var active = favorites.indexOf(tool.id) !== -1;
+    return '<article class="tile">' +
+      '<div class="tile-top"><div class="tile-icon">' + escapeHtml(tool.icon) + '</div>' +
+      '<button class="star ' + (active ? "active" : "") + '" data-favorite="' + escapeHtml(tool.id) + '" aria-label="' + (active ? "Remove from" : "Add to") + ' favorites">' + (active ? "★" : "☆") + '</button></div>' +
+      '<div data-open="' + escapeHtml(tool.id) + '"><strong>' + escapeHtml(tool.name) + '</strong><small>' + escapeHtml(tool.description) + '</small></div>' +
+      '<span class="badge">' + escapeHtml(tool.category) + '</span>' +
+      '</article>';
+  }
+  function renderTools() {
+    var list = page === "favorites" ? tools.filter(function (t) { return favorites.indexOf(t.id) !== -1; }) : visibleTools();
+    if (page === "favorites") {
+      document.getElementById("favoriteGrid").innerHTML = list.length ? list.map(toolMarkup).join("") : '<div class="empty">No favorites yet. Tap ☆ on any tool to save it here.</div>';
+      attachTileEvents("favoriteGrid");
+      return;
+    }
+    document.getElementById("toolGrid").innerHTML = list.length ? list.map(toolMarkup).join("") : '<div class="empty">No tools match this search.</div>';
+    document.getElementById("toolCount").textContent = list.length + (list.length === 1 ? " tool" : " tools");
+    attachTileEvents("toolGrid");
+  }
+  function attachTileEvents(rootId) {
+    var root = document.getElementById(rootId);
+    root.querySelectorAll("[data-open]").forEach(function (element) {
+      element.addEventListener("click", function () {
+        var item = tools.find(function (tool) { return tool.id === element.getAttribute("data-open"); });
+        if (item) openSite(item.url);
+      });
+    });
+    root.querySelectorAll("[data-favorite]").forEach(function (element) {
+      element.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var id = element.getAttribute("data-favorite");
+        favorites = favorites.indexOf(id) === -1 ? favorites.concat([id]) : favorites.filter(function (value) { return value !== id; });
+        save("madstation-mobile-favorites", favorites);
+        renderTools();
+      });
+    });
+  }
+  function setPage(next) {
+    page = next;
+    document.getElementById("homePage").classList.toggle("hidden", next !== "home");
+    document.getElementById("favoritesPage").classList.toggle("hidden", next !== "favorites");
+    document.getElementById("notesPage").classList.toggle("hidden", next !== "notes");
+    document.querySelectorAll(".tab").forEach(function (button) {
+      button.setAttribute("aria-selected", button.getAttribute("data-page") === next ? "true" : "false");
+    });
+    document.getElementById("listTitle").textContent = next === "favorites" ? "Your favorites" : "Quick access";
+    renderTools();
+    renderNotes();
+    renderTasks();
+  }
+  function renderNotes() {
+    var list = document.getElementById("notesList");
+    list.innerHTML = notes.length ? notes.map(function (note, index) {
+      return '<div class="item"><span>' + escapeHtml(note.text) + '</span><button class="delete" data-delete-note="' + index + '" aria-label="Delete note">×</button></div>';
+    }).join("") : '<div class="small">Your saved notes will appear here.</div>';
+    list.querySelectorAll("[data-delete-note]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        notes.splice(Number(button.getAttribute("data-delete-note")), 1);
+        save("madstation-mobile-notes", notes);
+        renderNotes();
+      });
+    });
+  }
+  function renderTasks() {
+    var list = document.getElementById("tasksList");
+    list.innerHTML = tasks.length ? tasks.map(function (task, index) {
+      return '<div class="item ' + (task.done ? "done" : "") + '"><input type="checkbox" data-task-check="' + index + '" ' + (task.done ? "checked" : "") + '><span>' + escapeHtml(task.text) + '</span><button class="delete" data-delete-task="' + index + '" aria-label="Delete task">×</button></div>';
+    }).join("") : '<div class="small">No tasks yet. Add one above.</div>';
+    list.querySelectorAll("[data-task-check]").forEach(function (box) {
+      box.addEventListener("change", function () {
+        tasks[Number(box.getAttribute("data-task-check"))].done = box.checked;
+        save("madstation-mobile-tasks", tasks);
+        renderTasks();
+      });
+    });
+    list.querySelectorAll("[data-delete-task]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        tasks.splice(Number(button.getAttribute("data-delete-task")), 1);
+        save("madstation-mobile-tasks", tasks);
+        renderTasks();
+      });
+    });
+  }
+
+  document.querySelectorAll(".tab").forEach(function (button) {
+    button.addEventListener("click", function () { setPage(button.getAttribute("data-page")); });
+  });
+  document.querySelectorAll(".category").forEach(function (button) {
+    button.addEventListener("click", function () {
+      category = button.getAttribute("data-category");
+      document.querySelectorAll(".category").forEach(function (item) {
+        item.setAttribute("aria-pressed", item === button ? "true" : "false");
+      });
+      renderTools();
+    });
+  });
+  document.getElementById("searchInput").addEventListener("input", function (event) {
+    query = event.target.value.trim();
+    renderTools();
+  });
+  document.getElementById("searchInput").addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && /^https:\/\//i.test(query)) {
+      openSite(query);
+    }
+  });
+  document.getElementById("clearSearch").addEventListener("click", function () {
+    document.getElementById("searchInput").value = "";
+    query = "";
+    category = "All";
+    document.querySelectorAll(".category").forEach(function (item) { item.setAttribute("aria-pressed", item.getAttribute("data-category") === "All" ? "true" : "false"); });
+    renderTools();
+  });
+  document.getElementById("themeButton").addEventListener("click", function () {
+    var root = document.documentElement;
+    var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+    root.setAttribute("data-theme", next);
+    save("madstation-mobile-theme", next);
+  });
+  var savedTheme = localStorage.getItem("madstation-mobile-theme");
+  if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
+  document.getElementById("saveNote").addEventListener("click", function () {
+    var input = document.getElementById("noteInput");
+    var text = input.value.trim();
+    if (!text) return;
+    notes.unshift({ text: text, createdAt: Date.now() });
+    save("madstation-mobile-notes", notes);
+    input.value = "";
+    renderNotes();
+  });
+  document.getElementById("addTask").addEventListener("click", addTask);
+  document.getElementById("taskInput").addEventListener("keydown", function (event) { if (event.key === "Enter") addTask(); });
+  function addTask() {
+    var input = document.getElementById("taskInput");
+    var text = input.value.trim();
+    if (!text) return;
+    tasks.unshift({ text: text, done: false });
+    save("madstation-mobile-tasks", tasks);
+    input.value = "";
+    renderTasks();
+  }
+  renderTools();
+  renderNotes();
+  renderTasks();
+}());
+</script>
+</body>
+</html>
